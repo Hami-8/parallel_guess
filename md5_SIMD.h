@@ -40,16 +40,27 @@ typedef unsigned int bit32;
 // 可以看到，FGHI四个函数都涉及一系列位运算，在数据上是对齐的，非常容易实现SIMD的并行化
 
 #define F(x, y, z) (((x) & (y)) | ((~x) & (z)))
-// SIMD version of F(x, y, z) for 4 32-bit integers
-uint32x4_t F(uint32x4_t x, uint32x4_t y, uint32x4_t z) {
-    uint32x4_t and_xy = vand(x, y);       // (x & y)
-    uint32x4_t not_x = vmvn(x);           // ~x
-    uint32x4_t and_not_xz = vand(not_x, z); // (~x & z)
-    return vorr(and_xy, and_not_xz);      // ((x & y) | (~x & z))
+
+inline uint32x4_t F_NEON(uint32x4_t x, uint32x4_t y, uint32x4_t z) {
+    return vorrq_u32(vandq_u32(x, y), vandq_u32(vmvnq_u32(x), z));
 }
+
 #define G(x, y, z) (((x) & (z)) | ((y) & (~z)))
+
+// NEON 实现 G(x, y, z) 函数，处理 4 个操作数
+inline uint32x4_t G_NEON(uint32x4_t x, uint32x4_t y, uint32x4_t z) {
+    return vorrq_u32(vandq_u32(x, z), vandq_u32(y, vmvnq_u32(z)));
+}
+
 #define H(x, y, z) ((x) ^ (y) ^ (z))
+inline uint32x4_t H_NEON(uint32x4_t x, uint32x4_t y, uint32x4_t z) {
+    return veorq_u32(x, veorq_u32(y, z));
+}
+
 #define I(x, y, z) ((y) ^ ((x) | (~z)))
+inline uint32x4_t I_NEON(uint32x4_t x, uint32x4_t y, uint32x4_t z) {
+    return veorq_u32(y, vorrq_u32(x, vmvnq_u32(z)));
+}
 
 /**
  * @Rotate Left.
@@ -65,10 +76,25 @@ uint32x4_t F(uint32x4_t x, uint32x4_t y, uint32x4_t z) {
 // 但是你需要注意的是#define的功能及其效果，可以发现这里的FGHI是没有返回值的，为什么呢？你可以查询#define的含义和用法
 #define ROTATELEFT(num, n) (((num) << (n)) | ((num) >> (32-(n))))
 
+inline uint32x4_t ROTATELEFT_NEON(uint32x4_t num, uint32_t n) {
+    uint32x4_t left_shifted = vshlq_n_u32(num, n); // 左移n位
+    uint32x4_t right_shifted = vshrq_n_u32(num, 32 - n); // 右移(32-n)位
+    return vorrq_u32(left_shifted, right_shifted); // 合并两者
+}
+
 #define FF(a, b, c, d, x, s, ac) { \
   (a) += F ((b), (c), (d)) + (x) + ac; \
   (a) = ROTATELEFT ((a), (s)); \
   (a) += (b); \
+}
+
+inline void FF_NEON(uint32x4_t &a, uint32x4_t b, uint32x4_t c, uint32x4_t d, uint32x4_t x, uint32_t s, uint32_t ac) {
+    uint32x4_t f_result = F_NEON(b, c, d);  // 使用F函数并行计算
+    uint32x4_t sum = vaddq_u32(f_result, x); // f_result + x
+    sum = vaddq_u32(sum, vdupq_n_u32(ac));   // 加上常数ac
+    a = vaddq_u32(a, sum);                   // (a) += f_result + x + ac
+    a = ROTATELEFT_NEON(a, s);               // 旋转操作
+    a = vaddq_u32(a, b);                    // 最后 (a) += b
 }
 
 #define GG(a, b, c, d, x, s, ac) { \
@@ -76,15 +102,44 @@ uint32x4_t F(uint32x4_t x, uint32x4_t y, uint32x4_t z) {
   (a) = ROTATELEFT ((a), (s)); \
   (a) += (b); \
 }
+
+inline void GG_NEON(uint32x4_t &a, uint32x4_t b, uint32x4_t c, uint32x4_t d, uint32x4_t x, uint32_t s, uint32_t ac) {
+    uint32x4_t g_result = G_NEON(b, c, d);  // 计算 G 函数结果
+    uint32x4_t sum = vaddq_u32(g_result, x); // 结果加上 x
+    sum = vaddq_u32(sum, vdupq_n_u32(ac));   // 加上常数 ac
+    a = vaddq_u32(a, sum);                   // (a) += G(b, c, d) + x + ac
+    a = ROTATELEFT_NEON(a, s);               // 旋转
+    a = vaddq_u32(a, b);                    // (a) += b
+}
+
 #define HH(a, b, c, d, x, s, ac) { \
   (a) += H ((b), (c), (d)) + (x) + ac; \
   (a) = ROTATELEFT ((a), (s)); \
   (a) += (b); \
 }
+
+inline void HH_NEON(uint32x4_t &a, uint32x4_t b, uint32x4_t c, uint32x4_t d, uint32x4_t x, uint32_t s, uint32_t ac) {
+    uint32x4_t h_result = H_NEON(b, c, d);  // 计算 H 函数结果
+    uint32x4_t sum = vaddq_u32(h_result, x); // 结果加上 x
+    sum = vaddq_u32(sum, vdupq_n_u32(ac));   // 加上常数 ac
+    a = vaddq_u32(a, sum);                   // (a) += H(b, c, d) + x + ac
+    a = ROTATELEFT_NEON(a, s);               // 旋转
+    a = vaddq_u32(a, b);                    // (a) += b
+}
+
 #define II(a, b, c, d, x, s, ac) { \
   (a) += I ((b), (c), (d)) + (x) + ac; \
   (a) = ROTATELEFT ((a), (s)); \
   (a) += (b); \
+}
+
+inline void II_NEON(uint32x4_t &a, uint32x4_t b, uint32x4_t c, uint32x4_t d, uint32x4_t x, uint32_t s, uint32_t ac) {
+    uint32x4_t i_result = I_NEON(b, c, d);  // 计算 I 函数结果
+    uint32x4_t sum = vaddq_u32(i_result, x); // 结果加上 x
+    sum = vaddq_u32(sum, vdupq_n_u32(ac));   // 加上常数 ac
+    a = vaddq_u32(a, sum);                   // (a) += I(b, c, d) + x + ac
+    a = ROTATELEFT_NEON(a, s);               // 旋转
+    a = vaddq_u32(a, b);                    // (a) += b
 }
 
 void MD5Hash(string input, bit32 *state);
