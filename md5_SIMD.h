@@ -40,6 +40,13 @@ typedef unsigned int bit32;
 // 可以看到，FGHI四个函数都涉及一系列位运算，在数据上是对齐的，非常容易实现SIMD的并行化
 
 #define F(x, y, z) (((x) & (y)) | ((~x) & (z)))
+// SIMD version of F(x, y, z) for 4 32-bit integers
+uint32x4_t F(uint32x4_t x, uint32x4_t y, uint32x4_t z) {
+    uint32x4_t and_xy = vand(x, y);       // (x & y)
+    uint32x4_t not_x = vmvn(x);           // ~x
+    uint32x4_t and_not_xz = vand(not_x, z); // (~x & z)
+    return vorr(and_xy, and_not_xz);      // ((x & y) | (~x & z))
+}
 #define G(x, y, z) (((x) & (z)) | ((y) & (~z)))
 #define H(x, y, z) ((x) ^ (y) ^ (z))
 #define I(x, y, z) ((y) ^ ((x) | (~z)))
