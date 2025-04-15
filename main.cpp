@@ -30,7 +30,7 @@ int main()
     auto start = system_clock::now();
     // 由于需要定期清空内存，我们在这里记录已生成的猜测总数
     int history = 0;
-    // std::ofstream a("./files/results.txt");
+    std::ofstream a("./files/results_right.txt");
     while (!q.priority.empty())
     {
         q.PopNext();
@@ -65,12 +65,12 @@ int main()
                 MD5Hash(pw, state);
 
                 // 以下注释部分用于输出猜测和哈希，但是由于自动测试系统不太能写文件，所以这里你可以改成cout
-                // a<<pw<<"\t";
-                // for (int i1 = 0; i1 < 4; i1 += 1)
-                // {
-                //     a << std::setw(8) << std::setfill('0') << hex << state[i1];
-                // }
-                // a << endl;
+                a<<pw<<"\t";
+                for (int i1 = 0; i1 < 4; i1 += 1)
+                {
+                    a << std::setw(8) << std::setfill('0') << hex << state[i1];
+                }
+                a << endl;
             }
 
             // 在这里对哈希所需的总时长进行计算
