@@ -142,4 +142,4 @@ inline void II_NEON(uint32x4_t &a, uint32x4_t b, uint32x4_t c, uint32x4_t d, uin
     a = vaddq_u32(a, b);                    // (a) += b
 }
 
-void MD5Hash(string input, bit32 *state);
+void MD5Hash_SIMD(const std::string inputs[4], bit32 state_out[4][4]);

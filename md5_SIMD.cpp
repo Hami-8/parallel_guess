@@ -80,7 +80,7 @@ Byte *StringProcess(string input, int *n_byte)
  * @param[out] state 用于给调用者传递额外的返回值，即最终的缓冲区，也就是MD5的结果
  * @return Byte消息数组
  */
-void MD5Hash(const std::string inputs[4], bit32 state_out[4][4])
+void MD5Hash_SIMD(const std::string inputs[4], bit32 state_out[4][4])
 {
 
 	Byte* paddedMessages[4];
@@ -217,7 +217,8 @@ void MD5Hash(const std::string inputs[4], bit32 state_out[4][4])
 	// 后处理：对输出每个 32 位数进行字节顺序转换（大端转换）
 	for (int i = 0; i < 4; i++) {
 		uint32_t temp[4];
-		vst1q_u32(temp, state_out[i]);
+		uint32x4_t vec = vld1q_u32(state_out[i]); // 加载为 NEON 向量
+		vst1q_u32(temp, vec);
 		for (int j = 0; j < 4; j++) {
 			uint32_t value = temp[j];
 			temp[j] = ((value & 0xff) << 24) |
@@ -242,6 +243,6 @@ void MD5Hash(const std::string inputs[4], bit32 state_out[4][4])
 		delete[] paddedMessages[i];
 	}
 	// 这里 messageLength 最初为 4 个 int 存储，分配时可用 new int[4]
-	delete[] paddedLengths;
+	// delete[] paddedLengths;
 }
 
