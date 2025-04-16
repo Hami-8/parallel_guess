@@ -33,7 +33,7 @@ int main()
     auto start = system_clock::now();
     // 由于需要定期清空内存，我们在这里记录已生成的猜测总数
     int history = 0;
-    // std::ofstream a("./files/results.txt");
+    // std::ofstream a("./files/results_mine.txt");
     while (!q.priority.empty())
     {
         q.PopNext();
@@ -92,33 +92,33 @@ int main()
                 MD5Hash_SIMD(batch, state_parallel);
 
                 // 这里可以根据需要输出或记录每个口令的哈希结果
-                /*
-                for (int j = 0; j < 4; j++) {
-                    cout << batch[j] << "\t";
-                    for (int k = 0; k < 4; k++) {
-                        cout << std::setw(8) << std::setfill('0') << hex << state_parallel[k][j] << " ";
-                    }
-                    cout << endl;
-                }
-                */
+                
+                // for (int j = 0; j < 4; j++) {
+                //     a << batch[j] << "\t";
+                //     for (int k = 0; k < 4; k++) {
+                //         a << std::setw(8) << std::setfill('0') << hex << state_parallel[k][j] << " ";
+                //     }
+                //     a << endl;
+                // }
+                
             }
             // 如果剩余不足 4 个口令，单独处理（这里可以选择使用串行 MD5Hash 或补充空串）
-            int remaining = total % 4;
-            if (remaining > 0)
-            {
-                std::string batch[4];
-                for (int i = 0; i < remaining; i++)
-                {
-                    batch[i] = q.guesses[groupCount * 4 + i];
-                }
-                for (int i = remaining; i < 4; i++)
-                {
-                    batch[i] = ""; // 补充空字符串，保证 4 个口令
-                }
-                bit32 state_parallel[4][4];
-                MD5Hash_SIMD(batch, state_parallel);
-                // 可选：输出剩余组的哈希结果
-            }
+            // int remaining = total % 4;
+            // if (remaining > 0)
+            // {
+            //     std::string batch[4];
+            //     for (int i = 0; i < remaining; i++)
+            //     {
+            //         batch[i] = q.guesses[groupCount * 4 + i];
+            //     }
+            //     for (int i = remaining; i < 4; i++)
+            //     {
+            //         batch[i] = ""; // 补充空字符串，保证 4 个口令
+            //     }
+            //     bit32 state_parallel[4][4];
+            //     MD5Hash_SIMD(batch, state_parallel);
+            //     // 可选：输出剩余组的哈希结果
+            // }
 
             // 在这里对哈希所需的总时长进行计算
             auto end_hash = system_clock::now();
