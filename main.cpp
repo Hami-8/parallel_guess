@@ -103,22 +103,22 @@ int main()
                 
             }
             // 如果剩余不足 4 个口令，单独处理（这里可以选择使用串行 MD5Hash 或补充空串）
-            // int remaining = total % 4;
-            // if (remaining > 0)
-            // {
-            //     std::string batch[4];
-            //     for (int i = 0; i < remaining; i++)
-            //     {
-            //         batch[i] = q.guesses[groupCount * 4 + i];
-            //     }
-            //     for (int i = remaining; i < 4; i++)
-            //     {
-            //         batch[i] = ""; // 补充空字符串，保证 4 个口令
-            //     }
-            //     bit32 state_parallel[4][4];
-            //     MD5Hash_SIMD(batch, state_parallel);
-            //     // 可选：输出剩余组的哈希结果
-            // }
+            int remaining = total % 4;
+            if (remaining > 0)
+            {
+                std::string batch[4];
+                for (int i = 0; i < remaining; i++)
+                {
+                    batch[i] = q.guesses[groupCount * 4 + i];
+                }
+                for (int i = remaining; i < 4; i++)
+                {
+                    batch[i] = ""; // 补充空字符串，保证 4 个口令
+                }
+                bit32 state_parallel[4][4];
+                MD5Hash_SIMD(batch, state_parallel);
+                // 可选：输出剩余组的哈希结果
+            }
 
             // 在这里对哈希所需的总时长进行计算
             auto end_hash = system_clock::now();

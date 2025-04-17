@@ -242,7 +242,7 @@ void MD5Hash_SIMD(const std::string inputs[4], bit32 state_out[4][4])
 	for (int i = 0; i < 4; i++) {
 		delete[] paddedMessages[i];
 	}
-	// 这里 messageLength 最初为 4 个 int 存储，分配时可用 new int[4]
+	// 这里 paddedLengths 改为数组存储，不需要delete
 	// delete[] paddedLengths;
 }
 
