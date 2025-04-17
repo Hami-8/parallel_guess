@@ -13,6 +13,7 @@ using namespace chrono;
 // g++ main.cpp train.cpp guessing.cpp md5.cpp -o main -O2
 
 // g++ main.cpp train.cpp guessing.cpp md5_SIMD.cpp -o main
+// g++ main.cpp train.cpp guessing.cpp md5_SIMD.cpp -g -o main  生成调试信息
 
 int main()
 {
