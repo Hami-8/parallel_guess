@@ -1,0 +1,1130 @@
+ Percent |	Source code & Disassembly of main for cycles:u (761 samples, percent: local period)
+---------------------------------------------------------------------------------------------------
+         :
+         :
+         :
+         :            Disassembly of section .text:
+         :
+         :            0000000000414b6c <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])>:
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            * @param input 输入
+         :            * @param[out] state 用于给调用者传递额外的返回值，即最终的缓冲区，也就是MD5的结果
+         :            * @return Byte消息数组
+         :            */
+         :            void MD5Hash_SIMD(const std::string inputs[4], bit32 state_out[4][4])
+         :            {
+    0.00 :   414b6c: sub     sp, sp, #0x3c0
+    0.00 :   414b70: stp     x29, x30, [sp]
+    0.00 :   414b74: mov     x29, sp
+    0.00 :   414b78: str     x19, [sp, #16]
+    0.00 :   414b7c: str     x0, [sp, #40]
+    0.00 :   414b80: str     x1, [sp, #32]
+         :
+         :            Byte* paddedMessages[4];
+         :            int paddedLengths[4];
+         :            for (int i = 0; i < 4; i += 1)
+    0.00 :   414b84: str     wzr, [sp, #956]
+    0.00 :   414b88: ldr     w0, [sp, #956]
+    0.00 :   414b8c: cmp     w0, #0x3
+    0.00 :   414b90: b.gt    414bec <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0x80>
+         :            {
+         :            paddedMessages[i] = StringProcess(inputs[i], &paddedLengths[i]);
+    0.00 :   414b94: ldrsw   x0, [sp, #956]
+    0.00 :   414b98: lsl     x0, x0, #5
+    0.53 :   414b9c: ldr     x1, [sp, #40]
+    0.00 :   414ba0: add     x1, x1, x0
+    0.00 :   414ba4: add     x0, sp, #0x1d0
+    0.00 :   414ba8: bl      401b00 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@plt>
+    0.00 :   414bac: add     x1, sp, #0x1a0
+    0.00 :   414bb0: ldrsw   x0, [sp, #956]
+    0.00 :   414bb4: lsl     x0, x0, #2
+    0.00 :   414bb8: add     x1, x1, x0
+    0.00 :   414bbc: add     x0, sp, #0x1d0
+    0.00 :   414bc0: bl      4149b0 <StringProcess(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int*)>
+    0.00 :   414bc4: mov     x2, x0
+    0.00 :   414bc8: add     x0, sp, #0x1b0
+    0.00 :   414bcc: ldrsw   x1, [sp, #956]
+    0.00 :   414bd0: str     x2, [x0, x1, lsl #3]
+    0.00 :   414bd4: add     x0, sp, #0x1d0
+    0.00 :   414bd8: bl      401b70 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string()@plt>
+         :            for (int i = 0; i < 4; i += 1)
+    0.00 :   414bdc: ldr     w0, [sp, #956]
+    0.00 :   414be0: add     w0, w0, #0x1
+    0.13 :   414be4: str     w0, [sp, #956]
+    0.00 :   414be8: b       414b88 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0x1c>
+         :            // cout<<messageLength[i]<<endl;
+         :            // assert(messageLength[i] == messageLength[0]);
+         :            }
+         :            int paddedLength = paddedLengths[0];
+    0.00 :   414bec: ldr     w0, [sp, #416]
+    0.39 :   414bf0: str     w0, [sp, #852]
+         :            int n_blocks = paddedLength / 64;  // 每个块 64 字节
+    0.00 :   414bf4: ldr     w0, [sp, #852]
+    0.00 :   414bf8: add     w1, w0, #0x3f
+    0.00 :   414bfc: cmp     w0, #0x0
+    0.00 :   414c00: csel    w0, w1, w0, lt  // lt = tstop
+    0.13 :   414c04: asr     w0, w0, #6
+    0.00 :   414c08: str     w0, [sp, #848]
+    0.00 :   414c0c: mov     w0, #0x2301                     // #8961
+    0.00 :   414c10: movk    w0, #0x6745, lsl #16
+    0.00 :   414c14: str     w0, [sp, #796]
+         :            vdupq_n_u32(unsigned int):
+         :
+         :            __extension__ extern __inline uint32x4_t
+         :            __attribute__ ((__always_inline__, __gnu_inline__, __artificial__))
+         :            vdupq_n_u32 (uint32_t __a)
+         :            {
+         :            return (uint32x4_t) {__a, __a, __a, __a};
+    0.00 :   414c18: ldr     s0, [sp, #796]
+    0.00 :   414c1c: dup     v0.4s, v0.s[0]
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :
+         :            // bit32* state= new bit32[4];
+         :            // 初始化 MD5 状态，每个状态都用 NEON 向量存储 4 个相同初始值（对应 4 个消息）
+         :            uint32x4_t A = vdupq_n_u32(0x67452301);
+    0.00 :   414c20: str     q0, [sp, #928]
+    0.00 :   414c24: mov     w0, #0xab89                     // #43913
+    0.00 :   414c28: movk    w0, #0xefcd, lsl #16
+    0.00 :   414c2c: str     w0, [sp, #800]
+         :            vdupq_n_u32(unsigned int):
+    0.00 :   414c30: ldr     s0, [sp, #800]
+    0.00 :   414c34: dup     v0.4s, v0.s[0]
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            uint32x4_t B = vdupq_n_u32(0xefcdab89);
+    0.13 :   414c38: str     q0, [sp, #912]
+    0.00 :   414c3c: mov     w0, #0xdcfe                     // #56574
+    0.00 :   414c40: movk    w0, #0x98ba, lsl #16
+    0.00 :   414c44: str     w0, [sp, #804]
+         :            vdupq_n_u32(unsigned int):
+    0.00 :   414c48: ldr     s0, [sp, #804]
+    0.00 :   414c4c: dup     v0.4s, v0.s[0]
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            uint32x4_t C = vdupq_n_u32(0x98badcfe);
+    0.00 :   414c50: str     q0, [sp, #896]
+    0.00 :   414c54: mov     w0, #0x5476                     // #21622
+    0.00 :   414c58: movk    w0, #0x1032, lsl #16
+    0.00 :   414c5c: str     w0, [sp, #808]
+         :            vdupq_n_u32(unsigned int):
+    0.00 :   414c60: ldr     s0, [sp, #808]
+    0.00 :   414c64: dup     v0.4s, v0.s[0]
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            uint32x4_t D = vdupq_n_u32(0x10325476);
+    0.00 :   414c68: str     q0, [sp, #880]
+         :
+         :            // 对于每个 512-bit 块同时处理 4 个口令
+         :            for (int block = 0; block < n_blocks; block++)
+    0.00 :   414c6c: str     wzr, [sp, #876]
+    0.13 :   414c70: ldr     w1, [sp, #876]
+    0.13 :   414c74: ldr     w0, [sp, #848]
+    0.00 :   414c78: cmp     w1, w0
+    0.00 :   414c7c: b.ge    41574c <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xbe0>  // b.tcont
+         :            {
+         :            // 为当前块构造 16 个 32 位字的向量 x[0..15]
+         :            uint32x4_t x[16];
+         :
+         :            // 下面的处理，在理解上较为复杂
+         :            for (int i1 = 0; i1 < 16; ++i1)
+    0.00 :   414c80: str     wzr, [sp, #872]
+    0.39 :   414c84: ldr     w0, [sp, #872]
+    0.00 :   414c88: cmp     w0, #0xf
+    0.00 :   414c8c: b.gt    414d98 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0x22c>
+         :            {
+         :            uint32_t word[4];  // 存储 4 个消息对应位置的 32 位字
+         :            for (int j = 0; j < 4; j++) {
+    0.26 :   414c90: str     wzr, [sp, #868]
+    2.11 :   414c94: ldr     w0, [sp, #868]
+    0.13 :   414c98: cmp     w0, #0x3
+    0.00 :   414c9c: b.gt    414d64 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0x1f8>
+         :            int idx = block * 64 + i1 * 4;
+    0.53 :   414ca0: ldr     w0, [sp, #876]
+    0.00 :   414ca4: lsl     w1, w0, #4
+    1.18 :   414ca8: ldr     w0, [sp, #872]
+    0.00 :   414cac: add     w0, w1, w0
+    0.00 :   414cb0: lsl     w0, w0, #2
+    0.39 :   414cb4: str     w0, [sp, #844]
+         :            word[j] = paddedMessages[j][idx] |
+    0.13 :   414cb8: add     x0, sp, #0x1b0
+    0.53 :   414cbc: ldrsw   x1, [sp, #868]
+    0.79 :   414cc0: ldr     x1, [x0, x1, lsl #3]
+    4.48 :   414cc4: ldrsw   x0, [sp, #844]
+    0.00 :   414cc8: add     x0, x1, x0
+    3.29 :   414ccc: ldrb    w0, [x0]
+    0.00 :   414cd0: mov     w2, w0
+         :            (paddedMessages[j][idx+1] << 8) |
+    0.00 :   414cd4: add     x0, sp, #0x1b0
+   12.89 :   414cd8: ldrsw   x1, [sp, #868]
+    0.13 :   414cdc: ldr     x1, [x0, x1, lsl #3]
+    0.13 :   414ce0: ldrsw   x0, [sp, #844]
+    0.00 :   414ce4: add     x0, x0, #0x1
+    0.00 :   414ce8: add     x0, x1, x0
+    0.13 :   414cec: ldrb    w0, [x0]
+    0.13 :   414cf0: lsl     w0, w0, #8
+         :            word[j] = paddedMessages[j][idx] |
+    0.79 :   414cf4: orr     w1, w2, w0
+         :            (paddedMessages[j][idx+2] << 16) |
+    0.00 :   414cf8: add     x0, sp, #0x1b0
+    4.19 :   414cfc: ldrsw   x2, [sp, #868]
+    0.00 :   414d00: ldr     x2, [x0, x2, lsl #3]
+    0.26 :   414d04: ldrsw   x0, [sp, #844]
+    0.00 :   414d08: add     x0, x0, #0x2
+    0.00 :   414d0c: add     x0, x2, x0
+    0.13 :   414d10: ldrb    w0, [x0]
+    0.00 :   414d14: lsl     w0, w0, #16
+         :            (paddedMessages[j][idx+1] << 8) |
+    0.00 :   414d18: orr     w1, w1, w0
+         :            (paddedMessages[j][idx+3] << 24);
+    0.13 :   414d1c: add     x0, sp, #0x1b0
+    3.28 :   414d20: ldrsw   x2, [sp, #868]
+    0.00 :   414d24: ldr     x2, [x0, x2, lsl #3]
+    0.40 :   414d28: ldrsw   x0, [sp, #844]
+    0.00 :   414d2c: add     x0, x0, #0x3
+    0.00 :   414d30: add     x0, x2, x0
+    0.26 :   414d34: ldrb    w0, [x0]
+    0.13 :   414d38: lsl     w0, w0, #24
+         :            (paddedMessages[j][idx+2] << 16) |
+    0.39 :   414d3c: orr     w0, w1, w0
+    0.00 :   414d40: mov     w2, w0
+         :            word[j] = paddedMessages[j][idx] |
+    4.33 :   414d44: ldrsw   x0, [sp, #868]
+    0.00 :   414d48: lsl     x0, x0, #2
+    0.00 :   414d4c: add     x1, sp, #0x148
+    0.00 :   414d50: str     w2, [x1, x0]
+         :            for (int j = 0; j < 4; j++) {
+    0.39 :   414d54: ldr     w0, [sp, #868]
+    0.00 :   414d58: add     w0, w0, #0x1
+    0.26 :   414d5c: str     w0, [sp, #868]
+    0.00 :   414d60: b       414c94 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0x128>
+    0.13 :   414d64: add     x0, sp, #0x148
+    0.39 :   414d68: str     x0, [sp, #784]
+         :            vld1q_u32(unsigned int const*):
+         :            __extension__ extern __inline uint32x4_t
+         :            __attribute__ ((__always_inline__, __gnu_inline__, __artificial__))
+         :            vld1q_u32 (const uint32_t *__a)
+         :            {
+         :            return (uint32x4_t)
+         :            __builtin_aarch64_ld1v4si ((const __builtin_aarch64_simd_si *) __a);
+    0.66 :   414d6c: ldr     x0, [sp, #784]
+    0.79 :   414d70: ldr     q0, [x0]
+    0.13 :   414d74: nop
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            }
+         :            x[i1] = vld1q_u32(word);  // 加载为 NEON 向量
+    3.55 :   414d78: ldrsw   x0, [sp, #872]
+    0.00 :   414d7c: lsl     x0, x0, #4
+    0.00 :   414d80: add     x1, sp, #0x30
+    0.00 :   414d84: str     q0, [x1, x0]
+         :            for (int i1 = 0; i1 < 16; ++i1)
+    0.00 :   414d88: ldr     w0, [sp, #872]
+    0.00 :   414d8c: add     w0, w0, #0x1
+    0.00 :   414d90: str     w0, [sp, #872]
+    0.00 :   414d94: b       414c84 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0x118>
+         :            }
+         :
+         :            // 保存当前状态 for this block
+         :            uint32x4_t a = A;
+    0.00 :   414d98: ldr     q0, [sp, #928]
+    0.79 :   414d9c: str     q0, [sp, #400]
+         :            uint32x4_t b = B;
+    0.00 :   414da0: ldr     q0, [sp, #912]
+    0.00 :   414da4: str     q0, [sp, #384]
+         :            uint32x4_t c = C;
+    0.00 :   414da8: ldr     q0, [sp, #896]
+    0.26 :   414dac: str     q0, [sp, #368]
+         :            uint32x4_t d = D;
+    0.00 :   414db0: ldr     q0, [sp, #880]
+    0.13 :   414db4: str     q0, [sp, #352]
+         :
+         :            auto start = system_clock::now();
+    0.00 :   414db8: bl      401a80 <std::chrono::_V2::system_clock::now()@plt>
+    0.00 :   414dbc: str     x0, [sp, #344]
+         :            /* Round 1 */
+         :            FF_NEON(a, b, c, d, x[0], s11, 0xd76aa478);
+    0.00 :   414dc0: ldr     q0, [sp, #384]
+    0.00 :   414dc4: ldr     q1, [sp, #368]
+    0.00 :   414dc8: ldr     q2, [sp, #352]
+    0.00 :   414dcc: ldr     q3, [sp, #48]
+    0.00 :   414dd0: add     x0, sp, #0x190
+    0.00 :   414dd4: mov     w2, #0xa478                     // #42104
+    0.00 :   414dd8: movk    w2, #0xd76a, lsl #16
+    0.00 :   414ddc: mov     w1, #0x7                        // #7
+    0.00 :   414de0: bl      415bc0 <FF_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            FF_NEON(d, a, b, c, x[1], s12, 0xe8c7b756);
+    0.00 :   414de4: ldr     q0, [sp, #400]
+    0.66 :   414de8: ldr     q1, [sp, #384]
+    0.00 :   414dec: ldr     q2, [sp, #368]
+    0.00 :   414df0: ldr     q3, [sp, #64]
+    0.00 :   414df4: add     x0, sp, #0x160
+    0.00 :   414df8: mov     w2, #0xb756                     // #46934
+    0.00 :   414dfc: movk    w2, #0xe8c7, lsl #16
+    0.00 :   414e00: mov     w1, #0xc                        // #12
+    0.00 :   414e04: bl      415bc0 <FF_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            FF_NEON(c, d, a, b, x[2], s13, 0x242070db);
+    0.00 :   414e08: ldr     q0, [sp, #352]
+    0.26 :   414e0c: ldr     q1, [sp, #400]
+    0.00 :   414e10: ldr     q2, [sp, #384]
+    0.00 :   414e14: ldr     q3, [sp, #80]
+    0.00 :   414e18: add     x0, sp, #0x170
+    0.00 :   414e1c: mov     w2, #0x70db                     // #28891
+    0.00 :   414e20: movk    w2, #0x2420, lsl #16
+    0.00 :   414e24: mov     w1, #0x11                       // #17
+    0.00 :   414e28: bl      415bc0 <FF_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            FF_NEON(b, c, d, a, x[3], s14, 0xc1bdceee);
+    0.13 :   414e2c: ldr     q0, [sp, #368]
+    0.66 :   414e30: ldr     q1, [sp, #352]
+    0.00 :   414e34: ldr     q2, [sp, #400]
+    0.00 :   414e38: ldr     q3, [sp, #96]
+    0.00 :   414e3c: add     x0, sp, #0x180
+    0.00 :   414e40: mov     w2, #0xceee                     // #52974
+    0.00 :   414e44: movk    w2, #0xc1bd, lsl #16
+    0.00 :   414e48: mov     w1, #0x16                       // #22
+    0.00 :   414e4c: bl      415bc0 <FF_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            FF_NEON(a, b, c, d, x[4], s11, 0xf57c0faf);
+    0.00 :   414e50: ldr     q0, [sp, #384]
+    0.65 :   414e54: ldr     q1, [sp, #368]
+    0.00 :   414e58: ldr     q2, [sp, #352]
+    0.00 :   414e5c: ldr     q3, [sp, #112]
+    0.00 :   414e60: add     x0, sp, #0x190
+    0.00 :   414e64: mov     w2, #0xfaf                      // #4015
+    0.00 :   414e68: movk    w2, #0xf57c, lsl #16
+    0.00 :   414e6c: mov     w1, #0x7                        // #7
+    0.00 :   414e70: bl      415bc0 <FF_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            FF_NEON(d, a, b, c, x[5], s12, 0x4787c62a);
+    0.13 :   414e74: ldr     q0, [sp, #400]
+    0.52 :   414e78: ldr     q1, [sp, #384]
+    0.00 :   414e7c: ldr     q2, [sp, #368]
+    0.00 :   414e80: ldr     q3, [sp, #128]
+    0.00 :   414e84: add     x0, sp, #0x160
+    0.00 :   414e88: mov     w2, #0xc62a                     // #50730
+    0.00 :   414e8c: movk    w2, #0x4787, lsl #16
+    0.00 :   414e90: mov     w1, #0xc                        // #12
+    0.00 :   414e94: bl      415bc0 <FF_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            FF_NEON(c, d, a, b, x[6], s13, 0xa8304613);
+    0.00 :   414e98: ldr     q0, [sp, #352]
+    0.26 :   414e9c: ldr     q1, [sp, #400]
+    0.00 :   414ea0: ldr     q2, [sp, #384]
+    0.00 :   414ea4: ldr     q3, [sp, #144]
+    0.00 :   414ea8: add     x0, sp, #0x170
+    0.00 :   414eac: mov     w2, #0x4613                     // #17939
+    0.00 :   414eb0: movk    w2, #0xa830, lsl #16
+    0.00 :   414eb4: mov     w1, #0x11                       // #17
+    0.00 :   414eb8: bl      415bc0 <FF_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            FF_NEON(b, c, d, a, x[7], s14, 0xfd469501);
+    0.00 :   414ebc: ldr     q0, [sp, #368]
+    0.40 :   414ec0: ldr     q1, [sp, #352]
+    0.00 :   414ec4: ldr     q2, [sp, #400]
+    0.00 :   414ec8: ldr     q3, [sp, #160]
+    0.00 :   414ecc: add     x0, sp, #0x180
+    0.00 :   414ed0: mov     w2, #0x9501                     // #38145
+    0.00 :   414ed4: movk    w2, #0xfd46, lsl #16
+    0.00 :   414ed8: mov     w1, #0x16                       // #22
+    0.00 :   414edc: bl      415bc0 <FF_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            FF_NEON(a, b, c, d, x[8], s11, 0x698098d8);
+    0.00 :   414ee0: ldr     q0, [sp, #384]
+    0.52 :   414ee4: ldr     q1, [sp, #368]
+    0.00 :   414ee8: ldr     q2, [sp, #352]
+    0.00 :   414eec: ldr     q3, [sp, #176]
+    0.00 :   414ef0: add     x0, sp, #0x190
+    0.00 :   414ef4: mov     w2, #0x98d8                     // #39128
+    0.00 :   414ef8: movk    w2, #0x6980, lsl #16
+    0.00 :   414efc: mov     w1, #0x7                        // #7
+    0.00 :   414f00: bl      415bc0 <FF_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            FF_NEON(d, a, b, c, x[9], s12, 0x8b44f7af);
+    0.13 :   414f04: ldr     q0, [sp, #400]
+    0.13 :   414f08: ldr     q1, [sp, #384]
+    0.00 :   414f0c: ldr     q2, [sp, #368]
+    0.00 :   414f10: ldr     q3, [sp, #192]
+    0.00 :   414f14: add     x0, sp, #0x160
+    0.00 :   414f18: mov     w2, #0xf7af                     // #63407
+    0.00 :   414f1c: movk    w2, #0x8b44, lsl #16
+    0.00 :   414f20: mov     w1, #0xc                        // #12
+    0.00 :   414f24: bl      415bc0 <FF_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            FF_NEON(c, d, a, b, x[10], s13, 0xffff5bb1);
+    0.00 :   414f28: ldr     q0, [sp, #352]
+    0.66 :   414f2c: ldr     q1, [sp, #400]
+    0.00 :   414f30: ldr     q2, [sp, #384]
+    0.00 :   414f34: ldr     q3, [sp, #208]
+    0.00 :   414f38: add     x0, sp, #0x170
+    0.00 :   414f3c: mov     w2, #0xffff5bb1                 // #-42063
+    0.00 :   414f40: mov     w1, #0x11                       // #17
+    0.00 :   414f44: bl      415bc0 <FF_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            FF_NEON(b, c, d, a, x[11], s14, 0x895cd7be);
+    0.13 :   414f48: ldr     q0, [sp, #368]
+    0.40 :   414f4c: ldr     q1, [sp, #352]
+    0.00 :   414f50: ldr     q2, [sp, #400]
+    0.00 :   414f54: ldr     q3, [sp, #224]
+    0.00 :   414f58: add     x0, sp, #0x180
+    0.00 :   414f5c: mov     w2, #0xd7be                     // #55230
+    0.00 :   414f60: movk    w2, #0x895c, lsl #16
+    0.00 :   414f64: mov     w1, #0x16                       // #22
+    0.00 :   414f68: bl      415bc0 <FF_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            FF_NEON(a, b, c, d, x[12], s11, 0x6b901122);
+    0.00 :   414f6c: ldr     q0, [sp, #384]
+    0.39 :   414f70: ldr     q1, [sp, #368]
+    0.00 :   414f74: ldr     q2, [sp, #352]
+    0.00 :   414f78: ldr     q3, [sp, #240]
+    0.00 :   414f7c: add     x0, sp, #0x190
+    0.00 :   414f80: mov     w2, #0x1122                     // #4386
+    0.00 :   414f84: movk    w2, #0x6b90, lsl #16
+    0.00 :   414f88: mov     w1, #0x7                        // #7
+    0.00 :   414f8c: bl      415bc0 <FF_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            FF_NEON(d, a, b, c, x[13], s12, 0xfd987193);
+    0.00 :   414f90: ldr     q0, [sp, #400]
+    0.39 :   414f94: ldr     q1, [sp, #384]
+    0.00 :   414f98: ldr     q2, [sp, #368]
+    0.00 :   414f9c: ldr     q3, [sp, #256]
+    0.00 :   414fa0: add     x0, sp, #0x160
+    0.00 :   414fa4: mov     w2, #0x7193                     // #29075
+    0.00 :   414fa8: movk    w2, #0xfd98, lsl #16
+    0.00 :   414fac: mov     w1, #0xc                        // #12
+    0.00 :   414fb0: bl      415bc0 <FF_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            FF_NEON(c, d, a, b, x[14], s13, 0xa679438e);
+    0.13 :   414fb4: ldr     q0, [sp, #352]
+    0.53 :   414fb8: ldr     q1, [sp, #400]
+    0.00 :   414fbc: ldr     q2, [sp, #384]
+    0.00 :   414fc0: ldr     q3, [sp, #272]
+    0.00 :   414fc4: add     x0, sp, #0x170
+    0.00 :   414fc8: mov     w2, #0x438e                     // #17294
+    0.00 :   414fcc: movk    w2, #0xa679, lsl #16
+    0.00 :   414fd0: mov     w1, #0x11                       // #17
+    0.00 :   414fd4: bl      415bc0 <FF_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            FF_NEON(b, c, d, a, x[15], s14, 0x49b40821);
+    0.13 :   414fd8: ldr     q0, [sp, #368]
+    0.26 :   414fdc: ldr     q1, [sp, #352]
+    0.00 :   414fe0: ldr     q2, [sp, #400]
+    0.00 :   414fe4: ldr     q3, [sp, #288]
+    0.00 :   414fe8: add     x0, sp, #0x180
+    0.00 :   414fec: mov     w2, #0x821                      // #2081
+    0.00 :   414ff0: movk    w2, #0x49b4, lsl #16
+    0.00 :   414ff4: mov     w1, #0x16                       // #22
+    0.00 :   414ff8: bl      415bc0 <FF_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :
+         :            /* Round 2 */
+         :            GG_NEON(a, b, c, d, x[1], s21, 0xf61e2562);
+    0.13 :   414ffc: ldr     q0, [sp, #384]
+    0.39 :   415000: ldr     q1, [sp, #368]
+    0.00 :   415004: ldr     q2, [sp, #352]
+    0.00 :   415008: ldr     q3, [sp, #64]
+    0.00 :   41500c: add     x0, sp, #0x190
+    0.00 :   415010: mov     w2, #0x2562                     // #9570
+    0.00 :   415014: movk    w2, #0xf61e, lsl #16
+    0.00 :   415018: mov     w1, #0x5                        // #5
+    0.00 :   41501c: bl      415cbc <GG_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            GG_NEON(d, a, b, c, x[6], s22, 0xc040b340);
+    0.26 :   415020: ldr     q0, [sp, #400]
+    0.79 :   415024: ldr     q1, [sp, #384]
+    0.00 :   415028: ldr     q2, [sp, #368]
+    0.00 :   41502c: ldr     q3, [sp, #144]
+    0.00 :   415030: add     x0, sp, #0x160
+    0.00 :   415034: mov     w2, #0xb340                     // #45888
+    0.00 :   415038: movk    w2, #0xc040, lsl #16
+    0.00 :   41503c: mov     w1, #0x9                        // #9
+    0.00 :   415040: bl      415cbc <GG_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            GG_NEON(c, d, a, b, x[11], s23, 0x265e5a51);
+    0.00 :   415044: ldr     q0, [sp, #352]
+    0.26 :   415048: ldr     q1, [sp, #400]
+    0.00 :   41504c: ldr     q2, [sp, #384]
+    0.00 :   415050: ldr     q3, [sp, #224]
+    0.00 :   415054: add     x0, sp, #0x170
+    0.00 :   415058: mov     w2, #0x5a51                     // #23121
+    0.00 :   41505c: movk    w2, #0x265e, lsl #16
+    0.00 :   415060: mov     w1, #0xe                        // #14
+    0.00 :   415064: bl      415cbc <GG_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            GG_NEON(b, c, d, a, x[0], s24, 0xe9b6c7aa);
+    0.27 :   415068: ldr     q0, [sp, #368]
+    0.53 :   41506c: ldr     q1, [sp, #352]
+    0.00 :   415070: ldr     q2, [sp, #400]
+    0.00 :   415074: ldr     q3, [sp, #48]
+    0.00 :   415078: add     x0, sp, #0x180
+    0.00 :   41507c: mov     w2, #0xc7aa                     // #51114
+    0.00 :   415080: movk    w2, #0xe9b6, lsl #16
+    0.00 :   415084: mov     w1, #0x14                       // #20
+    0.00 :   415088: bl      415cbc <GG_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            GG_NEON(a, b, c, d, x[5], s21, 0xd62f105d);
+    0.00 :   41508c: ldr     q0, [sp, #384]
+    0.26 :   415090: ldr     q1, [sp, #368]
+    0.00 :   415094: ldr     q2, [sp, #352]
+    0.00 :   415098: ldr     q3, [sp, #128]
+    0.00 :   41509c: add     x0, sp, #0x190
+    0.00 :   4150a0: mov     w2, #0x105d                     // #4189
+    0.00 :   4150a4: movk    w2, #0xd62f, lsl #16
+    0.00 :   4150a8: mov     w1, #0x5                        // #5
+    0.00 :   4150ac: bl      415cbc <GG_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            GG_NEON(d, a, b, c, x[10], s22, 0x2441453);
+    0.00 :   4150b0: ldr     q0, [sp, #400]
+    0.13 :   4150b4: ldr     q1, [sp, #384]
+    0.00 :   4150b8: ldr     q2, [sp, #368]
+    0.00 :   4150bc: ldr     q3, [sp, #208]
+    0.00 :   4150c0: add     x0, sp, #0x160
+    0.00 :   4150c4: mov     w2, #0x1453                     // #5203
+    0.00 :   4150c8: movk    w2, #0x244, lsl #16
+    0.00 :   4150cc: mov     w1, #0x9                        // #9
+    0.00 :   4150d0: bl      415cbc <GG_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            GG_NEON(c, d, a, b, x[15], s23, 0xd8a1e681);
+    0.00 :   4150d4: ldr     q0, [sp, #352]
+    0.00 :   4150d8: ldr     q1, [sp, #400]
+    0.00 :   4150dc: ldr     q2, [sp, #384]
+    0.00 :   4150e0: ldr     q3, [sp, #288]
+    0.00 :   4150e4: add     x0, sp, #0x170
+    0.00 :   4150e8: mov     w2, #0xe681                     // #59009
+    0.00 :   4150ec: movk    w2, #0xd8a1, lsl #16
+    0.00 :   4150f0: mov     w1, #0xe                        // #14
+    0.00 :   4150f4: bl      415cbc <GG_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            GG_NEON(b, c, d, a, x[4], s24, 0xe7d3fbc8);
+    0.13 :   4150f8: ldr     q0, [sp, #368]
+    0.26 :   4150fc: ldr     q1, [sp, #352]
+    0.00 :   415100: ldr     q2, [sp, #400]
+    0.00 :   415104: ldr     q3, [sp, #112]
+    0.00 :   415108: add     x0, sp, #0x180
+    0.00 :   41510c: mov     w2, #0xfbc8                     // #64456
+    0.00 :   415110: movk    w2, #0xe7d3, lsl #16
+    0.00 :   415114: mov     w1, #0x14                       // #20
+    0.00 :   415118: bl      415cbc <GG_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            GG_NEON(a, b, c, d, x[9], s21, 0x21e1cde6);
+    0.13 :   41511c: ldr     q0, [sp, #384]
+    0.39 :   415120: ldr     q1, [sp, #368]
+    0.00 :   415124: ldr     q2, [sp, #352]
+    0.00 :   415128: ldr     q3, [sp, #192]
+    0.00 :   41512c: add     x0, sp, #0x190
+    0.00 :   415130: mov     w2, #0xcde6                     // #52710
+    0.00 :   415134: movk    w2, #0x21e1, lsl #16
+    0.00 :   415138: mov     w1, #0x5                        // #5
+    0.00 :   41513c: bl      415cbc <GG_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            GG_NEON(d, a, b, c, x[14], s22, 0xc33707d6);
+    0.00 :   415140: ldr     q0, [sp, #400]
+    0.26 :   415144: ldr     q1, [sp, #384]
+    0.00 :   415148: ldr     q2, [sp, #368]
+    0.00 :   41514c: ldr     q3, [sp, #272]
+    0.00 :   415150: add     x0, sp, #0x160
+    0.00 :   415154: mov     w2, #0x7d6                      // #2006
+    0.00 :   415158: movk    w2, #0xc337, lsl #16
+    0.00 :   41515c: mov     w1, #0x9                        // #9
+    0.00 :   415160: bl      415cbc <GG_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            GG_NEON(c, d, a, b, x[3], s23, 0xf4d50d87);
+    0.00 :   415164: ldr     q0, [sp, #352]
+    0.39 :   415168: ldr     q1, [sp, #400]
+    0.00 :   41516c: ldr     q2, [sp, #384]
+    0.00 :   415170: ldr     q3, [sp, #96]
+    0.00 :   415174: add     x0, sp, #0x170
+    0.00 :   415178: mov     w2, #0xd87                      // #3463
+    0.00 :   41517c: movk    w2, #0xf4d5, lsl #16
+    0.00 :   415180: mov     w1, #0xe                        // #14
+    0.00 :   415184: bl      415cbc <GG_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            GG_NEON(b, c, d, a, x[8], s24, 0x455a14ed);
+    0.13 :   415188: ldr     q0, [sp, #368]
+    0.13 :   41518c: ldr     q1, [sp, #352]
+    0.00 :   415190: ldr     q2, [sp, #400]
+    0.00 :   415194: ldr     q3, [sp, #176]
+    0.00 :   415198: add     x0, sp, #0x180
+    0.00 :   41519c: mov     w2, #0x14ed                     // #5357
+    0.00 :   4151a0: movk    w2, #0x455a, lsl #16
+    0.00 :   4151a4: mov     w1, #0x14                       // #20
+    0.00 :   4151a8: bl      415cbc <GG_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            GG_NEON(a, b, c, d, x[13], s21, 0xa9e3e905);
+    0.13 :   4151ac: ldr     q0, [sp, #384]
+    0.26 :   4151b0: ldr     q1, [sp, #368]
+    0.00 :   4151b4: ldr     q2, [sp, #352]
+    0.00 :   4151b8: ldr     q3, [sp, #256]
+    0.00 :   4151bc: add     x0, sp, #0x190
+    0.00 :   4151c0: mov     w2, #0xe905                     // #59653
+    0.00 :   4151c4: movk    w2, #0xa9e3, lsl #16
+    0.00 :   4151c8: mov     w1, #0x5                        // #5
+    0.00 :   4151cc: bl      415cbc <GG_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            GG_NEON(d, a, b, c, x[2], s22, 0xfcefa3f8);
+    0.39 :   4151d0: ldr     q0, [sp, #400]
+    0.40 :   4151d4: ldr     q1, [sp, #384]
+    0.00 :   4151d8: ldr     q2, [sp, #368]
+    0.00 :   4151dc: ldr     q3, [sp, #80]
+    0.00 :   4151e0: add     x0, sp, #0x160
+    0.00 :   4151e4: mov     w2, #0xa3f8                     // #41976
+    0.00 :   4151e8: movk    w2, #0xfcef, lsl #16
+    0.00 :   4151ec: mov     w1, #0x9                        // #9
+    0.00 :   4151f0: bl      415cbc <GG_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            GG_NEON(c, d, a, b, x[7], s23, 0x676f02d9);
+    0.26 :   4151f4: ldr     q0, [sp, #352]
+    0.39 :   4151f8: ldr     q1, [sp, #400]
+    0.00 :   4151fc: ldr     q2, [sp, #384]
+    0.00 :   415200: ldr     q3, [sp, #160]
+    0.00 :   415204: add     x0, sp, #0x170
+    0.00 :   415208: mov     w2, #0x2d9                      // #729
+    0.00 :   41520c: movk    w2, #0x676f, lsl #16
+    0.00 :   415210: mov     w1, #0xe                        // #14
+    0.00 :   415214: bl      415cbc <GG_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            GG_NEON(b, c, d, a, x[12], s24, 0x8d2a4c8a);
+    0.00 :   415218: ldr     q0, [sp, #368]
+    0.40 :   41521c: ldr     q1, [sp, #352]
+    0.00 :   415220: ldr     q2, [sp, #400]
+    0.00 :   415224: ldr     q3, [sp, #240]
+    0.00 :   415228: add     x0, sp, #0x180
+    0.00 :   41522c: mov     w2, #0x4c8a                     // #19594
+    0.00 :   415230: movk    w2, #0x8d2a, lsl #16
+    0.00 :   415234: mov     w1, #0x14                       // #20
+    0.00 :   415238: bl      415cbc <GG_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :
+         :            /* Round 3 */
+         :            HH_NEON(a, b, c, d, x[5], s31, 0xfffa3942);
+    0.13 :   41523c: ldr     q0, [sp, #384]
+    0.65 :   415240: ldr     q1, [sp, #368]
+    0.00 :   415244: ldr     q2, [sp, #352]
+    0.00 :   415248: ldr     q3, [sp, #128]
+    0.00 :   41524c: add     x0, sp, #0x190
+    0.00 :   415250: mov     w2, #0x3942                     // #14658
+    0.00 :   415254: movk    w2, #0xfffa, lsl #16
+    0.00 :   415258: mov     w1, #0x4                        // #4
+    0.00 :   41525c: bl      415db8 <HH_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            HH_NEON(d, a, b, c, x[8], s32, 0x8771f681);
+    0.66 :   415260: ldr     q0, [sp, #400]
+    0.52 :   415264: ldr     q1, [sp, #384]
+    0.00 :   415268: ldr     q2, [sp, #368]
+    0.00 :   41526c: ldr     q3, [sp, #176]
+    0.00 :   415270: add     x0, sp, #0x160
+    0.00 :   415274: mov     w2, #0xf681                     // #63105
+    0.00 :   415278: movk    w2, #0x8771, lsl #16
+    0.26 :   41527c: mov     w1, #0xb                        // #11
+    0.00 :   415280: bl      415db8 <HH_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            HH_NEON(c, d, a, b, x[11], s33, 0x6d9d6122);
+    0.53 :   415284: ldr     q0, [sp, #352]
+    0.52 :   415288: ldr     q1, [sp, #400]
+    0.00 :   41528c: ldr     q2, [sp, #384]
+    0.00 :   415290: ldr     q3, [sp, #224]
+    0.00 :   415294: add     x0, sp, #0x170
+    0.00 :   415298: mov     w2, #0x6122                     // #24866
+    0.00 :   41529c: movk    w2, #0x6d9d, lsl #16
+    0.00 :   4152a0: mov     w1, #0x10                       // #16
+    0.13 :   4152a4: bl      415db8 <HH_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            HH_NEON(b, c, d, a, x[14], s34, 0xfde5380c);
+    0.13 :   4152a8: ldr     q0, [sp, #368]
+    0.39 :   4152ac: ldr     q1, [sp, #352]
+    0.00 :   4152b0: ldr     q2, [sp, #400]
+    0.00 :   4152b4: ldr     q3, [sp, #272]
+    0.00 :   4152b8: add     x0, sp, #0x180
+    0.00 :   4152bc: mov     w2, #0x380c                     // #14348
+    0.00 :   4152c0: movk    w2, #0xfde5, lsl #16
+    0.00 :   4152c4: mov     w1, #0x17                       // #23
+    0.00 :   4152c8: bl      415db8 <HH_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            HH_NEON(a, b, c, d, x[1], s31, 0xa4beea44);
+    0.00 :   4152cc: ldr     q0, [sp, #384]
+    0.79 :   4152d0: ldr     q1, [sp, #368]
+    0.00 :   4152d4: ldr     q2, [sp, #352]
+    0.00 :   4152d8: ldr     q3, [sp, #64]
+    0.00 :   4152dc: add     x0, sp, #0x190
+    0.00 :   4152e0: mov     w2, #0xea44                     // #59972
+    0.00 :   4152e4: movk    w2, #0xa4be, lsl #16
+    0.00 :   4152e8: mov     w1, #0x4                        // #4
+    0.00 :   4152ec: bl      415db8 <HH_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            HH_NEON(d, a, b, c, x[4], s32, 0x4bdecfa9);
+    0.00 :   4152f0: ldr     q0, [sp, #400]
+    0.13 :   4152f4: ldr     q1, [sp, #384]
+    0.00 :   4152f8: ldr     q2, [sp, #368]
+    0.00 :   4152fc: ldr     q3, [sp, #112]
+    0.00 :   415300: add     x0, sp, #0x160
+    0.00 :   415304: mov     w2, #0xcfa9                     // #53161
+    0.00 :   415308: movk    w2, #0x4bde, lsl #16
+    0.00 :   41530c: mov     w1, #0xb                        // #11
+    0.00 :   415310: bl      415db8 <HH_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            HH_NEON(c, d, a, b, x[7], s33, 0xf6bb4b60);
+    0.00 :   415314: ldr     q0, [sp, #352]
+    0.26 :   415318: ldr     q1, [sp, #400]
+    0.00 :   41531c: ldr     q2, [sp, #384]
+    0.13 :   415320: ldr     q3, [sp, #160]
+    0.00 :   415324: add     x0, sp, #0x170
+    0.00 :   415328: mov     w2, #0x4b60                     // #19296
+    0.00 :   41532c: movk    w2, #0xf6bb, lsl #16
+    0.00 :   415330: mov     w1, #0x10                       // #16
+    0.00 :   415334: bl      415db8 <HH_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            HH_NEON(b, c, d, a, x[10], s34, 0xbebfbc70);
+    0.00 :   415338: ldr     q0, [sp, #368]
+    0.79 :   41533c: ldr     q1, [sp, #352]
+    0.00 :   415340: ldr     q2, [sp, #400]
+    0.00 :   415344: ldr     q3, [sp, #208]
+    0.00 :   415348: add     x0, sp, #0x180
+    0.00 :   41534c: mov     w2, #0xbc70                     // #48240
+    0.00 :   415350: movk    w2, #0xbebf, lsl #16
+    0.00 :   415354: mov     w1, #0x17                       // #23
+    0.00 :   415358: bl      415db8 <HH_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            HH_NEON(a, b, c, d, x[13], s31, 0x289b7ec6);
+    0.00 :   41535c: ldr     q0, [sp, #384]
+    0.39 :   415360: ldr     q1, [sp, #368]
+    0.00 :   415364: ldr     q2, [sp, #352]
+    0.00 :   415368: ldr     q3, [sp, #256]
+    0.00 :   41536c: add     x0, sp, #0x190
+    0.00 :   415370: mov     w2, #0x7ec6                     // #32454
+    0.00 :   415374: movk    w2, #0x289b, lsl #16
+    0.00 :   415378: mov     w1, #0x4                        // #4
+    0.00 :   41537c: bl      415db8 <HH_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            HH_NEON(d, a, b, c, x[0], s32, 0xeaa127fa);
+    0.00 :   415380: ldr     q0, [sp, #400]
+    0.39 :   415384: ldr     q1, [sp, #384]
+    0.00 :   415388: ldr     q2, [sp, #368]
+    0.00 :   41538c: ldr     q3, [sp, #48]
+    0.00 :   415390: add     x0, sp, #0x160
+    0.00 :   415394: mov     w2, #0x27fa                     // #10234
+    0.00 :   415398: movk    w2, #0xeaa1, lsl #16
+    0.00 :   41539c: mov     w1, #0xb                        // #11
+    0.00 :   4153a0: bl      415db8 <HH_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            HH_NEON(c, d, a, b, x[3], s33, 0xd4ef3085);
+    0.00 :   4153a4: ldr     q0, [sp, #352]
+    0.00 :   4153a8: ldr     q1, [sp, #400]
+    0.00 :   4153ac: ldr     q2, [sp, #384]
+    0.00 :   4153b0: ldr     q3, [sp, #96]
+    0.00 :   4153b4: add     x0, sp, #0x170
+    0.00 :   4153b8: mov     w2, #0x3085                     // #12421
+    0.00 :   4153bc: movk    w2, #0xd4ef, lsl #16
+    0.00 :   4153c0: mov     w1, #0x10                       // #16
+    0.00 :   4153c4: bl      415db8 <HH_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            HH_NEON(b, c, d, a, x[6], s34, 0x4881d05);
+    0.00 :   4153c8: ldr     q0, [sp, #368]
+    0.39 :   4153cc: ldr     q1, [sp, #352]
+    0.00 :   4153d0: ldr     q2, [sp, #400]
+    0.00 :   4153d4: ldr     q3, [sp, #144]
+    0.00 :   4153d8: add     x0, sp, #0x180
+    0.00 :   4153dc: mov     w2, #0x1d05                     // #7429
+    0.00 :   4153e0: movk    w2, #0x488, lsl #16
+    0.00 :   4153e4: mov     w1, #0x17                       // #23
+    0.00 :   4153e8: bl      415db8 <HH_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            HH_NEON(a, b, c, d, x[9], s31, 0xd9d4d039);
+    0.00 :   4153ec: ldr     q0, [sp, #384]
+    0.00 :   4153f0: ldr     q1, [sp, #368]
+    0.00 :   4153f4: ldr     q2, [sp, #352]
+    0.00 :   4153f8: ldr     q3, [sp, #192]
+    0.00 :   4153fc: add     x0, sp, #0x190
+    0.00 :   415400: mov     w2, #0xd039                     // #53305
+    0.00 :   415404: movk    w2, #0xd9d4, lsl #16
+    0.00 :   415408: mov     w1, #0x4                        // #4
+    0.00 :   41540c: bl      415db8 <HH_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            HH_NEON(d, a, b, c, x[12], s32, 0xe6db99e5);
+    0.00 :   415410: ldr     q0, [sp, #400]
+    0.13 :   415414: ldr     q1, [sp, #384]
+    0.00 :   415418: ldr     q2, [sp, #368]
+    0.00 :   41541c: ldr     q3, [sp, #240]
+    0.00 :   415420: add     x0, sp, #0x160
+    0.00 :   415424: mov     w2, #0x99e5                     // #39397
+    0.00 :   415428: movk    w2, #0xe6db, lsl #16
+    0.00 :   41542c: mov     w1, #0xb                        // #11
+    0.00 :   415430: bl      415db8 <HH_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            HH_NEON(c, d, a, b, x[15], s33, 0x1fa27cf8);
+    0.00 :   415434: ldr     q0, [sp, #352]
+    0.26 :   415438: ldr     q1, [sp, #400]
+    0.00 :   41543c: ldr     q2, [sp, #384]
+    0.00 :   415440: ldr     q3, [sp, #288]
+    0.00 :   415444: add     x0, sp, #0x170
+    0.00 :   415448: mov     w2, #0x7cf8                     // #31992
+    0.00 :   41544c: movk    w2, #0x1fa2, lsl #16
+    0.00 :   415450: mov     w1, #0x10                       // #16
+    0.00 :   415454: bl      415db8 <HH_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            HH_NEON(b, c, d, a, x[2], s34, 0xc4ac5665);
+    0.00 :   415458: ldr     q0, [sp, #368]
+    0.39 :   41545c: ldr     q1, [sp, #352]
+    0.00 :   415460: ldr     q2, [sp, #400]
+    0.00 :   415464: ldr     q3, [sp, #80]
+    0.00 :   415468: add     x0, sp, #0x180
+    0.00 :   41546c: mov     w2, #0x5665                     // #22117
+    0.00 :   415470: movk    w2, #0xc4ac, lsl #16
+    0.00 :   415474: mov     w1, #0x17                       // #23
+    0.00 :   415478: bl      415db8 <HH_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :
+         :            /* Round 4 */
+         :            II_NEON(a, b, c, d, x[0], s41, 0xf4292244);
+    0.00 :   41547c: ldr     q0, [sp, #384]
+    0.26 :   415480: ldr     q1, [sp, #368]
+    0.00 :   415484: ldr     q2, [sp, #352]
+    0.00 :   415488: ldr     q3, [sp, #48]
+    0.00 :   41548c: add     x0, sp, #0x190
+    0.00 :   415490: mov     w2, #0x2244                     // #8772
+    0.00 :   415494: movk    w2, #0xf429, lsl #16
+    0.00 :   415498: mov     w1, #0x6                        // #6
+    0.00 :   41549c: bl      415eb4 <II_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            II_NEON(d, a, b, c, x[7], s42, 0x432aff97);
+    0.13 :   4154a0: ldr     q0, [sp, #400]
+    0.26 :   4154a4: ldr     q1, [sp, #384]
+    0.00 :   4154a8: ldr     q2, [sp, #368]
+    0.00 :   4154ac: ldr     q3, [sp, #160]
+    0.00 :   4154b0: add     x0, sp, #0x160
+    0.00 :   4154b4: mov     w2, #0xff97                     // #65431
+    0.00 :   4154b8: movk    w2, #0x432a, lsl #16
+    0.00 :   4154bc: mov     w1, #0xa                        // #10
+    0.00 :   4154c0: bl      415eb4 <II_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            II_NEON(c, d, a, b, x[14], s43, 0xab9423a7);
+    0.26 :   4154c4: ldr     q0, [sp, #352]
+    0.79 :   4154c8: ldr     q1, [sp, #400]
+    0.00 :   4154cc: ldr     q2, [sp, #384]
+    0.00 :   4154d0: ldr     q3, [sp, #272]
+    0.00 :   4154d4: add     x0, sp, #0x170
+    0.00 :   4154d8: mov     w2, #0x23a7                     // #9127
+    0.00 :   4154dc: movk    w2, #0xab94, lsl #16
+    0.00 :   4154e0: mov     w1, #0xf                        // #15
+    0.00 :   4154e4: bl      415eb4 <II_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            II_NEON(b, c, d, a, x[5], s44, 0xfc93a039);
+    0.13 :   4154e8: ldr     q0, [sp, #368]
+    0.66 :   4154ec: ldr     q1, [sp, #352]
+    0.00 :   4154f0: ldr     q2, [sp, #400]
+    0.00 :   4154f4: ldr     q3, [sp, #128]
+    0.00 :   4154f8: add     x0, sp, #0x180
+    0.00 :   4154fc: mov     w2, #0xa039                     // #41017
+    0.00 :   415500: movk    w2, #0xfc93, lsl #16
+    0.00 :   415504: mov     w1, #0x15                       // #21
+    0.00 :   415508: bl      415eb4 <II_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            II_NEON(a, b, c, d, x[12], s41, 0x655b59c3);
+    0.00 :   41550c: ldr     q0, [sp, #384]
+    0.53 :   415510: ldr     q1, [sp, #368]
+    0.00 :   415514: ldr     q2, [sp, #352]
+    0.00 :   415518: ldr     q3, [sp, #240]
+    0.00 :   41551c: add     x0, sp, #0x190
+    0.00 :   415520: mov     w2, #0x59c3                     // #22979
+    0.00 :   415524: movk    w2, #0x655b, lsl #16
+    0.00 :   415528: mov     w1, #0x6                        // #6
+    0.00 :   41552c: bl      415eb4 <II_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            II_NEON(d, a, b, c, x[3], s42, 0x8f0ccc92);
+    0.00 :   415530: ldr     q0, [sp, #400]
+    1.32 :   415534: ldr     q1, [sp, #384]
+    0.00 :   415538: ldr     q2, [sp, #368]
+    0.00 :   41553c: ldr     q3, [sp, #96]
+    0.00 :   415540: add     x0, sp, #0x160
+    0.00 :   415544: mov     w2, #0xcc92                     // #52370
+    0.00 :   415548: movk    w2, #0x8f0c, lsl #16
+    0.00 :   41554c: mov     w1, #0xa                        // #10
+    0.00 :   415550: bl      415eb4 <II_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            II_NEON(c, d, a, b, x[10], s43, 0xffeff47d);
+    0.00 :   415554: ldr     q0, [sp, #352]
+    0.26 :   415558: ldr     q1, [sp, #400]
+    0.00 :   41555c: ldr     q2, [sp, #384]
+    0.00 :   415560: ldr     q3, [sp, #208]
+    0.00 :   415564: add     x0, sp, #0x170
+    0.00 :   415568: mov     w2, #0xf47d                     // #62589
+    0.00 :   41556c: movk    w2, #0xffef, lsl #16
+    0.00 :   415570: mov     w1, #0xf                        // #15
+    0.00 :   415574: bl      415eb4 <II_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            II_NEON(b, c, d, a, x[1], s44, 0x85845dd1);
+    0.00 :   415578: ldr     q0, [sp, #368]
+    0.26 :   41557c: ldr     q1, [sp, #352]
+    0.00 :   415580: ldr     q2, [sp, #400]
+    0.00 :   415584: ldr     q3, [sp, #64]
+    0.00 :   415588: add     x0, sp, #0x180
+    0.00 :   41558c: mov     w2, #0x5dd1                     // #24017
+    0.00 :   415590: movk    w2, #0x8584, lsl #16
+    0.00 :   415594: mov     w1, #0x15                       // #21
+    0.00 :   415598: bl      415eb4 <II_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            II_NEON(a, b, c, d, x[8], s41, 0x6fa87e4f);
+    0.00 :   41559c: ldr     q0, [sp, #384]
+    0.39 :   4155a0: ldr     q1, [sp, #368]
+    0.00 :   4155a4: ldr     q2, [sp, #352]
+    0.00 :   4155a8: ldr     q3, [sp, #176]
+    0.00 :   4155ac: add     x0, sp, #0x190
+    0.00 :   4155b0: mov     w2, #0x7e4f                     // #32335
+    0.00 :   4155b4: movk    w2, #0x6fa8, lsl #16
+    0.00 :   4155b8: mov     w1, #0x6                        // #6
+    0.00 :   4155bc: bl      415eb4 <II_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            II_NEON(d, a, b, c, x[15], s42, 0xfe2ce6e0);
+    0.00 :   4155c0: ldr     q0, [sp, #400]
+    0.13 :   4155c4: ldr     q1, [sp, #384]
+    0.00 :   4155c8: ldr     q2, [sp, #368]
+    0.00 :   4155cc: ldr     q3, [sp, #288]
+    0.00 :   4155d0: add     x0, sp, #0x160
+    0.00 :   4155d4: mov     w2, #0xe6e0                     // #59104
+    0.00 :   4155d8: movk    w2, #0xfe2c, lsl #16
+    0.00 :   4155dc: mov     w1, #0xa                        // #10
+    0.00 :   4155e0: bl      415eb4 <II_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            II_NEON(c, d, a, b, x[6], s43, 0xa3014314);
+    0.26 :   4155e4: ldr     q0, [sp, #352]
+    0.13 :   4155e8: ldr     q1, [sp, #400]
+    0.00 :   4155ec: ldr     q2, [sp, #384]
+    0.00 :   4155f0: ldr     q3, [sp, #144]
+    0.00 :   4155f4: add     x0, sp, #0x170
+    0.00 :   4155f8: mov     w2, #0x4314                     // #17172
+    0.00 :   4155fc: movk    w2, #0xa301, lsl #16
+    0.00 :   415600: mov     w1, #0xf                        // #15
+    0.00 :   415604: bl      415eb4 <II_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            II_NEON(b, c, d, a, x[13], s44, 0x4e0811a1);
+    0.13 :   415608: ldr     q0, [sp, #368]
+    0.13 :   41560c: ldr     q1, [sp, #352]
+    0.00 :   415610: ldr     q2, [sp, #400]
+    0.00 :   415614: ldr     q3, [sp, #256]
+    0.00 :   415618: add     x0, sp, #0x180
+    0.00 :   41561c: mov     w2, #0x11a1                     // #4513
+    0.00 :   415620: movk    w2, #0x4e08, lsl #16
+    0.00 :   415624: mov     w1, #0x15                       // #21
+    0.00 :   415628: bl      415eb4 <II_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            II_NEON(a, b, c, d, x[4], s41, 0xf7537e82);
+    0.13 :   41562c: ldr     q0, [sp, #384]
+    0.26 :   415630: ldr     q1, [sp, #368]
+    0.00 :   415634: ldr     q2, [sp, #352]
+    0.00 :   415638: ldr     q3, [sp, #112]
+    0.00 :   41563c: add     x0, sp, #0x190
+    0.00 :   415640: mov     w2, #0x7e82                     // #32386
+    0.00 :   415644: movk    w2, #0xf753, lsl #16
+    0.00 :   415648: mov     w1, #0x6                        // #6
+    0.00 :   41564c: bl      415eb4 <II_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            II_NEON(d, a, b, c, x[11], s42, 0xbd3af235);
+    0.13 :   415650: ldr     q0, [sp, #400]
+    0.78 :   415654: ldr     q1, [sp, #384]
+    0.00 :   415658: ldr     q2, [sp, #368]
+    0.00 :   41565c: ldr     q3, [sp, #224]
+    0.00 :   415660: add     x0, sp, #0x160
+    0.00 :   415664: mov     w2, #0xf235                     // #62005
+    0.00 :   415668: movk    w2, #0xbd3a, lsl #16
+    0.00 :   41566c: mov     w1, #0xa                        // #10
+    0.00 :   415670: bl      415eb4 <II_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            II_NEON(c, d, a, b, x[2], s43, 0x2ad7d2bb);
+    0.00 :   415674: ldr     q0, [sp, #352]
+    0.39 :   415678: ldr     q1, [sp, #400]
+    0.00 :   41567c: ldr     q2, [sp, #384]
+    0.00 :   415680: ldr     q3, [sp, #80]
+    0.00 :   415684: add     x0, sp, #0x170
+    0.00 :   415688: mov     w2, #0xd2bb                     // #53947
+    0.00 :   41568c: movk    w2, #0x2ad7, lsl #16
+    0.00 :   415690: mov     w1, #0xf                        // #15
+    0.00 :   415694: bl      415eb4 <II_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :            II_NEON(b, c, d, a, x[9], s44, 0xeb86d391);
+    0.00 :   415698: ldr     q0, [sp, #368]
+    0.13 :   41569c: ldr     q1, [sp, #352]
+    0.00 :   4156a0: ldr     q2, [sp, #400]
+    0.00 :   4156a4: ldr     q3, [sp, #192]
+    0.00 :   4156a8: add     x0, sp, #0x180
+    0.00 :   4156ac: mov     w2, #0xd391                     // #54161
+    0.00 :   4156b0: movk    w2, #0xeb86, lsl #16
+    0.00 :   4156b4: mov     w1, #0x15                       // #21
+    0.00 :   4156b8: bl      415eb4 <II_NEON(__Uint32x4_t&, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, __Uint32x4_t, unsigned int, unsigned int)>
+         :
+         :            // 累加当前块的计算结果到全局状态
+         :            A = vaddq_u32(A, a);
+    0.00 :   4156bc: ldr     q0, [sp, #400]
+    0.00 :   4156c0: ldr     q1, [sp, #928]
+    0.00 :   4156c4: str     q1, [sp, #672]
+    0.00 :   4156c8: str     q0, [sp, #656]
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   4156cc: ldr     q1, [sp, #672]
+    0.66 :   4156d0: ldr     q0, [sp, #656]
+    0.00 :   4156d4: add     v0.4s, v1.4s, v0.4s
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+    0.66 :   4156d8: str     q0, [sp, #928]
+         :            B = vaddq_u32(B, b);
+    0.00 :   4156dc: ldr     q0, [sp, #384]
+    0.13 :   4156e0: ldr     q1, [sp, #912]
+    0.00 :   4156e4: str     q1, [sp, #704]
+    0.00 :   4156e8: str     q0, [sp, #688]
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+    0.00 :   4156ec: ldr     q1, [sp, #704]
+    0.13 :   4156f0: ldr     q0, [sp, #688]
+    0.00 :   4156f4: add     v0.4s, v1.4s, v0.4s
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+    0.00 :   4156f8: str     q0, [sp, #912]
+         :            C = vaddq_u32(C, c);
+    0.00 :   4156fc: ldr     q0, [sp, #368]
+    0.00 :   415700: ldr     q1, [sp, #896]
+    0.00 :   415704: str     q1, [sp, #736]
+    0.00 :   415708: str     q0, [sp, #720]
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+    0.00 :   41570c: ldr     q1, [sp, #736]
+    0.00 :   415710: ldr     q0, [sp, #720]
+    0.00 :   415714: add     v0.4s, v1.4s, v0.4s
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+    0.00 :   415718: str     q0, [sp, #896]
+         :            D = vaddq_u32(D, d);
+    0.00 :   41571c: ldr     q0, [sp, #352]
+    0.00 :   415720: ldr     q1, [sp, #880]
+    0.00 :   415724: str     q1, [sp, #768]
+    0.00 :   415728: str     q0, [sp, #752]
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+    0.00 :   41572c: ldr     q1, [sp, #768]
+    0.00 :   415730: ldr     q0, [sp, #752]
+    0.00 :   415734: add     v0.4s, v1.4s, v0.4s
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+    0.00 :   415738: str     q0, [sp, #880]
+         :            for (int block = 0; block < n_blocks; block++)
+    0.00 :   41573c: ldr     w0, [sp, #876]
+    0.00 :   415740: add     w0, w0, #0x1
+    0.00 :   415744: str     w0, [sp, #876]
+    0.00 :   415748: b       414c70 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0x104>
+    0.00 :   41574c: ldr     x0, [sp, #32]
+    0.13 :   415750: str     x0, [sp, #648]
+    0.00 :   415754: ldr     q0, [sp, #928]
+    0.00 :   415758: str     q0, [sp, #624]
+         :            vst1q_u32(unsigned int*, __Uint32x4_t):
+         :
+         :            __extension__ extern __inline void
+         :            __attribute__ ((__always_inline__, __gnu_inline__, __artificial__))
+         :            vst1q_u32 (uint32_t *__a, uint32x4_t __b)
+         :            {
+         :            __builtin_aarch64_st1v4si ((__builtin_aarch64_simd_si *) __a,
+    0.26 :   41575c: ldr     q0, [sp, #624]
+    0.13 :   415760: ldr     x0, [sp, #648]
+    0.00 :   415764: str     q0, [x0]
+         :            (int32x4_t) __b);
+         :            }
+    0.00 :   415768: nop
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            }
+         :
+         :            // 将 NEON 向量状态存入输出二维数组 state_out
+         :            vst1q_u32(state_out[0], A);
+         :            vst1q_u32(state_out[1], B);
+    0.00 :   41576c: ldr     x0, [sp, #32]
+    0.00 :   415770: add     x0, x0, #0x10
+    0.00 :   415774: str     x0, [sp, #616]
+    0.13 :   415778: ldr     q0, [sp, #912]
+    0.00 :   41577c: str     q0, [sp, #592]
+         :            vst1q_u32(unsigned int*, __Uint32x4_t):
+         :            __builtin_aarch64_st1v4si ((__builtin_aarch64_simd_si *) __a,
+    0.00 :   415780: ldr     q0, [sp, #592]
+    0.13 :   415784: ldr     x0, [sp, #616]
+    0.00 :   415788: str     q0, [x0]
+         :            }
+    0.00 :   41578c: nop
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            vst1q_u32(state_out[2], C);
+    0.00 :   415790: ldr     x0, [sp, #32]
+    0.00 :   415794: add     x0, x0, #0x20
+    0.00 :   415798: str     x0, [sp, #584]
+    0.00 :   41579c: ldr     q0, [sp, #896]
+    0.00 :   4157a0: str     q0, [sp, #560]
+         :            vst1q_u32(unsigned int*, __Uint32x4_t):
+         :            __builtin_aarch64_st1v4si ((__builtin_aarch64_simd_si *) __a,
+    0.00 :   4157a4: ldr     q0, [sp, #560]
+    0.00 :   4157a8: ldr     x0, [sp, #584]
+    0.00 :   4157ac: str     q0, [x0]
+         :            }
+    0.00 :   4157b0: nop
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            vst1q_u32(state_out[3], D);
+    0.13 :   4157b4: ldr     x0, [sp, #32]
+    0.00 :   4157b8: add     x0, x0, #0x30
+    0.00 :   4157bc: str     x0, [sp, #552]
+    0.00 :   4157c0: ldr     q0, [sp, #880]
+    0.00 :   4157c4: str     q0, [sp, #528]
+         :            vst1q_u32(unsigned int*, __Uint32x4_t):
+         :            __builtin_aarch64_st1v4si ((__builtin_aarch64_simd_si *) __a,
+    0.13 :   4157c8: ldr     q0, [sp, #528]
+    0.26 :   4157cc: ldr     x0, [sp, #552]
+    0.00 :   4157d0: str     q0, [x0]
+         :            }
+    0.00 :   4157d4: nop
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :
+         :            // 下面的处理，在理解上较为复杂
+         :            // 后处理：对输出每个 32 位数进行字节顺序转换（大端转换）
+         :            for (int i = 0; i < 4; i++) {
+    0.13 :   4157d8: str     wzr, [sp, #864]
+    0.13 :   4157dc: ldr     w0, [sp, #864]
+    0.00 :   4157e0: cmp     w0, #0x3
+    0.00 :   4157e4: b.gt    4158cc <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd60>
+         :            uint32_t temp[4];
+         :            uint32x4_t vec = vld1q_u32(state_out[i]); // 加载为 NEON 向量
+    0.00 :   4157e8: ldrsw   x0, [sp, #864]
+    0.00 :   4157ec: lsl     x0, x0, #4
+    0.00 :   4157f0: ldr     x1, [sp, #32]
+    0.00 :   4157f4: add     x0, x1, x0
+    0.00 :   4157f8: str     x0, [sp, #520]
+         :            vld1q_u32(unsigned int const*):
+         :            __builtin_aarch64_ld1v4si ((const __builtin_aarch64_simd_si *) __a);
+    0.13 :   4157fc: ldr     x0, [sp, #520]
+    0.79 :   415800: ldr     q0, [x0]
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+    0.53 :   415804: str     q0, [sp, #816]
+    0.00 :   415808: add     x0, sp, #0x138
+    0.00 :   41580c: str     x0, [sp, #512]
+    0.00 :   415810: ldr     q0, [sp, #816]
+    1.71 :   415814: str     q0, [sp, #496]
+         :            vst1q_u32(unsigned int*, __Uint32x4_t):
+         :            __builtin_aarch64_st1v4si ((__builtin_aarch64_simd_si *) __a,
+    0.13 :   415818: ldr     q0, [sp, #496]
+    1.31 :   41581c: ldr     x0, [sp, #512]
+    0.00 :   415820: str     q0, [x0]
+         :            }
+    0.00 :   415824: nop
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            vst1q_u32(temp, vec);
+         :            for (int j = 0; j < 4; j++) {
+    0.00 :   415828: str     wzr, [sp, #860]
+    1.18 :   41582c: ldr     w0, [sp, #860]
+    0.00 :   415830: cmp     w0, #0x3
+    0.13 :   415834: b.gt    4158a0 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd34>
+         :            uint32_t value = temp[j];
+    0.39 :   415838: ldrsw   x0, [sp, #860]
+    0.00 :   41583c: lsl     x0, x0, #2
+    0.13 :   415840: add     x1, sp, #0x138
+    0.13 :   415844: ldr     w0, [x1, x0]
+    2.11 :   415848: str     w0, [sp, #812]
+         :            temp[j] = ((value & 0xff) << 24) |
+    0.00 :   41584c: ldr     w0, [sp, #812]
+    0.00 :   415850: lsl     w1, w0, #24
+         :            ((value & 0xff00) << 8) |
+    1.84 :   415854: ldr     w0, [sp, #812]
+    0.00 :   415858: lsl     w0, w0, #8
+    0.00 :   41585c: and     w0, w0, #0xff0000
+         :            temp[j] = ((value & 0xff) << 24) |
+    0.00 :   415860: orr     w1, w1, w0
+         :            ((value & 0xff0000) >> 8) |
+    0.00 :   415864: ldr     w0, [sp, #812]
+    0.00 :   415868: lsr     w0, w0, #8
+    0.00 :   41586c: and     w0, w0, #0xff00
+         :            ((value & 0xff00) << 8) |
+    0.00 :   415870: orr     w1, w1, w0
+         :            ((value & 0xff000000) >> 24);
+    0.79 :   415874: ldr     w0, [sp, #812]
+    0.00 :   415878: lsr     w0, w0, #24
+         :            ((value & 0xff0000) >> 8) |
+    0.00 :   41587c: orr     w2, w1, w0
+         :            temp[j] = ((value & 0xff) << 24) |
+    0.00 :   415880: ldrsw   x0, [sp, #860]
+    0.00 :   415884: lsl     x0, x0, #2
+    0.00 :   415888: add     x1, sp, #0x138
+    0.13 :   41588c: str     w2, [x1, x0]
+         :            for (int j = 0; j < 4; j++) {
+    0.26 :   415890: ldr     w0, [sp, #860]
+    0.00 :   415894: add     w0, w0, #0x1
+    0.39 :   415898: str     w0, [sp, #860]
+    0.00 :   41589c: b       41582c <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xcc0>
+         :            }
+         :            memcpy(state_out[i], temp, sizeof(temp));
+    0.13 :   4158a0: ldrsw   x0, [sp, #864]
+    0.00 :   4158a4: lsl     x0, x0, #4
+    0.26 :   4158a8: ldr     x1, [sp, #32]
+    0.00 :   4158ac: add     x2, x1, x0
+    0.00 :   4158b0: add     x0, sp, #0x200
+    0.00 :   4158b4: ldp     x0, x1, [x0, #-200]
+    1.18 :   4158b8: stp     x0, x1, [x2]
+         :            for (int i = 0; i < 4; i++) {
+    0.00 :   4158bc: ldr     w0, [sp, #864]
+    0.00 :   4158c0: add     w0, w0, #0x1
+    0.00 :   4158c4: str     w0, [sp, #864]
+    0.00 :   4158c8: b       4157dc <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xc70>
+         :            // cout << endl;
+         :
+         :            // 释放动态分配的内存
+         :            // 实现SIMD并行算法的时候，也请记得及时回收内存！
+         :            // 释放动态分配的内存
+         :            for (int i = 0; i < 4; i++) {
+    0.00 :   4158cc: str     wzr, [sp, #856]
+    0.26 :   4158d0: ldr     w0, [sp, #856]
+    0.00 :   4158d4: cmp     w0, #0x3
+    0.00 :   4158d8: b.gt    415924 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xdb8>
+         :            delete[] paddedMessages[i];
+    0.39 :   4158dc: add     x0, sp, #0x1b0
+    0.00 :   4158e0: ldrsw   x1, [sp, #856]
+    0.00 :   4158e4: ldr     x0, [x0, x1, lsl #3]
+    0.00 :   4158e8: cmp     x0, #0x0
+    0.00 :   4158ec: b.eq    415900 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd94>  // b.none
+    0.53 :   4158f0: add     x0, sp, #0x1b0
+    0.00 :   4158f4: ldrsw   x1, [sp, #856]
+    0.00 :   4158f8: ldr     x0, [x0, x1, lsl #3]
+    0.00 :   4158fc: bl      401ca0 <operator delete[](void*)@plt>
+         :            for (int i = 0; i < 4; i++) {
+    0.00 :   415900: ldr     w0, [sp, #856]
+    0.00 :   415904: add     w0, w0, #0x1
+    0.00 :   415908: str     w0, [sp, #856]
+    0.00 :   41590c: b       4158d0 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd64>
+         :            paddedMessages[i] = StringProcess(inputs[i], &paddedLengths[i]);
+    0.00 :   415910: mov     x19, x0
+    0.00 :   415914: add     x0, sp, #0x1d0
+    0.00 :   415918: bl      401b70 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string()@plt>
+    0.00 :   41591c: mov     x0, x19
+    0.00 :   415920: bl      401db0 <_Unwind_Resume@plt>
+         :            }
+         :            // 这里 paddedLengths 改为数组存储，不需要delete
+         :            // delete[] paddedLengths;
+         :            }
+    0.39 :   415924: nop
+    0.13 :   415928: ldr     x19, [sp, #16]
+    0.00 :   41592c: ldp     x29, x30, [sp]
+    0.00 :   415930: add     sp, sp, #0x3c0
+    0.00 :   415934: ret
