@@ -1,0 +1,1784 @@
+ Percent |	Source code & Disassembly of main for cycles:u (1923 samples, percent: local period)
+----------------------------------------------------------------------------------------------------
+         :
+         :
+         :
+         :            Disassembly of section .text:
+         :
+         :            00000000004148d0 <MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*)>:
+         :            MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*):
+         :            * @param input 输入
+         :            * @param[out] state 用于给调用者传递额外的返回值，即最终的缓冲区，也就是MD5的结果
+         :            * @return Byte消息数组
+         :            */
+         :            void MD5Hash(string input, bit32 *state)
+         :            {
+    0.00 :   4148d0: stp     x29, x30, [sp, #-208]!
+    0.00 :   4148d4: mov     x29, sp
+    0.10 :   4148d8: str     x19, [sp, #16]
+    0.00 :   4148dc: str     x0, [sp, #40]
+    0.00 :   4148e0: str     x1, [sp, #32]
+         :
+         :            Byte *paddedMessage;
+         :            int *messageLength = new int[1];
+    0.00 :   4148e4: mov     x0, #0x4                        // #4
+    0.00 :   4148e8: bl      4019c0 <operator new[](unsigned long)@plt>
+    0.00 :   4148ec: str     x0, [sp, #176]
+         :            for (int i = 0; i < 1; i += 1)
+    0.00 :   4148f0: str     wzr, [sp, #196]
+    0.05 :   4148f4: ldr     w0, [sp, #196]
+    0.00 :   4148f8: cmp     w0, #0x0
+    0.00 :   4148fc: b.gt    414984 <MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*)+0xb4>
+         :            {
+         :            paddedMessage = StringProcess(input, &messageLength[i]);
+    0.05 :   414900: add     x0, sp, #0x88
+    0.00 :   414904: ldr     x1, [sp, #40]
+    0.00 :   414908: bl      401a50 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@plt>
+    0.00 :   41490c: ldrsw   x0, [sp, #196]
+    0.00 :   414910: lsl     x0, x0, #2
+    0.00 :   414914: ldr     x1, [sp, #176]
+    0.00 :   414918: add     x1, x1, x0
+    0.00 :   41491c: add     x0, sp, #0x88
+    0.00 :   414920: bl      414714 <StringProcess(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int*)>
+    0.00 :   414924: str     x0, [sp, #200]
+    0.00 :   414928: add     x0, sp, #0x88
+    0.00 :   41492c: bl      401ad0 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string()@plt>
+         :            // cout<<messageLength[i]<<endl;
+         :            assert(messageLength[i] == messageLength[0]);
+    0.00 :   414930: ldrsw   x0, [sp, #196]
+    0.00 :   414934: lsl     x0, x0, #2
+    0.00 :   414938: ldr     x1, [sp, #176]
+    0.00 :   41493c: add     x0, x1, x0
+    0.00 :   414940: ldr     w1, [x0]
+    0.10 :   414944: ldr     x0, [sp, #176]
+    0.00 :   414948: ldr     w0, [x0]
+    0.00 :   41494c: cmp     w1, w0
+    0.00 :   414950: b.eq    414974 <MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*)+0xa4>  // b.none
+    0.00 :   414954: adrp    x0, 416000 <MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*)+0x1730>
+    0.00 :   414958: add     x3, x0, #0x530
+    0.00 :   41495c: mov     w2, #0x5c                       // #92
+    0.00 :   414960: adrp    x0, 416000 <MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*)+0x1730>
+    0.00 :   414964: add     x1, x0, #0x558
+    0.00 :   414968: adrp    x0, 416000 <MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*)+0x1730>
+    0.00 :   41496c: add     x0, x0, #0x560
+    0.00 :   414970: bl      401a80 <__assert_fail@plt>
+         :            for (int i = 0; i < 1; i += 1)
+    0.00 :   414974: ldr     w0, [sp, #196]
+    0.00 :   414978: add     w0, w0, #0x1
+    0.00 :   41497c: str     w0, [sp, #196]
+    0.00 :   414980: b       4148f4 <MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*)+0x24>
+         :            }
+         :            int n_blocks = messageLength[0] / 64;
+    0.00 :   414984: ldr     x0, [sp, #176]
+    0.00 :   414988: ldr     w0, [x0]
+    0.00 :   41498c: add     w1, w0, #0x3f
+    0.00 :   414990: cmp     w0, #0x0
+    0.00 :   414994: csel    w0, w1, w0, lt  // lt = tstop
+    0.00 :   414998: asr     w0, w0, #6
+    0.10 :   41499c: str     w0, [sp, #172]
+         :
+         :            // bit32* state= new bit32[4];
+         :            state[0] = 0x67452301;
+    0.00 :   4149a0: ldr     x0, [sp, #32]
+    0.00 :   4149a4: mov     w1, #0x2301                     // #8961
+    0.00 :   4149a8: movk    w1, #0x6745, lsl #16
+    0.00 :   4149ac: str     w1, [x0]
+         :            state[1] = 0xefcdab89;
+    0.00 :   4149b0: ldr     x0, [sp, #32]
+    0.00 :   4149b4: add     x0, x0, #0x4
+    0.00 :   4149b8: mov     w1, #0xab89                     // #43913
+    0.00 :   4149bc: movk    w1, #0xefcd, lsl #16
+    0.00 :   4149c0: str     w1, [x0]
+         :            state[2] = 0x98badcfe;
+    0.00 :   4149c4: ldr     x0, [sp, #32]
+    0.00 :   4149c8: add     x0, x0, #0x8
+    0.00 :   4149cc: mov     w1, #0xdcfe                     // #56574
+    0.00 :   4149d0: movk    w1, #0x98ba, lsl #16
+    0.00 :   4149d4: str     w1, [x0]
+         :            state[3] = 0x10325476;
+    0.05 :   4149d8: ldr     x0, [sp, #32]
+    0.00 :   4149dc: add     x0, x0, #0xc
+    0.00 :   4149e0: mov     w1, #0x5476                     // #21622
+    0.00 :   4149e4: movk    w1, #0x1032, lsl #16
+    0.00 :   4149e8: str     w1, [x0]
+         :
+         :            // 逐block地更新state
+         :            for (int i = 0; i < n_blocks; i += 1)
+    0.00 :   4149ec: str     wzr, [sp, #192]
+    0.00 :   4149f0: ldr     w1, [sp, #192]
+    0.10 :   4149f4: ldr     w0, [sp, #172]
+    0.00 :   4149f8: cmp     w1, w0
+    0.00 :   4149fc: b.ge    416168 <MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*)+0x1898>  // b.tcont
+         :            {
+         :            bit32 x[16];
+         :
+         :            // 下面的处理，在理解上较为复杂
+         :            for (int i1 = 0; i1 < 16; ++i1)
+    0.21 :   414a00: str     wzr, [sp, #188]
+    0.52 :   414a04: ldr     w0, [sp, #188]
+    0.00 :   414a08: cmp     w0, #0xf
+    0.05 :   414a0c: b.gt    414aec <MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*)+0x21c>
+         :            {
+         :            x[i1] = (paddedMessage[4 * i1 + i * 64]) |
+    0.52 :   414a10: ldr     w0, [sp, #192]
+    0.00 :   414a14: lsl     w1, w0, #4
+    0.21 :   414a18: ldr     w0, [sp, #188]
+    0.00 :   414a1c: add     w0, w1, w0
+    0.00 :   414a20: lsl     w0, w0, #2
+    0.00 :   414a24: sxtw    x0, w0
+    0.16 :   414a28: ldr     x1, [sp, #200]
+    0.05 :   414a2c: add     x0, x1, x0
+    0.47 :   414a30: ldrb    w0, [x0]
+    0.47 :   414a34: mov     w2, w0
+         :            (paddedMessage[4 * i1 + 1 + i * 64] << 8) |
+    4.89 :   414a38: ldr     w0, [sp, #188]
+    0.00 :   414a3c: lsl     w0, w0, #2
+    0.00 :   414a40: add     w1, w0, #0x1
+    0.00 :   414a44: ldr     w0, [sp, #192]
+    0.00 :   414a48: lsl     w0, w0, #6
+    0.00 :   414a4c: add     w0, w1, w0
+    0.00 :   414a50: sxtw    x0, w0
+    0.05 :   414a54: ldr     x1, [sp, #200]
+    0.00 :   414a58: add     x0, x1, x0
+    0.10 :   414a5c: ldrb    w0, [x0]
+    0.00 :   414a60: lsl     w0, w0, #8
+         :            x[i1] = (paddedMessage[4 * i1 + i * 64]) |
+    0.05 :   414a64: orr     w1, w2, w0
+         :            (paddedMessage[4 * i1 + 2 + i * 64] << 16) |
+    1.56 :   414a68: ldr     w0, [sp, #188]
+    0.00 :   414a6c: lsl     w0, w0, #2
+    0.00 :   414a70: add     w2, w0, #0x2
+    0.00 :   414a74: ldr     w0, [sp, #192]
+    0.00 :   414a78: lsl     w0, w0, #6
+    0.00 :   414a7c: add     w0, w2, w0
+    0.00 :   414a80: sxtw    x0, w0
+    0.10 :   414a84: ldr     x2, [sp, #200]
+    0.00 :   414a88: add     x0, x2, x0
+    0.10 :   414a8c: ldrb    w0, [x0]
+    0.00 :   414a90: lsl     w0, w0, #16
+         :            (paddedMessage[4 * i1 + 1 + i * 64] << 8) |
+    0.00 :   414a94: orr     w1, w1, w0
+         :            (paddedMessage[4 * i1 + 3 + i * 64] << 24);
+    2.34 :   414a98: ldr     w0, [sp, #188]
+    0.00 :   414a9c: lsl     w0, w0, #2
+    0.00 :   414aa0: add     w2, w0, #0x3
+    0.00 :   414aa4: ldr     w0, [sp, #192]
+    0.00 :   414aa8: lsl     w0, w0, #6
+    0.00 :   414aac: add     w0, w2, w0
+    0.00 :   414ab0: sxtw    x0, w0
+    0.00 :   414ab4: ldr     x2, [sp, #200]
+    0.00 :   414ab8: add     x0, x2, x0
+    0.00 :   414abc: ldrb    w0, [x0]
+    0.00 :   414ac0: lsl     w0, w0, #24
+         :            (paddedMessage[4 * i1 + 2 + i * 64] << 16) |
+    0.00 :   414ac4: orr     w0, w1, w0
+    0.00 :   414ac8: mov     w2, w0
+         :            x[i1] = (paddedMessage[4 * i1 + i * 64]) |
+    1.87 :   414acc: ldrsw   x0, [sp, #188]
+    0.00 :   414ad0: lsl     x0, x0, #2
+    0.00 :   414ad4: add     x1, sp, #0x30
+    0.00 :   414ad8: str     w2, [x1, x0]
+         :            for (int i1 = 0; i1 < 16; ++i1)
+    0.00 :   414adc: ldr     w0, [sp, #188]
+    0.00 :   414ae0: add     w0, w0, #0x1
+    0.05 :   414ae4: str     w0, [sp, #188]
+    0.00 :   414ae8: b       414a04 <MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*)+0x134>
+         :            }
+         :
+         :            bit32 a = state[0], b = state[1], c = state[2], d = state[3];
+    0.00 :   414aec: ldr     x0, [sp, #32]
+    0.10 :   414af0: ldr     w0, [x0]
+    0.00 :   414af4: str     w0, [sp, #132]
+    0.05 :   414af8: ldr     x0, [sp, #32]
+    0.00 :   414afc: ldr     w0, [x0, #4]
+    0.05 :   414b00: str     w0, [sp, #128]
+    0.00 :   414b04: ldr     x0, [sp, #32]
+    0.10 :   414b08: ldr     w0, [x0, #8]
+    0.00 :   414b0c: str     w0, [sp, #124]
+    0.10 :   414b10: ldr     x0, [sp, #32]
+    0.05 :   414b14: ldr     w0, [x0, #12]
+    0.10 :   414b18: str     w0, [sp, #120]
+         :
+         :            auto start = system_clock::now();
+    0.00 :   414b1c: bl      4019d0 <std::chrono::_V2::system_clock::now()@plt>
+    0.00 :   414b20: str     x0, [sp, #112]
+         :            /* Round 1 */
+         :            FF(a, b, c, d, x[0], s11, 0xd76aa478);
+    0.00 :   414b24: ldr     w1, [sp, #132]
+    0.00 :   414b28: ldr     w2, [sp, #128]
+    0.05 :   414b2c: ldr     w0, [sp, #124]
+    0.00 :   414b30: and     w2, w2, w0
+    0.00 :   414b34: ldr     w0, [sp, #128]
+    0.00 :   414b38: mvn     w3, w0
+    0.00 :   414b3c: ldr     w0, [sp, #120]
+    0.00 :   414b40: and     w0, w3, w0
+    0.00 :   414b44: orr     w2, w2, w0
+    0.00 :   414b48: ldr     w0, [sp, #48]
+    0.00 :   414b4c: add     w0, w2, w0
+    0.00 :   414b50: add     w1, w1, w0
+    0.00 :   414b54: mov     w0, #0xa478                     // #42104
+    0.00 :   414b58: movk    w0, #0xd76a, lsl #16
+    0.00 :   414b5c: add     w0, w1, w0
+    0.00 :   414b60: str     w0, [sp, #132]
+    0.00 :   414b64: ldr     w0, [sp, #132]
+    0.00 :   414b68: ror     w0, w0, #25
+    0.36 :   414b6c: str     w0, [sp, #132]
+    0.00 :   414b70: ldr     w1, [sp, #132]
+    0.78 :   414b74: ldr     w0, [sp, #128]
+    0.00 :   414b78: add     w0, w1, w0
+    0.00 :   414b7c: str     w0, [sp, #132]
+         :            FF(d, a, b, c, x[1], s12, 0xe8c7b756);
+    0.00 :   414b80: ldr     w1, [sp, #120]
+    0.00 :   414b84: ldr     w2, [sp, #132]
+    0.21 :   414b88: ldr     w0, [sp, #128]
+    0.00 :   414b8c: and     w2, w2, w0
+    0.00 :   414b90: ldr     w0, [sp, #132]
+    0.00 :   414b94: mvn     w3, w0
+    0.10 :   414b98: ldr     w0, [sp, #124]
+    0.00 :   414b9c: and     w0, w3, w0
+    0.00 :   414ba0: orr     w2, w2, w0
+    0.00 :   414ba4: ldr     w0, [sp, #52]
+    0.00 :   414ba8: add     w0, w2, w0
+    0.00 :   414bac: add     w1, w1, w0
+    0.00 :   414bb0: mov     w0, #0xb756                     // #46934
+    0.00 :   414bb4: movk    w0, #0xe8c7, lsl #16
+    0.00 :   414bb8: add     w0, w1, w0
+    0.00 :   414bbc: str     w0, [sp, #120]
+    0.00 :   414bc0: ldr     w0, [sp, #120]
+    0.00 :   414bc4: ror     w0, w0, #20
+    0.52 :   414bc8: str     w0, [sp, #120]
+    0.00 :   414bcc: ldr     w1, [sp, #120]
+    0.36 :   414bd0: ldr     w0, [sp, #132]
+    0.00 :   414bd4: add     w0, w1, w0
+    0.00 :   414bd8: str     w0, [sp, #120]
+         :            FF(c, d, a, b, x[2], s13, 0x242070db);
+    0.00 :   414bdc: ldr     w1, [sp, #124]
+    0.00 :   414be0: ldr     w2, [sp, #120]
+    0.73 :   414be4: ldr     w0, [sp, #132]
+    0.00 :   414be8: and     w2, w2, w0
+    0.00 :   414bec: ldr     w0, [sp, #120]
+    0.00 :   414bf0: mvn     w3, w0
+    0.00 :   414bf4: ldr     w0, [sp, #128]
+    0.00 :   414bf8: and     w0, w3, w0
+    0.00 :   414bfc: orr     w2, w2, w0
+    0.00 :   414c00: ldr     w0, [sp, #56]
+    0.00 :   414c04: add     w0, w2, w0
+    0.00 :   414c08: add     w1, w1, w0
+    0.00 :   414c0c: mov     w0, #0x70db                     // #28891
+    0.00 :   414c10: movk    w0, #0x2420, lsl #16
+    0.00 :   414c14: add     w0, w1, w0
+    0.00 :   414c18: str     w0, [sp, #124]
+    0.00 :   414c1c: ldr     w0, [sp, #124]
+    0.00 :   414c20: ror     w0, w0, #15
+    0.67 :   414c24: str     w0, [sp, #124]
+    0.00 :   414c28: ldr     w1, [sp, #124]
+    0.42 :   414c2c: ldr     w0, [sp, #120]
+    0.00 :   414c30: add     w0, w1, w0
+    0.00 :   414c34: str     w0, [sp, #124]
+         :            FF(b, c, d, a, x[3], s14, 0xc1bdceee);
+    0.00 :   414c38: ldr     w1, [sp, #128]
+    0.00 :   414c3c: ldr     w2, [sp, #124]
+    0.52 :   414c40: ldr     w0, [sp, #120]
+    0.00 :   414c44: and     w2, w2, w0
+    0.00 :   414c48: ldr     w0, [sp, #124]
+    0.00 :   414c4c: mvn     w3, w0
+    0.16 :   414c50: ldr     w0, [sp, #132]
+    0.00 :   414c54: and     w0, w3, w0
+    0.00 :   414c58: orr     w2, w2, w0
+    0.00 :   414c5c: ldr     w0, [sp, #60]
+    0.00 :   414c60: add     w0, w2, w0
+    0.00 :   414c64: add     w1, w1, w0
+    0.00 :   414c68: mov     w0, #0xceee                     // #52974
+    0.00 :   414c6c: movk    w0, #0xc1bd, lsl #16
+    0.00 :   414c70: add     w0, w1, w0
+    0.00 :   414c74: str     w0, [sp, #128]
+    0.00 :   414c78: ldr     w0, [sp, #128]
+    0.00 :   414c7c: ror     w0, w0, #10
+    0.62 :   414c80: str     w0, [sp, #128]
+    0.00 :   414c84: ldr     w1, [sp, #128]
+    0.31 :   414c88: ldr     w0, [sp, #124]
+    0.00 :   414c8c: add     w0, w1, w0
+    0.00 :   414c90: str     w0, [sp, #128]
+         :            FF(a, b, c, d, x[4], s11, 0xf57c0faf);
+    0.00 :   414c94: ldr     w1, [sp, #132]
+    0.00 :   414c98: ldr     w2, [sp, #128]
+    0.47 :   414c9c: ldr     w0, [sp, #124]
+    0.00 :   414ca0: and     w2, w2, w0
+    0.00 :   414ca4: ldr     w0, [sp, #128]
+    0.00 :   414ca8: mvn     w3, w0
+    0.00 :   414cac: ldr     w0, [sp, #120]
+    0.00 :   414cb0: and     w0, w3, w0
+    0.00 :   414cb4: orr     w2, w2, w0
+    0.00 :   414cb8: ldr     w0, [sp, #64]
+    0.00 :   414cbc: add     w0, w2, w0
+    0.00 :   414cc0: add     w1, w1, w0
+    0.00 :   414cc4: mov     w0, #0xfaf                      // #4015
+    0.00 :   414cc8: movk    w0, #0xf57c, lsl #16
+    0.00 :   414ccc: add     w0, w1, w0
+    0.00 :   414cd0: str     w0, [sp, #132]
+    0.00 :   414cd4: ldr     w0, [sp, #132]
+    0.00 :   414cd8: ror     w0, w0, #25
+    0.68 :   414cdc: str     w0, [sp, #132]
+    0.00 :   414ce0: ldr     w1, [sp, #132]
+    0.36 :   414ce4: ldr     w0, [sp, #128]
+    0.00 :   414ce8: add     w0, w1, w0
+    0.00 :   414cec: str     w0, [sp, #132]
+         :            FF(d, a, b, c, x[5], s12, 0x4787c62a);
+    0.00 :   414cf0: ldr     w1, [sp, #120]
+    0.00 :   414cf4: ldr     w2, [sp, #132]
+    0.36 :   414cf8: ldr     w0, [sp, #128]
+    0.00 :   414cfc: and     w2, w2, w0
+    0.00 :   414d00: ldr     w0, [sp, #132]
+    0.00 :   414d04: mvn     w3, w0
+    0.05 :   414d08: ldr     w0, [sp, #124]
+    0.00 :   414d0c: and     w0, w3, w0
+    0.00 :   414d10: orr     w2, w2, w0
+    0.00 :   414d14: ldr     w0, [sp, #68]
+    0.00 :   414d18: add     w0, w2, w0
+    0.00 :   414d1c: add     w1, w1, w0
+    0.00 :   414d20: mov     w0, #0xc62a                     // #50730
+    0.00 :   414d24: movk    w0, #0x4787, lsl #16
+    0.00 :   414d28: add     w0, w1, w0
+    0.00 :   414d2c: str     w0, [sp, #120]
+    0.05 :   414d30: ldr     w0, [sp, #120]
+    0.00 :   414d34: ror     w0, w0, #20
+    0.47 :   414d38: str     w0, [sp, #120]
+    0.00 :   414d3c: ldr     w1, [sp, #120]
+    0.52 :   414d40: ldr     w0, [sp, #132]
+    0.00 :   414d44: add     w0, w1, w0
+    0.00 :   414d48: str     w0, [sp, #120]
+         :            FF(c, d, a, b, x[6], s13, 0xa8304613);
+    0.00 :   414d4c: ldr     w1, [sp, #124]
+    0.00 :   414d50: ldr     w2, [sp, #120]
+    0.31 :   414d54: ldr     w0, [sp, #132]
+    0.00 :   414d58: and     w2, w2, w0
+    0.00 :   414d5c: ldr     w0, [sp, #120]
+    0.00 :   414d60: mvn     w3, w0
+    0.05 :   414d64: ldr     w0, [sp, #128]
+    0.00 :   414d68: and     w0, w3, w0
+    0.00 :   414d6c: orr     w2, w2, w0
+    0.00 :   414d70: ldr     w0, [sp, #72]
+    0.00 :   414d74: add     w0, w2, w0
+    0.00 :   414d78: add     w1, w1, w0
+    0.00 :   414d7c: mov     w0, #0x4613                     // #17939
+    0.00 :   414d80: movk    w0, #0xa830, lsl #16
+    0.00 :   414d84: add     w0, w1, w0
+    0.00 :   414d88: str     w0, [sp, #124]
+    0.00 :   414d8c: ldr     w0, [sp, #124]
+    0.00 :   414d90: ror     w0, w0, #15
+    0.36 :   414d94: str     w0, [sp, #124]
+    0.00 :   414d98: ldr     w1, [sp, #124]
+    0.31 :   414d9c: ldr     w0, [sp, #120]
+    0.00 :   414da0: add     w0, w1, w0
+    0.00 :   414da4: str     w0, [sp, #124]
+         :            FF(b, c, d, a, x[7], s14, 0xfd469501);
+    0.00 :   414da8: ldr     w1, [sp, #128]
+    0.00 :   414dac: ldr     w2, [sp, #124]
+    0.16 :   414db0: ldr     w0, [sp, #120]
+    0.00 :   414db4: and     w2, w2, w0
+    0.00 :   414db8: ldr     w0, [sp, #124]
+    0.00 :   414dbc: mvn     w3, w0
+    0.00 :   414dc0: ldr     w0, [sp, #132]
+    0.00 :   414dc4: and     w0, w3, w0
+    0.00 :   414dc8: orr     w2, w2, w0
+    0.00 :   414dcc: ldr     w0, [sp, #76]
+    0.00 :   414dd0: add     w0, w2, w0
+    0.00 :   414dd4: add     w1, w1, w0
+    0.00 :   414dd8: mov     w0, #0x9501                     // #38145
+    0.00 :   414ddc: movk    w0, #0xfd46, lsl #16
+    0.00 :   414de0: add     w0, w1, w0
+    0.00 :   414de4: str     w0, [sp, #128]
+    0.00 :   414de8: ldr     w0, [sp, #128]
+    0.00 :   414dec: ror     w0, w0, #10
+    0.73 :   414df0: str     w0, [sp, #128]
+    0.00 :   414df4: ldr     w1, [sp, #128]
+    0.16 :   414df8: ldr     w0, [sp, #124]
+    0.00 :   414dfc: add     w0, w1, w0
+    0.00 :   414e00: str     w0, [sp, #128]
+         :            FF(a, b, c, d, x[8], s11, 0x698098d8);
+    0.00 :   414e04: ldr     w1, [sp, #132]
+    0.00 :   414e08: ldr     w2, [sp, #128]
+    0.42 :   414e0c: ldr     w0, [sp, #124]
+    0.00 :   414e10: and     w2, w2, w0
+    0.00 :   414e14: ldr     w0, [sp, #128]
+    0.05 :   414e18: mvn     w3, w0
+    0.05 :   414e1c: ldr     w0, [sp, #120]
+    0.00 :   414e20: and     w0, w3, w0
+    0.00 :   414e24: orr     w2, w2, w0
+    0.00 :   414e28: ldr     w0, [sp, #80]
+    0.00 :   414e2c: add     w0, w2, w0
+    0.00 :   414e30: add     w1, w1, w0
+    0.00 :   414e34: mov     w0, #0x98d8                     // #39128
+    0.00 :   414e38: movk    w0, #0x6980, lsl #16
+    0.00 :   414e3c: add     w0, w1, w0
+    0.05 :   414e40: str     w0, [sp, #132]
+    0.00 :   414e44: ldr     w0, [sp, #132]
+    0.31 :   414e48: ror     w0, w0, #25
+    0.00 :   414e4c: str     w0, [sp, #132]
+    0.00 :   414e50: ldr     w1, [sp, #132]
+    0.36 :   414e54: ldr     w0, [sp, #128]
+    0.00 :   414e58: add     w0, w1, w0
+    0.00 :   414e5c: str     w0, [sp, #132]
+         :            FF(d, a, b, c, x[9], s12, 0x8b44f7af);
+    0.00 :   414e60: ldr     w1, [sp, #120]
+    0.00 :   414e64: ldr     w2, [sp, #132]
+    0.26 :   414e68: ldr     w0, [sp, #128]
+    0.00 :   414e6c: and     w2, w2, w0
+    0.00 :   414e70: ldr     w0, [sp, #132]
+    0.00 :   414e74: mvn     w3, w0
+    0.16 :   414e78: ldr     w0, [sp, #124]
+    0.00 :   414e7c: and     w0, w3, w0
+    0.00 :   414e80: orr     w2, w2, w0
+    0.00 :   414e84: ldr     w0, [sp, #84]
+    0.00 :   414e88: add     w0, w2, w0
+    0.00 :   414e8c: add     w1, w1, w0
+    0.00 :   414e90: mov     w0, #0xf7af                     // #63407
+    0.00 :   414e94: movk    w0, #0x8b44, lsl #16
+    0.00 :   414e98: add     w0, w1, w0
+    0.16 :   414e9c: str     w0, [sp, #120]
+    0.00 :   414ea0: ldr     w0, [sp, #120]
+    0.00 :   414ea4: ror     w0, w0, #20
+    0.21 :   414ea8: str     w0, [sp, #120]
+    0.00 :   414eac: ldr     w1, [sp, #120]
+    0.21 :   414eb0: ldr     w0, [sp, #132]
+    0.00 :   414eb4: add     w0, w1, w0
+    0.00 :   414eb8: str     w0, [sp, #120]
+         :            FF(c, d, a, b, x[10], s13, 0xffff5bb1);
+    0.00 :   414ebc: ldr     w1, [sp, #124]
+    0.00 :   414ec0: ldr     w2, [sp, #120]
+    0.42 :   414ec4: ldr     w0, [sp, #132]
+    0.00 :   414ec8: and     w2, w2, w0
+    0.00 :   414ecc: ldr     w0, [sp, #120]
+    0.00 :   414ed0: mvn     w3, w0
+    0.00 :   414ed4: ldr     w0, [sp, #128]
+    0.00 :   414ed8: and     w0, w3, w0
+    0.00 :   414edc: orr     w2, w2, w0
+    0.00 :   414ee0: ldr     w0, [sp, #88]
+    0.00 :   414ee4: add     w0, w2, w0
+    0.00 :   414ee8: add     w1, w1, w0
+    0.00 :   414eec: mov     w0, #0xffff5bb1                 // #-42063
+    0.00 :   414ef0: add     w0, w1, w0
+    0.05 :   414ef4: str     w0, [sp, #124]
+    0.00 :   414ef8: ldr     w0, [sp, #124]
+    0.00 :   414efc: ror     w0, w0, #15
+    0.62 :   414f00: str     w0, [sp, #124]
+    0.00 :   414f04: ldr     w1, [sp, #124]
+    0.42 :   414f08: ldr     w0, [sp, #120]
+    0.00 :   414f0c: add     w0, w1, w0
+    0.00 :   414f10: str     w0, [sp, #124]
+         :            FF(b, c, d, a, x[11], s14, 0x895cd7be);
+    0.00 :   414f14: ldr     w1, [sp, #128]
+    0.00 :   414f18: ldr     w2, [sp, #124]
+    0.26 :   414f1c: ldr     w0, [sp, #120]
+    0.00 :   414f20: and     w2, w2, w0
+    0.00 :   414f24: ldr     w0, [sp, #124]
+    0.10 :   414f28: mvn     w3, w0
+    0.05 :   414f2c: ldr     w0, [sp, #132]
+    0.00 :   414f30: and     w0, w3, w0
+    0.00 :   414f34: orr     w2, w2, w0
+    0.00 :   414f38: ldr     w0, [sp, #92]
+    0.00 :   414f3c: add     w0, w2, w0
+    0.00 :   414f40: add     w1, w1, w0
+    0.00 :   414f44: mov     w0, #0xd7be                     // #55230
+    0.00 :   414f48: movk    w0, #0x895c, lsl #16
+    0.00 :   414f4c: add     w0, w1, w0
+    0.05 :   414f50: str     w0, [sp, #128]
+    0.00 :   414f54: ldr     w0, [sp, #128]
+    0.52 :   414f58: ror     w0, w0, #10
+    0.00 :   414f5c: str     w0, [sp, #128]
+    0.00 :   414f60: ldr     w1, [sp, #128]
+    0.21 :   414f64: ldr     w0, [sp, #124]
+    0.00 :   414f68: add     w0, w1, w0
+    0.00 :   414f6c: str     w0, [sp, #128]
+         :            FF(a, b, c, d, x[12], s11, 0x6b901122);
+    0.00 :   414f70: ldr     w1, [sp, #132]
+    0.10 :   414f74: ldr     w2, [sp, #128]
+    0.21 :   414f78: ldr     w0, [sp, #124]
+    0.00 :   414f7c: and     w2, w2, w0
+    0.00 :   414f80: ldr     w0, [sp, #128]
+    0.00 :   414f84: mvn     w3, w0
+    0.10 :   414f88: ldr     w0, [sp, #120]
+    0.00 :   414f8c: and     w0, w3, w0
+    0.00 :   414f90: orr     w2, w2, w0
+    0.00 :   414f94: ldr     w0, [sp, #96]
+    0.00 :   414f98: add     w0, w2, w0
+    0.00 :   414f9c: add     w1, w1, w0
+    0.00 :   414fa0: mov     w0, #0x1122                     // #4386
+    0.00 :   414fa4: movk    w0, #0x6b90, lsl #16
+    0.00 :   414fa8: add     w0, w1, w0
+    0.00 :   414fac: str     w0, [sp, #132]
+    0.05 :   414fb0: ldr     w0, [sp, #132]
+    0.00 :   414fb4: ror     w0, w0, #25
+    0.42 :   414fb8: str     w0, [sp, #132]
+    0.00 :   414fbc: ldr     w1, [sp, #132]
+    0.47 :   414fc0: ldr     w0, [sp, #128]
+    0.00 :   414fc4: add     w0, w1, w0
+    0.00 :   414fc8: str     w0, [sp, #132]
+         :            FF(d, a, b, c, x[13], s12, 0xfd987193);
+    0.00 :   414fcc: ldr     w1, [sp, #120]
+    0.00 :   414fd0: ldr     w2, [sp, #132]
+    0.36 :   414fd4: ldr     w0, [sp, #128]
+    0.00 :   414fd8: and     w2, w2, w0
+    0.00 :   414fdc: ldr     w0, [sp, #132]
+    0.00 :   414fe0: mvn     w3, w0
+    0.00 :   414fe4: ldr     w0, [sp, #124]
+    0.00 :   414fe8: and     w0, w3, w0
+    0.00 :   414fec: orr     w2, w2, w0
+    0.00 :   414ff0: ldr     w0, [sp, #100]
+    0.00 :   414ff4: add     w0, w2, w0
+    0.00 :   414ff8: add     w1, w1, w0
+    0.00 :   414ffc: mov     w0, #0x7193                     // #29075
+    0.00 :   415000: movk    w0, #0xfd98, lsl #16
+    0.00 :   415004: add     w0, w1, w0
+    0.21 :   415008: str     w0, [sp, #120]
+    0.00 :   41500c: ldr     w0, [sp, #120]
+    0.00 :   415010: ror     w0, w0, #20
+    0.41 :   415014: str     w0, [sp, #120]
+    0.00 :   415018: ldr     w1, [sp, #120]
+    0.26 :   41501c: ldr     w0, [sp, #132]
+    0.00 :   415020: add     w0, w1, w0
+    0.00 :   415024: str     w0, [sp, #120]
+         :            FF(c, d, a, b, x[14], s13, 0xa679438e);
+    0.00 :   415028: ldr     w1, [sp, #124]
+    0.00 :   41502c: ldr     w2, [sp, #120]
+    0.68 :   415030: ldr     w0, [sp, #132]
+    0.00 :   415034: and     w2, w2, w0
+    0.00 :   415038: ldr     w0, [sp, #120]
+    0.00 :   41503c: mvn     w3, w0
+    0.10 :   415040: ldr     w0, [sp, #128]
+    0.00 :   415044: and     w0, w3, w0
+    0.00 :   415048: orr     w2, w2, w0
+    0.00 :   41504c: ldr     w0, [sp, #104]
+    0.00 :   415050: add     w0, w2, w0
+    0.00 :   415054: add     w1, w1, w0
+    0.00 :   415058: mov     w0, #0x438e                     // #17294
+    0.00 :   41505c: movk    w0, #0xa679, lsl #16
+    0.00 :   415060: add     w0, w1, w0
+    0.00 :   415064: str     w0, [sp, #124]
+    0.00 :   415068: ldr     w0, [sp, #124]
+    0.00 :   41506c: ror     w0, w0, #15
+    0.42 :   415070: str     w0, [sp, #124]
+    0.00 :   415074: ldr     w1, [sp, #124]
+    0.10 :   415078: ldr     w0, [sp, #120]
+    0.00 :   41507c: add     w0, w1, w0
+    0.00 :   415080: str     w0, [sp, #124]
+         :            FF(b, c, d, a, x[15], s14, 0x49b40821);
+    0.00 :   415084: ldr     w1, [sp, #128]
+    0.00 :   415088: ldr     w2, [sp, #124]
+    0.41 :   41508c: ldr     w0, [sp, #120]
+    0.00 :   415090: and     w2, w2, w0
+    0.00 :   415094: ldr     w0, [sp, #124]
+    0.05 :   415098: mvn     w3, w0
+    0.00 :   41509c: ldr     w0, [sp, #132]
+    0.00 :   4150a0: and     w0, w3, w0
+    0.00 :   4150a4: orr     w2, w2, w0
+    0.00 :   4150a8: ldr     w0, [sp, #108]
+    0.00 :   4150ac: add     w0, w2, w0
+    0.00 :   4150b0: add     w1, w1, w0
+    0.00 :   4150b4: mov     w0, #0x821                      // #2081
+    0.00 :   4150b8: movk    w0, #0x49b4, lsl #16
+    0.00 :   4150bc: add     w0, w1, w0
+    0.10 :   4150c0: str     w0, [sp, #128]
+    0.00 :   4150c4: ldr     w0, [sp, #128]
+    0.47 :   4150c8: ror     w0, w0, #10
+    0.16 :   4150cc: str     w0, [sp, #128]
+    0.00 :   4150d0: ldr     w1, [sp, #128]
+    0.10 :   4150d4: ldr     w0, [sp, #124]
+    0.00 :   4150d8: add     w0, w1, w0
+    0.00 :   4150dc: str     w0, [sp, #128]
+         :
+         :            /* Round 2 */
+         :            GG(a, b, c, d, x[1], s21, 0xf61e2562);
+    0.00 :   4150e0: ldr     w1, [sp, #132]
+    0.00 :   4150e4: ldr     w2, [sp, #128]
+    0.16 :   4150e8: ldr     w0, [sp, #120]
+    0.00 :   4150ec: and     w2, w2, w0
+    0.00 :   4150f0: ldr     w0, [sp, #120]
+    0.00 :   4150f4: mvn     w3, w0
+    0.00 :   4150f8: ldr     w0, [sp, #124]
+    0.00 :   4150fc: and     w0, w3, w0
+    0.00 :   415100: orr     w2, w2, w0
+    0.00 :   415104: ldr     w0, [sp, #52]
+    0.05 :   415108: add     w0, w2, w0
+    0.00 :   41510c: add     w1, w1, w0
+    0.00 :   415110: mov     w0, #0x2562                     // #9570
+    0.00 :   415114: movk    w0, #0xf61e, lsl #16
+    0.00 :   415118: add     w0, w1, w0
+    0.00 :   41511c: str     w0, [sp, #132]
+    0.00 :   415120: ldr     w0, [sp, #132]
+    0.00 :   415124: ror     w0, w0, #27
+    0.62 :   415128: str     w0, [sp, #132]
+    0.00 :   41512c: ldr     w1, [sp, #132]
+    0.26 :   415130: ldr     w0, [sp, #128]
+    0.00 :   415134: add     w0, w1, w0
+    0.00 :   415138: str     w0, [sp, #132]
+         :            GG(d, a, b, c, x[6], s22, 0xc040b340);
+    0.00 :   41513c: ldr     w1, [sp, #120]
+    0.00 :   415140: ldr     w2, [sp, #132]
+    0.47 :   415144: ldr     w0, [sp, #124]
+    0.00 :   415148: and     w2, w2, w0
+    0.00 :   41514c: ldr     w0, [sp, #124]
+    0.00 :   415150: mvn     w3, w0
+    0.00 :   415154: ldr     w0, [sp, #128]
+    0.00 :   415158: and     w0, w3, w0
+    0.00 :   41515c: orr     w2, w2, w0
+    0.00 :   415160: ldr     w0, [sp, #72]
+    0.00 :   415164: add     w0, w2, w0
+    0.00 :   415168: add     w1, w1, w0
+    0.00 :   41516c: mov     w0, #0xb340                     // #45888
+    0.00 :   415170: movk    w0, #0xc040, lsl #16
+    0.00 :   415174: add     w0, w1, w0
+    0.00 :   415178: str     w0, [sp, #120]
+    0.00 :   41517c: ldr     w0, [sp, #120]
+    0.00 :   415180: ror     w0, w0, #23
+    0.42 :   415184: str     w0, [sp, #120]
+    0.00 :   415188: ldr     w1, [sp, #120]
+    0.26 :   41518c: ldr     w0, [sp, #132]
+    0.00 :   415190: add     w0, w1, w0
+    0.00 :   415194: str     w0, [sp, #120]
+         :            GG(c, d, a, b, x[11], s23, 0x265e5a51);
+    0.00 :   415198: ldr     w1, [sp, #124]
+    0.00 :   41519c: ldr     w2, [sp, #120]
+    0.21 :   4151a0: ldr     w0, [sp, #128]
+    0.00 :   4151a4: and     w2, w2, w0
+    0.00 :   4151a8: ldr     w0, [sp, #128]
+    0.00 :   4151ac: mvn     w3, w0
+    0.00 :   4151b0: ldr     w0, [sp, #132]
+    0.00 :   4151b4: and     w0, w3, w0
+    0.00 :   4151b8: orr     w2, w2, w0
+    0.10 :   4151bc: ldr     w0, [sp, #92]
+    0.00 :   4151c0: add     w0, w2, w0
+    0.00 :   4151c4: add     w1, w1, w0
+    0.00 :   4151c8: mov     w0, #0x5a51                     // #23121
+    0.00 :   4151cc: movk    w0, #0x265e, lsl #16
+    0.00 :   4151d0: add     w0, w1, w0
+    0.00 :   4151d4: str     w0, [sp, #124]
+    0.00 :   4151d8: ldr     w0, [sp, #124]
+    0.00 :   4151dc: ror     w0, w0, #18
+    0.57 :   4151e0: str     w0, [sp, #124]
+    0.00 :   4151e4: ldr     w1, [sp, #124]
+    0.47 :   4151e8: ldr     w0, [sp, #120]
+    0.00 :   4151ec: add     w0, w1, w0
+    0.00 :   4151f0: str     w0, [sp, #124]
+         :            GG(b, c, d, a, x[0], s24, 0xe9b6c7aa);
+    0.00 :   4151f4: ldr     w1, [sp, #128]
+    0.00 :   4151f8: ldr     w2, [sp, #124]
+    0.16 :   4151fc: ldr     w0, [sp, #132]
+    0.00 :   415200: and     w2, w2, w0
+    0.00 :   415204: ldr     w0, [sp, #132]
+    0.00 :   415208: mvn     w3, w0
+    0.00 :   41520c: ldr     w0, [sp, #120]
+    0.00 :   415210: and     w0, w3, w0
+    0.00 :   415214: orr     w2, w2, w0
+    0.00 :   415218: ldr     w0, [sp, #48]
+    0.00 :   41521c: add     w0, w2, w0
+    0.00 :   415220: add     w1, w1, w0
+    0.00 :   415224: mov     w0, #0xc7aa                     // #51114
+    0.00 :   415228: movk    w0, #0xe9b6, lsl #16
+    0.00 :   41522c: add     w0, w1, w0
+    0.00 :   415230: str     w0, [sp, #128]
+    0.00 :   415234: ldr     w0, [sp, #128]
+    0.26 :   415238: ror     w0, w0, #12
+    0.00 :   41523c: str     w0, [sp, #128]
+    0.00 :   415240: ldr     w1, [sp, #128]
+    0.36 :   415244: ldr     w0, [sp, #124]
+    0.00 :   415248: add     w0, w1, w0
+    0.00 :   41524c: str     w0, [sp, #128]
+         :            GG(a, b, c, d, x[5], s21, 0xd62f105d);
+    0.00 :   415250: ldr     w1, [sp, #132]
+    0.05 :   415254: ldr     w2, [sp, #128]
+    0.36 :   415258: ldr     w0, [sp, #120]
+    0.00 :   41525c: and     w2, w2, w0
+    0.00 :   415260: ldr     w0, [sp, #120]
+    0.00 :   415264: mvn     w3, w0
+    0.00 :   415268: ldr     w0, [sp, #124]
+    0.00 :   41526c: and     w0, w3, w0
+    0.00 :   415270: orr     w2, w2, w0
+    0.00 :   415274: ldr     w0, [sp, #68]
+    0.00 :   415278: add     w0, w2, w0
+    0.00 :   41527c: add     w1, w1, w0
+    0.00 :   415280: mov     w0, #0x105d                     // #4189
+    0.00 :   415284: movk    w0, #0xd62f, lsl #16
+    0.00 :   415288: add     w0, w1, w0
+    0.00 :   41528c: str     w0, [sp, #132]
+    0.00 :   415290: ldr     w0, [sp, #132]
+    0.00 :   415294: ror     w0, w0, #27
+    0.42 :   415298: str     w0, [sp, #132]
+    0.00 :   41529c: ldr     w1, [sp, #132]
+    0.47 :   4152a0: ldr     w0, [sp, #128]
+    0.00 :   4152a4: add     w0, w1, w0
+    0.00 :   4152a8: str     w0, [sp, #132]
+         :            GG(d, a, b, c, x[10], s22, 0x2441453);
+    0.00 :   4152ac: ldr     w1, [sp, #120]
+    0.00 :   4152b0: ldr     w2, [sp, #132]
+    0.31 :   4152b4: ldr     w0, [sp, #124]
+    0.00 :   4152b8: and     w2, w2, w0
+    0.00 :   4152bc: ldr     w0, [sp, #124]
+    0.00 :   4152c0: mvn     w3, w0
+    0.00 :   4152c4: ldr     w0, [sp, #128]
+    0.05 :   4152c8: and     w0, w3, w0
+    0.00 :   4152cc: orr     w2, w2, w0
+    0.00 :   4152d0: ldr     w0, [sp, #88]
+    0.00 :   4152d4: add     w0, w2, w0
+    0.00 :   4152d8: add     w1, w1, w0
+    0.00 :   4152dc: mov     w0, #0x1453                     // #5203
+    0.00 :   4152e0: movk    w0, #0x244, lsl #16
+    0.00 :   4152e4: add     w0, w1, w0
+    0.00 :   4152e8: str     w0, [sp, #120]
+    0.16 :   4152ec: ldr     w0, [sp, #120]
+    0.00 :   4152f0: ror     w0, w0, #23
+    0.31 :   4152f4: str     w0, [sp, #120]
+    0.00 :   4152f8: ldr     w1, [sp, #120]
+    0.21 :   4152fc: ldr     w0, [sp, #132]
+    0.00 :   415300: add     w0, w1, w0
+    0.00 :   415304: str     w0, [sp, #120]
+         :            GG(c, d, a, b, x[15], s23, 0xd8a1e681);
+    0.00 :   415308: ldr     w1, [sp, #124]
+    0.00 :   41530c: ldr     w2, [sp, #120]
+    0.31 :   415310: ldr     w0, [sp, #128]
+    0.00 :   415314: and     w2, w2, w0
+    0.00 :   415318: ldr     w0, [sp, #128]
+    0.00 :   41531c: mvn     w3, w0
+    0.00 :   415320: ldr     w0, [sp, #132]
+    0.00 :   415324: and     w0, w3, w0
+    0.00 :   415328: orr     w2, w2, w0
+    0.00 :   41532c: ldr     w0, [sp, #108]
+    0.00 :   415330: add     w0, w2, w0
+    0.00 :   415334: add     w1, w1, w0
+    0.00 :   415338: mov     w0, #0xe681                     // #59009
+    0.00 :   41533c: movk    w0, #0xd8a1, lsl #16
+    0.00 :   415340: add     w0, w1, w0
+    0.00 :   415344: str     w0, [sp, #124]
+    0.10 :   415348: ldr     w0, [sp, #124]
+    0.00 :   41534c: ror     w0, w0, #18
+    0.21 :   415350: str     w0, [sp, #124]
+    0.00 :   415354: ldr     w1, [sp, #124]
+    0.57 :   415358: ldr     w0, [sp, #120]
+    0.00 :   41535c: add     w0, w1, w0
+    0.00 :   415360: str     w0, [sp, #124]
+         :            GG(b, c, d, a, x[4], s24, 0xe7d3fbc8);
+    0.00 :   415364: ldr     w1, [sp, #128]
+    0.00 :   415368: ldr     w2, [sp, #124]
+    0.26 :   41536c: ldr     w0, [sp, #132]
+    0.00 :   415370: and     w2, w2, w0
+    0.00 :   415374: ldr     w0, [sp, #132]
+    0.00 :   415378: mvn     w3, w0
+    0.00 :   41537c: ldr     w0, [sp, #120]
+    0.00 :   415380: and     w0, w3, w0
+    0.00 :   415384: orr     w2, w2, w0
+    0.10 :   415388: ldr     w0, [sp, #64]
+    0.00 :   41538c: add     w0, w2, w0
+    0.00 :   415390: add     w1, w1, w0
+    0.00 :   415394: mov     w0, #0xfbc8                     // #64456
+    0.00 :   415398: movk    w0, #0xe7d3, lsl #16
+    0.00 :   41539c: add     w0, w1, w0
+    0.00 :   4153a0: str     w0, [sp, #128]
+    0.00 :   4153a4: ldr     w0, [sp, #128]
+    1.04 :   4153a8: ror     w0, w0, #12
+    0.00 :   4153ac: str     w0, [sp, #128]
+    0.00 :   4153b0: ldr     w1, [sp, #128]
+    0.42 :   4153b4: ldr     w0, [sp, #124]
+    0.00 :   4153b8: add     w0, w1, w0
+    0.00 :   4153bc: str     w0, [sp, #128]
+         :            GG(a, b, c, d, x[9], s21, 0x21e1cde6);
+    0.00 :   4153c0: ldr     w1, [sp, #132]
+    0.16 :   4153c4: ldr     w2, [sp, #128]
+    0.36 :   4153c8: ldr     w0, [sp, #120]
+    0.00 :   4153cc: and     w2, w2, w0
+    0.00 :   4153d0: ldr     w0, [sp, #120]
+    0.00 :   4153d4: mvn     w3, w0
+    0.00 :   4153d8: ldr     w0, [sp, #124]
+    0.00 :   4153dc: and     w0, w3, w0
+    0.00 :   4153e0: orr     w2, w2, w0
+    0.00 :   4153e4: ldr     w0, [sp, #84]
+    0.10 :   4153e8: add     w0, w2, w0
+    0.00 :   4153ec: add     w1, w1, w0
+    0.00 :   4153f0: mov     w0, #0xcde6                     // #52710
+    0.00 :   4153f4: movk    w0, #0x21e1, lsl #16
+    0.00 :   4153f8: add     w0, w1, w0
+    0.00 :   4153fc: str     w0, [sp, #132]
+    0.00 :   415400: ldr     w0, [sp, #132]
+    0.00 :   415404: ror     w0, w0, #27
+    0.57 :   415408: str     w0, [sp, #132]
+    0.00 :   41540c: ldr     w1, [sp, #132]
+    0.47 :   415410: ldr     w0, [sp, #128]
+    0.00 :   415414: add     w0, w1, w0
+    0.00 :   415418: str     w0, [sp, #132]
+         :            GG(d, a, b, c, x[14], s22, 0xc33707d6);
+    0.00 :   41541c: ldr     w1, [sp, #120]
+    0.00 :   415420: ldr     w2, [sp, #132]
+    0.42 :   415424: ldr     w0, [sp, #124]
+    0.00 :   415428: and     w2, w2, w0
+    0.00 :   41542c: ldr     w0, [sp, #124]
+    0.00 :   415430: mvn     w3, w0
+    0.00 :   415434: ldr     w0, [sp, #128]
+    0.00 :   415438: and     w0, w3, w0
+    0.00 :   41543c: orr     w2, w2, w0
+    0.00 :   415440: ldr     w0, [sp, #104]
+    0.00 :   415444: add     w0, w2, w0
+    0.00 :   415448: add     w1, w1, w0
+    0.00 :   41544c: mov     w0, #0x7d6                      // #2006
+    0.00 :   415450: movk    w0, #0xc337, lsl #16
+    0.00 :   415454: add     w0, w1, w0
+    0.00 :   415458: str     w0, [sp, #120]
+    0.05 :   41545c: ldr     w0, [sp, #120]
+    0.00 :   415460: ror     w0, w0, #23
+    0.16 :   415464: str     w0, [sp, #120]
+    0.00 :   415468: ldr     w1, [sp, #120]
+    0.57 :   41546c: ldr     w0, [sp, #132]
+    0.00 :   415470: add     w0, w1, w0
+    0.00 :   415474: str     w0, [sp, #120]
+         :            GG(c, d, a, b, x[3], s23, 0xf4d50d87);
+    0.00 :   415478: ldr     w1, [sp, #124]
+    0.00 :   41547c: ldr     w2, [sp, #120]
+    0.31 :   415480: ldr     w0, [sp, #128]
+    0.00 :   415484: and     w2, w2, w0
+    0.00 :   415488: ldr     w0, [sp, #128]
+    0.00 :   41548c: mvn     w3, w0
+    0.00 :   415490: ldr     w0, [sp, #132]
+    0.00 :   415494: and     w0, w3, w0
+    0.00 :   415498: orr     w2, w2, w0
+    0.05 :   41549c: ldr     w0, [sp, #60]
+    0.00 :   4154a0: add     w0, w2, w0
+    0.00 :   4154a4: add     w1, w1, w0
+    0.00 :   4154a8: mov     w0, #0xd87                      // #3463
+    0.00 :   4154ac: movk    w0, #0xf4d5, lsl #16
+    0.00 :   4154b0: add     w0, w1, w0
+    0.00 :   4154b4: str     w0, [sp, #124]
+    0.00 :   4154b8: ldr     w0, [sp, #124]
+    0.00 :   4154bc: ror     w0, w0, #18
+    0.47 :   4154c0: str     w0, [sp, #124]
+    0.00 :   4154c4: ldr     w1, [sp, #124]
+    0.52 :   4154c8: ldr     w0, [sp, #120]
+    0.00 :   4154cc: add     w0, w1, w0
+    0.00 :   4154d0: str     w0, [sp, #124]
+         :            GG(b, c, d, a, x[8], s24, 0x455a14ed);
+    0.00 :   4154d4: ldr     w1, [sp, #128]
+    0.00 :   4154d8: ldr     w2, [sp, #124]
+    0.26 :   4154dc: ldr     w0, [sp, #132]
+    0.00 :   4154e0: and     w2, w2, w0
+    0.00 :   4154e4: ldr     w0, [sp, #132]
+    0.00 :   4154e8: mvn     w3, w0
+    0.00 :   4154ec: ldr     w0, [sp, #120]
+    0.00 :   4154f0: and     w0, w3, w0
+    0.00 :   4154f4: orr     w2, w2, w0
+    0.05 :   4154f8: ldr     w0, [sp, #80]
+    0.00 :   4154fc: add     w0, w2, w0
+    0.00 :   415500: add     w1, w1, w0
+    0.00 :   415504: mov     w0, #0x14ed                     // #5357
+    0.00 :   415508: movk    w0, #0x455a, lsl #16
+    0.00 :   41550c: add     w0, w1, w0
+    0.00 :   415510: str     w0, [sp, #128]
+    0.00 :   415514: ldr     w0, [sp, #128]
+    0.26 :   415518: ror     w0, w0, #12
+    0.00 :   41551c: str     w0, [sp, #128]
+    0.00 :   415520: ldr     w1, [sp, #128]
+    0.21 :   415524: ldr     w0, [sp, #124]
+    0.00 :   415528: add     w0, w1, w0
+    0.00 :   41552c: str     w0, [sp, #128]
+         :            GG(a, b, c, d, x[13], s21, 0xa9e3e905);
+    0.00 :   415530: ldr     w1, [sp, #132]
+    0.05 :   415534: ldr     w2, [sp, #128]
+    0.26 :   415538: ldr     w0, [sp, #120]
+    0.00 :   41553c: and     w2, w2, w0
+    0.00 :   415540: ldr     w0, [sp, #120]
+    0.00 :   415544: mvn     w3, w0
+    0.00 :   415548: ldr     w0, [sp, #124]
+    0.00 :   41554c: and     w0, w3, w0
+    0.00 :   415550: orr     w2, w2, w0
+    0.00 :   415554: ldr     w0, [sp, #100]
+    0.00 :   415558: add     w0, w2, w0
+    0.00 :   41555c: add     w1, w1, w0
+    0.00 :   415560: mov     w0, #0xe905                     // #59653
+    0.00 :   415564: movk    w0, #0xa9e3, lsl #16
+    0.00 :   415568: add     w0, w1, w0
+    0.00 :   41556c: str     w0, [sp, #132]
+    0.00 :   415570: ldr     w0, [sp, #132]
+    0.00 :   415574: ror     w0, w0, #27
+    0.62 :   415578: str     w0, [sp, #132]
+    0.00 :   41557c: ldr     w1, [sp, #132]
+    0.21 :   415580: ldr     w0, [sp, #128]
+    0.00 :   415584: add     w0, w1, w0
+    0.00 :   415588: str     w0, [sp, #132]
+         :            GG(d, a, b, c, x[2], s22, 0xfcefa3f8);
+    0.00 :   41558c: ldr     w1, [sp, #120]
+    0.00 :   415590: ldr     w2, [sp, #132]
+    0.31 :   415594: ldr     w0, [sp, #124]
+    0.00 :   415598: and     w2, w2, w0
+    0.00 :   41559c: ldr     w0, [sp, #124]
+    0.00 :   4155a0: mvn     w3, w0
+    0.00 :   4155a4: ldr     w0, [sp, #128]
+    0.00 :   4155a8: and     w0, w3, w0
+    0.00 :   4155ac: orr     w2, w2, w0
+    0.00 :   4155b0: ldr     w0, [sp, #56]
+    0.00 :   4155b4: add     w0, w2, w0
+    0.00 :   4155b8: add     w1, w1, w0
+    0.00 :   4155bc: mov     w0, #0xa3f8                     // #41976
+    0.00 :   4155c0: movk    w0, #0xfcef, lsl #16
+    0.00 :   4155c4: add     w0, w1, w0
+    0.00 :   4155c8: str     w0, [sp, #120]
+    0.05 :   4155cc: ldr     w0, [sp, #120]
+    0.00 :   4155d0: ror     w0, w0, #23
+    0.36 :   4155d4: str     w0, [sp, #120]
+    0.00 :   4155d8: ldr     w1, [sp, #120]
+    0.52 :   4155dc: ldr     w0, [sp, #132]
+    0.00 :   4155e0: add     w0, w1, w0
+    0.00 :   4155e4: str     w0, [sp, #120]
+         :            GG(c, d, a, b, x[7], s23, 0x676f02d9);
+    0.00 :   4155e8: ldr     w1, [sp, #124]
+    0.00 :   4155ec: ldr     w2, [sp, #120]
+    0.45 :   4155f0: ldr     w0, [sp, #128]
+    0.00 :   4155f4: and     w2, w2, w0
+    0.00 :   4155f8: ldr     w0, [sp, #128]
+    0.00 :   4155fc: mvn     w3, w0
+    0.00 :   415600: ldr     w0, [sp, #132]
+    0.00 :   415604: and     w0, w3, w0
+    0.00 :   415608: orr     w2, w2, w0
+    0.05 :   41560c: ldr     w0, [sp, #76]
+    0.00 :   415610: add     w0, w2, w0
+    0.00 :   415614: add     w1, w1, w0
+    0.00 :   415618: mov     w0, #0x2d9                      // #729
+    0.00 :   41561c: movk    w0, #0x676f, lsl #16
+    0.00 :   415620: add     w0, w1, w0
+    0.00 :   415624: str     w0, [sp, #124]
+    0.00 :   415628: ldr     w0, [sp, #124]
+    0.00 :   41562c: ror     w0, w0, #18
+    0.42 :   415630: str     w0, [sp, #124]
+    0.00 :   415634: ldr     w1, [sp, #124]
+    0.52 :   415638: ldr     w0, [sp, #120]
+    0.00 :   41563c: add     w0, w1, w0
+    0.00 :   415640: str     w0, [sp, #124]
+         :            GG(b, c, d, a, x[12], s24, 0x8d2a4c8a);
+    0.00 :   415644: ldr     w1, [sp, #128]
+    0.00 :   415648: ldr     w2, [sp, #124]
+    0.42 :   41564c: ldr     w0, [sp, #132]
+    0.00 :   415650: and     w2, w2, w0
+    0.00 :   415654: ldr     w0, [sp, #132]
+    0.00 :   415658: mvn     w3, w0
+    0.00 :   41565c: ldr     w0, [sp, #120]
+    0.00 :   415660: and     w0, w3, w0
+    0.00 :   415664: orr     w2, w2, w0
+    0.00 :   415668: ldr     w0, [sp, #96]
+    0.00 :   41566c: add     w0, w2, w0
+    0.00 :   415670: add     w1, w1, w0
+    0.00 :   415674: mov     w0, #0x4c8a                     // #19594
+    0.00 :   415678: movk    w0, #0x8d2a, lsl #16
+    0.00 :   41567c: add     w0, w1, w0
+    0.00 :   415680: str     w0, [sp, #128]
+    0.00 :   415684: ldr     w0, [sp, #128]
+    0.57 :   415688: ror     w0, w0, #12
+    0.00 :   41568c: str     w0, [sp, #128]
+    0.00 :   415690: ldr     w1, [sp, #128]
+    0.36 :   415694: ldr     w0, [sp, #124]
+    0.00 :   415698: add     w0, w1, w0
+    0.00 :   41569c: str     w0, [sp, #128]
+         :
+         :            /* Round 3 */
+         :            HH(a, b, c, d, x[5], s31, 0xfffa3942);
+    0.00 :   4156a0: ldr     w1, [sp, #132]
+    0.00 :   4156a4: ldr     w2, [sp, #128]
+    0.42 :   4156a8: ldr     w0, [sp, #124]
+    0.00 :   4156ac: eor     w2, w2, w0
+    0.00 :   4156b0: ldr     w0, [sp, #120]
+    0.00 :   4156b4: eor     w2, w2, w0
+    0.00 :   4156b8: ldr     w0, [sp, #68]
+    0.00 :   4156bc: add     w0, w2, w0
+    0.00 :   4156c0: add     w1, w1, w0
+    0.00 :   4156c4: mov     w0, #0x3942                     // #14658
+    0.00 :   4156c8: movk    w0, #0xfffa, lsl #16
+    0.00 :   4156cc: add     w0, w1, w0
+    0.00 :   4156d0: str     w0, [sp, #132]
+    0.00 :   4156d4: ldr     w0, [sp, #132]
+    0.00 :   4156d8: ror     w0, w0, #28
+    0.47 :   4156dc: str     w0, [sp, #132]
+    0.00 :   4156e0: ldr     w1, [sp, #132]
+    0.26 :   4156e4: ldr     w0, [sp, #128]
+    0.00 :   4156e8: add     w0, w1, w0
+    0.00 :   4156ec: str     w0, [sp, #132]
+         :            HH(d, a, b, c, x[8], s32, 0x8771f681);
+    0.00 :   4156f0: ldr     w1, [sp, #120]
+    0.05 :   4156f4: ldr     w2, [sp, #132]
+    0.52 :   4156f8: ldr     w0, [sp, #128]
+    0.00 :   4156fc: eor     w2, w2, w0
+    0.00 :   415700: ldr     w0, [sp, #124]
+    0.00 :   415704: eor     w2, w2, w0
+    0.00 :   415708: ldr     w0, [sp, #80]
+    0.00 :   41570c: add     w0, w2, w0
+    0.00 :   415710: add     w1, w1, w0
+    0.00 :   415714: mov     w0, #0xf681                     // #63105
+    0.00 :   415718: movk    w0, #0x8771, lsl #16
+    0.05 :   41571c: add     w0, w1, w0
+    0.00 :   415720: str     w0, [sp, #120]
+    0.00 :   415724: ldr     w0, [sp, #120]
+    0.42 :   415728: ror     w0, w0, #21
+    0.00 :   41572c: str     w0, [sp, #120]
+    0.00 :   415730: ldr     w1, [sp, #120]
+    0.52 :   415734: ldr     w0, [sp, #132]
+    0.00 :   415738: add     w0, w1, w0
+    0.00 :   41573c: str     w0, [sp, #120]
+         :            HH(c, d, a, b, x[11], s33, 0x6d9d6122);
+    0.00 :   415740: ldr     w1, [sp, #124]
+    0.00 :   415744: ldr     w2, [sp, #120]
+    0.16 :   415748: ldr     w0, [sp, #132]
+    0.00 :   41574c: eor     w2, w2, w0
+    0.00 :   415750: ldr     w0, [sp, #128]
+    0.00 :   415754: eor     w2, w2, w0
+    0.00 :   415758: ldr     w0, [sp, #92]
+    0.00 :   41575c: add     w0, w2, w0
+    0.00 :   415760: add     w1, w1, w0
+    0.00 :   415764: mov     w0, #0x6122                     // #24866
+    0.00 :   415768: movk    w0, #0x6d9d, lsl #16
+    0.00 :   41576c: add     w0, w1, w0
+    0.04 :   415770: str     w0, [sp, #124]
+    0.00 :   415774: ldr     w0, [sp, #124]
+    0.16 :   415778: ror     w0, w0, #16
+    0.00 :   41577c: str     w0, [sp, #124]
+    0.00 :   415780: ldr     w1, [sp, #124]
+    0.16 :   415784: ldr     w0, [sp, #120]
+    0.00 :   415788: add     w0, w1, w0
+    0.00 :   41578c: str     w0, [sp, #124]
+         :            HH(b, c, d, a, x[14], s34, 0xfde5380c);
+    0.00 :   415790: ldr     w1, [sp, #128]
+    0.05 :   415794: ldr     w2, [sp, #124]
+    0.41 :   415798: ldr     w0, [sp, #120]
+    0.00 :   41579c: eor     w2, w2, w0
+    0.00 :   4157a0: ldr     w0, [sp, #132]
+    0.00 :   4157a4: eor     w2, w2, w0
+    0.00 :   4157a8: ldr     w0, [sp, #104]
+    0.00 :   4157ac: add     w0, w2, w0
+    0.00 :   4157b0: add     w1, w1, w0
+    0.00 :   4157b4: mov     w0, #0x380c                     // #14348
+    0.00 :   4157b8: movk    w0, #0xfde5, lsl #16
+    0.00 :   4157bc: add     w0, w1, w0
+    0.00 :   4157c0: str     w0, [sp, #128]
+    0.00 :   4157c4: ldr     w0, [sp, #128]
+    0.83 :   4157c8: ror     w0, w0, #9
+    0.00 :   4157cc: str     w0, [sp, #128]
+    0.00 :   4157d0: ldr     w1, [sp, #128]
+    0.21 :   4157d4: ldr     w0, [sp, #124]
+    0.00 :   4157d8: add     w0, w1, w0
+    0.00 :   4157dc: str     w0, [sp, #128]
+         :            HH(a, b, c, d, x[1], s31, 0xa4beea44);
+    0.00 :   4157e0: ldr     w1, [sp, #132]
+    0.00 :   4157e4: ldr     w2, [sp, #128]
+    0.21 :   4157e8: ldr     w0, [sp, #124]
+    0.00 :   4157ec: eor     w2, w2, w0
+    0.00 :   4157f0: ldr     w0, [sp, #120]
+    0.00 :   4157f4: eor     w2, w2, w0
+    0.00 :   4157f8: ldr     w0, [sp, #52]
+    0.00 :   4157fc: add     w0, w2, w0
+    0.00 :   415800: add     w1, w1, w0
+    0.00 :   415804: mov     w0, #0xea44                     // #59972
+    0.00 :   415808: movk    w0, #0xa4be, lsl #16
+    0.00 :   41580c: add     w0, w1, w0
+    0.00 :   415810: str     w0, [sp, #132]
+    0.00 :   415814: ldr     w0, [sp, #132]
+    0.52 :   415818: ror     w0, w0, #28
+    0.21 :   41581c: str     w0, [sp, #132]
+    0.00 :   415820: ldr     w1, [sp, #132]
+    0.52 :   415824: ldr     w0, [sp, #128]
+    0.00 :   415828: add     w0, w1, w0
+    0.00 :   41582c: str     w0, [sp, #132]
+         :            HH(d, a, b, c, x[4], s32, 0x4bdecfa9);
+    0.00 :   415830: ldr     w1, [sp, #120]
+    0.00 :   415834: ldr     w2, [sp, #132]
+    0.26 :   415838: ldr     w0, [sp, #128]
+    0.00 :   41583c: eor     w2, w2, w0
+    0.00 :   415840: ldr     w0, [sp, #124]
+    0.00 :   415844: eor     w2, w2, w0
+    0.00 :   415848: ldr     w0, [sp, #64]
+    0.00 :   41584c: add     w0, w2, w0
+    0.00 :   415850: add     w1, w1, w0
+    0.00 :   415854: mov     w0, #0xcfa9                     // #53161
+    0.00 :   415858: movk    w0, #0x4bde, lsl #16
+    0.00 :   41585c: add     w0, w1, w0
+    0.05 :   415860: str     w0, [sp, #120]
+    0.00 :   415864: ldr     w0, [sp, #120]
+    0.47 :   415868: ror     w0, w0, #21
+    0.05 :   41586c: str     w0, [sp, #120]
+    0.00 :   415870: ldr     w1, [sp, #120]
+    0.36 :   415874: ldr     w0, [sp, #132]
+    0.00 :   415878: add     w0, w1, w0
+    0.00 :   41587c: str     w0, [sp, #120]
+         :            HH(c, d, a, b, x[7], s33, 0xf6bb4b60);
+    0.00 :   415880: ldr     w1, [sp, #124]
+    0.00 :   415884: ldr     w2, [sp, #120]
+    0.21 :   415888: ldr     w0, [sp, #132]
+    0.00 :   41588c: eor     w2, w2, w0
+    0.00 :   415890: ldr     w0, [sp, #128]
+    0.00 :   415894: eor     w2, w2, w0
+    0.00 :   415898: ldr     w0, [sp, #76]
+    0.00 :   41589c: add     w0, w2, w0
+    0.00 :   4158a0: add     w1, w1, w0
+    0.00 :   4158a4: mov     w0, #0x4b60                     // #19296
+    0.00 :   4158a8: movk    w0, #0xf6bb, lsl #16
+    0.00 :   4158ac: add     w0, w1, w0
+    0.00 :   4158b0: str     w0, [sp, #124]
+    0.00 :   4158b4: ldr     w0, [sp, #124]
+    0.52 :   4158b8: ror     w0, w0, #16
+    0.00 :   4158bc: str     w0, [sp, #124]
+    0.00 :   4158c0: ldr     w1, [sp, #124]
+    0.10 :   4158c4: ldr     w0, [sp, #120]
+    0.00 :   4158c8: add     w0, w1, w0
+    0.00 :   4158cc: str     w0, [sp, #124]
+         :            HH(b, c, d, a, x[10], s34, 0xbebfbc70);
+    0.00 :   4158d0: ldr     w1, [sp, #128]
+    0.00 :   4158d4: ldr     w2, [sp, #124]
+    0.26 :   4158d8: ldr     w0, [sp, #120]
+    0.00 :   4158dc: eor     w2, w2, w0
+    0.00 :   4158e0: ldr     w0, [sp, #132]
+    0.00 :   4158e4: eor     w2, w2, w0
+    0.00 :   4158e8: ldr     w0, [sp, #88]
+    0.00 :   4158ec: add     w0, w2, w0
+    0.00 :   4158f0: add     w1, w1, w0
+    0.00 :   4158f4: mov     w0, #0xbc70                     // #48240
+    0.00 :   4158f8: movk    w0, #0xbebf, lsl #16
+    0.00 :   4158fc: add     w0, w1, w0
+    0.16 :   415900: str     w0, [sp, #128]
+    0.00 :   415904: ldr     w0, [sp, #128]
+    0.52 :   415908: ror     w0, w0, #9
+    0.00 :   41590c: str     w0, [sp, #128]
+    0.00 :   415910: ldr     w1, [sp, #128]
+    0.57 :   415914: ldr     w0, [sp, #124]
+    0.00 :   415918: add     w0, w1, w0
+    0.00 :   41591c: str     w0, [sp, #128]
+         :            HH(a, b, c, d, x[13], s31, 0x289b7ec6);
+    0.00 :   415920: ldr     w1, [sp, #132]
+    0.00 :   415924: ldr     w2, [sp, #128]
+    0.10 :   415928: ldr     w0, [sp, #124]
+    0.00 :   41592c: eor     w2, w2, w0
+    0.00 :   415930: ldr     w0, [sp, #120]
+    0.00 :   415934: eor     w2, w2, w0
+    0.00 :   415938: ldr     w0, [sp, #100]
+    0.00 :   41593c: add     w0, w2, w0
+    0.00 :   415940: add     w1, w1, w0
+    0.00 :   415944: mov     w0, #0x7ec6                     // #32454
+    0.00 :   415948: movk    w0, #0x289b, lsl #16
+    0.00 :   41594c: add     w0, w1, w0
+    0.00 :   415950: str     w0, [sp, #132]
+    0.00 :   415954: ldr     w0, [sp, #132]
+    0.57 :   415958: ror     w0, w0, #28
+    0.00 :   41595c: str     w0, [sp, #132]
+    0.00 :   415960: ldr     w1, [sp, #132]
+    0.31 :   415964: ldr     w0, [sp, #128]
+    0.00 :   415968: add     w0, w1, w0
+    0.00 :   41596c: str     w0, [sp, #132]
+         :            HH(d, a, b, c, x[0], s32, 0xeaa127fa);
+    0.00 :   415970: ldr     w1, [sp, #120]
+    0.00 :   415974: ldr     w2, [sp, #132]
+    0.21 :   415978: ldr     w0, [sp, #128]
+    0.00 :   41597c: eor     w2, w2, w0
+    0.00 :   415980: ldr     w0, [sp, #124]
+    0.00 :   415984: eor     w2, w2, w0
+    0.00 :   415988: ldr     w0, [sp, #48]
+    0.00 :   41598c: add     w0, w2, w0
+    0.00 :   415990: add     w1, w1, w0
+    0.00 :   415994: mov     w0, #0x27fa                     // #10234
+    0.00 :   415998: movk    w0, #0xeaa1, lsl #16
+    0.00 :   41599c: add     w0, w1, w0
+    0.05 :   4159a0: str     w0, [sp, #120]
+    0.00 :   4159a4: ldr     w0, [sp, #120]
+    0.31 :   4159a8: ror     w0, w0, #21
+    0.05 :   4159ac: str     w0, [sp, #120]
+    0.00 :   4159b0: ldr     w1, [sp, #120]
+    0.42 :   4159b4: ldr     w0, [sp, #132]
+    0.00 :   4159b8: add     w0, w1, w0
+    0.00 :   4159bc: str     w0, [sp, #120]
+         :            HH(c, d, a, b, x[3], s33, 0xd4ef3085);
+    0.00 :   4159c0: ldr     w1, [sp, #124]
+    0.00 :   4159c4: ldr     w2, [sp, #120]
+    0.26 :   4159c8: ldr     w0, [sp, #132]
+    0.00 :   4159cc: eor     w2, w2, w0
+    0.00 :   4159d0: ldr     w0, [sp, #128]
+    0.00 :   4159d4: eor     w2, w2, w0
+    0.00 :   4159d8: ldr     w0, [sp, #60]
+    0.00 :   4159dc: add     w0, w2, w0
+    0.00 :   4159e0: add     w1, w1, w0
+    0.00 :   4159e4: mov     w0, #0x3085                     // #12421
+    0.00 :   4159e8: movk    w0, #0xd4ef, lsl #16
+    0.00 :   4159ec: add     w0, w1, w0
+    0.05 :   4159f0: str     w0, [sp, #124]
+    0.00 :   4159f4: ldr     w0, [sp, #124]
+    0.52 :   4159f8: ror     w0, w0, #16
+    0.00 :   4159fc: str     w0, [sp, #124]
+    0.00 :   415a00: ldr     w1, [sp, #124]
+    0.16 :   415a04: ldr     w0, [sp, #120]
+    0.00 :   415a08: add     w0, w1, w0
+    0.00 :   415a0c: str     w0, [sp, #124]
+         :            HH(b, c, d, a, x[6], s34, 0x4881d05);
+    0.00 :   415a10: ldr     w1, [sp, #128]
+    0.00 :   415a14: ldr     w2, [sp, #124]
+    0.05 :   415a18: ldr     w0, [sp, #120]
+    0.00 :   415a1c: eor     w2, w2, w0
+    0.00 :   415a20: ldr     w0, [sp, #132]
+    0.00 :   415a24: eor     w2, w2, w0
+    0.00 :   415a28: ldr     w0, [sp, #72]
+    0.00 :   415a2c: add     w0, w2, w0
+    0.00 :   415a30: add     w1, w1, w0
+    0.00 :   415a34: mov     w0, #0x1d05                     // #7429
+    0.10 :   415a38: movk    w0, #0x488, lsl #16
+    0.00 :   415a3c: add     w0, w1, w0
+    0.00 :   415a40: str     w0, [sp, #128]
+    0.00 :   415a44: ldr     w0, [sp, #128]
+    0.36 :   415a48: ror     w0, w0, #9
+    0.00 :   415a4c: str     w0, [sp, #128]
+    0.00 :   415a50: ldr     w1, [sp, #128]
+    0.26 :   415a54: ldr     w0, [sp, #124]
+    0.00 :   415a58: add     w0, w1, w0
+    0.00 :   415a5c: str     w0, [sp, #128]
+         :            HH(a, b, c, d, x[9], s31, 0xd9d4d039);
+    0.00 :   415a60: ldr     w1, [sp, #132]
+    0.05 :   415a64: ldr     w2, [sp, #128]
+    0.42 :   415a68: ldr     w0, [sp, #124]
+    0.00 :   415a6c: eor     w2, w2, w0
+    0.00 :   415a70: ldr     w0, [sp, #120]
+    0.00 :   415a74: eor     w2, w2, w0
+    0.00 :   415a78: ldr     w0, [sp, #84]
+    0.00 :   415a7c: add     w0, w2, w0
+    0.00 :   415a80: add     w1, w1, w0
+    0.00 :   415a84: mov     w0, #0xd039                     // #53305
+    0.00 :   415a88: movk    w0, #0xd9d4, lsl #16
+    0.00 :   415a8c: add     w0, w1, w0
+    0.00 :   415a90: str     w0, [sp, #132]
+    0.00 :   415a94: ldr     w0, [sp, #132]
+    0.68 :   415a98: ror     w0, w0, #28
+    0.16 :   415a9c: str     w0, [sp, #132]
+    0.00 :   415aa0: ldr     w1, [sp, #132]
+    0.88 :   415aa4: ldr     w0, [sp, #128]
+    0.00 :   415aa8: add     w0, w1, w0
+    0.00 :   415aac: str     w0, [sp, #132]
+         :            HH(d, a, b, c, x[12], s32, 0xe6db99e5);
+    0.00 :   415ab0: ldr     w1, [sp, #120]
+    0.00 :   415ab4: ldr     w2, [sp, #132]
+    0.26 :   415ab8: ldr     w0, [sp, #128]
+    0.00 :   415abc: eor     w2, w2, w0
+    0.00 :   415ac0: ldr     w0, [sp, #124]
+    0.00 :   415ac4: eor     w2, w2, w0
+    0.00 :   415ac8: ldr     w0, [sp, #96]
+    0.00 :   415acc: add     w0, w2, w0
+    0.00 :   415ad0: add     w1, w1, w0
+    0.00 :   415ad4: mov     w0, #0x99e5                     // #39397
+    0.00 :   415ad8: movk    w0, #0xe6db, lsl #16
+    0.00 :   415adc: add     w0, w1, w0
+    0.00 :   415ae0: str     w0, [sp, #120]
+    0.00 :   415ae4: ldr     w0, [sp, #120]
+    0.26 :   415ae8: ror     w0, w0, #21
+    0.00 :   415aec: str     w0, [sp, #120]
+    0.00 :   415af0: ldr     w1, [sp, #120]
+    0.57 :   415af4: ldr     w0, [sp, #132]
+    0.00 :   415af8: add     w0, w1, w0
+    0.00 :   415afc: str     w0, [sp, #120]
+         :            HH(c, d, a, b, x[15], s33, 0x1fa27cf8);
+    0.00 :   415b00: ldr     w1, [sp, #124]
+    0.05 :   415b04: ldr     w2, [sp, #120]
+    0.36 :   415b08: ldr     w0, [sp, #132]
+    0.00 :   415b0c: eor     w2, w2, w0
+    0.00 :   415b10: ldr     w0, [sp, #128]
+    0.00 :   415b14: eor     w2, w2, w0
+    0.00 :   415b18: ldr     w0, [sp, #108]
+    0.00 :   415b1c: add     w0, w2, w0
+    0.00 :   415b20: add     w1, w1, w0
+    0.00 :   415b24: mov     w0, #0x7cf8                     // #31992
+    0.00 :   415b28: movk    w0, #0x1fa2, lsl #16
+    0.00 :   415b2c: add     w0, w1, w0
+    0.00 :   415b30: str     w0, [sp, #124]
+    0.00 :   415b34: ldr     w0, [sp, #124]
+    0.78 :   415b38: ror     w0, w0, #16
+    0.00 :   415b3c: str     w0, [sp, #124]
+    0.00 :   415b40: ldr     w1, [sp, #124]
+    0.52 :   415b44: ldr     w0, [sp, #120]
+    0.00 :   415b48: add     w0, w1, w0
+    0.00 :   415b4c: str     w0, [sp, #124]
+         :            HH(b, c, d, a, x[2], s34, 0xc4ac5665);
+    0.00 :   415b50: ldr     w1, [sp, #128]
+    0.05 :   415b54: ldr     w2, [sp, #124]
+    0.57 :   415b58: ldr     w0, [sp, #120]
+    0.00 :   415b5c: eor     w2, w2, w0
+    0.00 :   415b60: ldr     w0, [sp, #132]
+    0.00 :   415b64: eor     w2, w2, w0
+    0.00 :   415b68: ldr     w0, [sp, #56]
+    0.00 :   415b6c: add     w0, w2, w0
+    0.00 :   415b70: add     w1, w1, w0
+    0.00 :   415b74: mov     w0, #0x5665                     // #22117
+    0.00 :   415b78: movk    w0, #0xc4ac, lsl #16
+    0.00 :   415b7c: add     w0, w1, w0
+    0.00 :   415b80: str     w0, [sp, #128]
+    0.00 :   415b84: ldr     w0, [sp, #128]
+    0.83 :   415b88: ror     w0, w0, #9
+    0.00 :   415b8c: str     w0, [sp, #128]
+    0.00 :   415b90: ldr     w1, [sp, #128]
+    0.47 :   415b94: ldr     w0, [sp, #124]
+    0.00 :   415b98: add     w0, w1, w0
+    0.00 :   415b9c: str     w0, [sp, #128]
+         :
+         :            /* Round 4 */
+         :            II(a, b, c, d, x[0], s41, 0xf4292244);
+    0.00 :   415ba0: ldr     w1, [sp, #132]
+    0.05 :   415ba4: ldr     w0, [sp, #120]
+    0.00 :   415ba8: mvn     w2, w0
+    0.00 :   415bac: ldr     w0, [sp, #128]
+    0.00 :   415bb0: orr     w2, w2, w0
+    0.05 :   415bb4: ldr     w0, [sp, #124]
+    0.00 :   415bb8: eor     w2, w2, w0
+    0.00 :   415bbc: ldr     w0, [sp, #48]
+    0.00 :   415bc0: add     w0, w2, w0
+    0.00 :   415bc4: add     w1, w1, w0
+    0.00 :   415bc8: mov     w0, #0x2244                     // #8772
+    0.00 :   415bcc: movk    w0, #0xf429, lsl #16
+    0.00 :   415bd0: add     w0, w1, w0
+    0.05 :   415bd4: str     w0, [sp, #132]
+    0.00 :   415bd8: ldr     w0, [sp, #132]
+    0.00 :   415bdc: ror     w0, w0, #26
+    0.68 :   415be0: str     w0, [sp, #132]
+    0.00 :   415be4: ldr     w1, [sp, #132]
+    0.57 :   415be8: ldr     w0, [sp, #128]
+    0.00 :   415bec: add     w0, w1, w0
+    0.00 :   415bf0: str     w0, [sp, #132]
+         :            II(d, a, b, c, x[7], s42, 0x432aff97);
+    0.00 :   415bf4: ldr     w1, [sp, #120]
+    0.00 :   415bf8: ldr     w0, [sp, #124]
+    0.00 :   415bfc: mvn     w2, w0
+    0.00 :   415c00: ldr     w0, [sp, #132]
+    0.00 :   415c04: orr     w2, w2, w0
+    0.31 :   415c08: ldr     w0, [sp, #128]
+    0.00 :   415c0c: eor     w2, w2, w0
+    0.00 :   415c10: ldr     w0, [sp, #76]
+    0.00 :   415c14: add     w0, w2, w0
+    0.00 :   415c18: add     w1, w1, w0
+    0.00 :   415c1c: mov     w0, #0xff97                     // #65431
+    0.00 :   415c20: movk    w0, #0x432a, lsl #16
+    0.00 :   415c24: add     w0, w1, w0
+    0.00 :   415c28: str     w0, [sp, #120]
+    0.10 :   415c2c: ldr     w0, [sp, #120]
+    0.00 :   415c30: ror     w0, w0, #22
+    0.57 :   415c34: str     w0, [sp, #120]
+    0.00 :   415c38: ldr     w1, [sp, #120]
+    0.42 :   415c3c: ldr     w0, [sp, #132]
+    0.00 :   415c40: add     w0, w1, w0
+    0.00 :   415c44: str     w0, [sp, #120]
+         :            II(c, d, a, b, x[14], s43, 0xab9423a7);
+    0.00 :   415c48: ldr     w1, [sp, #124]
+    0.00 :   415c4c: ldr     w0, [sp, #128]
+    0.00 :   415c50: mvn     w2, w0
+    0.00 :   415c54: ldr     w0, [sp, #120]
+    0.21 :   415c58: orr     w2, w2, w0
+    0.00 :   415c5c: ldr     w0, [sp, #132]
+    0.00 :   415c60: eor     w2, w2, w0
+    0.00 :   415c64: ldr     w0, [sp, #104]
+    0.00 :   415c68: add     w0, w2, w0
+    0.00 :   415c6c: add     w1, w1, w0
+    0.00 :   415c70: mov     w0, #0x23a7                     // #9127
+    0.00 :   415c74: movk    w0, #0xab94, lsl #16
+    0.05 :   415c78: add     w0, w1, w0
+    0.00 :   415c7c: str     w0, [sp, #124]
+    0.00 :   415c80: ldr     w0, [sp, #124]
+    0.00 :   415c84: ror     w0, w0, #17
+    0.57 :   415c88: str     w0, [sp, #124]
+    0.00 :   415c8c: ldr     w1, [sp, #124]
+    0.26 :   415c90: ldr     w0, [sp, #120]
+    0.00 :   415c94: add     w0, w1, w0
+    0.00 :   415c98: str     w0, [sp, #124]
+         :            II(b, c, d, a, x[5], s44, 0xfc93a039);
+    0.00 :   415c9c: ldr     w1, [sp, #128]
+    0.00 :   415ca0: ldr     w0, [sp, #132]
+    0.00 :   415ca4: mvn     w2, w0
+    0.00 :   415ca8: ldr     w0, [sp, #124]
+    0.00 :   415cac: orr     w2, w2, w0
+    0.52 :   415cb0: ldr     w0, [sp, #120]
+    0.00 :   415cb4: eor     w2, w2, w0
+    0.00 :   415cb8: ldr     w0, [sp, #68]
+    0.00 :   415cbc: add     w0, w2, w0
+    0.00 :   415cc0: add     w1, w1, w0
+    0.00 :   415cc4: mov     w0, #0xa039                     // #41017
+    0.00 :   415cc8: movk    w0, #0xfc93, lsl #16
+    0.00 :   415ccc: add     w0, w1, w0
+    0.00 :   415cd0: str     w0, [sp, #128]
+    0.05 :   415cd4: ldr     w0, [sp, #128]
+    0.52 :   415cd8: ror     w0, w0, #11
+    0.00 :   415cdc: str     w0, [sp, #128]
+    0.00 :   415ce0: ldr     w1, [sp, #128]
+    0.56 :   415ce4: ldr     w0, [sp, #124]
+    0.00 :   415ce8: add     w0, w1, w0
+    0.00 :   415cec: str     w0, [sp, #128]
+         :            II(a, b, c, d, x[12], s41, 0x655b59c3);
+    0.00 :   415cf0: ldr     w1, [sp, #132]
+    0.10 :   415cf4: ldr     w0, [sp, #120]
+    0.00 :   415cf8: mvn     w2, w0
+    0.00 :   415cfc: ldr     w0, [sp, #128]
+    0.00 :   415d00: orr     w2, w2, w0
+    0.42 :   415d04: ldr     w0, [sp, #124]
+    0.00 :   415d08: eor     w2, w2, w0
+    0.00 :   415d0c: ldr     w0, [sp, #96]
+    0.00 :   415d10: add     w0, w2, w0
+    0.00 :   415d14: add     w1, w1, w0
+    0.00 :   415d18: mov     w0, #0x59c3                     // #22979
+    0.05 :   415d1c: movk    w0, #0x655b, lsl #16
+    0.00 :   415d20: add     w0, w1, w0
+    0.05 :   415d24: str     w0, [sp, #132]
+    0.00 :   415d28: ldr     w0, [sp, #132]
+    0.00 :   415d2c: ror     w0, w0, #26
+    0.52 :   415d30: str     w0, [sp, #132]
+    0.00 :   415d34: ldr     w1, [sp, #132]
+    0.21 :   415d38: ldr     w0, [sp, #128]
+    0.00 :   415d3c: add     w0, w1, w0
+    0.00 :   415d40: str     w0, [sp, #132]
+         :            II(d, a, b, c, x[3], s42, 0x8f0ccc92);
+    0.00 :   415d44: ldr     w1, [sp, #120]
+    0.00 :   415d48: ldr     w0, [sp, #124]
+    0.00 :   415d4c: mvn     w2, w0
+    0.10 :   415d50: ldr     w0, [sp, #132]
+    0.00 :   415d54: orr     w2, w2, w0
+    0.47 :   415d58: ldr     w0, [sp, #128]
+    0.00 :   415d5c: eor     w2, w2, w0
+    0.00 :   415d60: ldr     w0, [sp, #60]
+    0.00 :   415d64: add     w0, w2, w0
+    0.00 :   415d68: add     w1, w1, w0
+    0.00 :   415d6c: mov     w0, #0xcc92                     // #52370
+    0.00 :   415d70: movk    w0, #0x8f0c, lsl #16
+    0.00 :   415d74: add     w0, w1, w0
+    0.00 :   415d78: str     w0, [sp, #120]
+    0.00 :   415d7c: ldr     w0, [sp, #120]
+    0.00 :   415d80: ror     w0, w0, #22
+    0.52 :   415d84: str     w0, [sp, #120]
+    0.00 :   415d88: ldr     w1, [sp, #120]
+    0.42 :   415d8c: ldr     w0, [sp, #132]
+    0.00 :   415d90: add     w0, w1, w0
+    0.00 :   415d94: str     w0, [sp, #120]
+         :            II(c, d, a, b, x[10], s43, 0xffeff47d);
+    0.00 :   415d98: ldr     w1, [sp, #124]
+    0.00 :   415d9c: ldr     w0, [sp, #128]
+    0.00 :   415da0: mvn     w2, w0
+    0.05 :   415da4: ldr     w0, [sp, #120]
+    0.47 :   415da8: orr     w2, w2, w0
+    0.00 :   415dac: ldr     w0, [sp, #132]
+    0.00 :   415db0: eor     w2, w2, w0
+    0.00 :   415db4: ldr     w0, [sp, #88]
+    0.00 :   415db8: add     w0, w2, w0
+    0.00 :   415dbc: add     w1, w1, w0
+    0.00 :   415dc0: mov     w0, #0xf47d                     // #62589
+    0.00 :   415dc4: movk    w0, #0xffef, lsl #16
+    0.05 :   415dc8: add     w0, w1, w0
+    0.00 :   415dcc: str     w0, [sp, #124]
+    0.00 :   415dd0: ldr     w0, [sp, #124]
+    0.00 :   415dd4: ror     w0, w0, #17
+    0.47 :   415dd8: str     w0, [sp, #124]
+    0.00 :   415ddc: ldr     w1, [sp, #124]
+    0.31 :   415de0: ldr     w0, [sp, #120]
+    0.00 :   415de4: add     w0, w1, w0
+    0.00 :   415de8: str     w0, [sp, #124]
+         :            II(b, c, d, a, x[1], s44, 0x85845dd1);
+    0.00 :   415dec: ldr     w1, [sp, #128]
+    0.00 :   415df0: ldr     w0, [sp, #132]
+    0.00 :   415df4: mvn     w2, w0
+    0.16 :   415df8: ldr     w0, [sp, #124]
+    0.00 :   415dfc: orr     w2, w2, w0
+    0.26 :   415e00: ldr     w0, [sp, #120]
+    0.00 :   415e04: eor     w2, w2, w0
+    0.00 :   415e08: ldr     w0, [sp, #52]
+    0.00 :   415e0c: add     w0, w2, w0
+    0.00 :   415e10: add     w1, w1, w0
+    0.00 :   415e14: mov     w0, #0x5dd1                     // #24017
+    0.00 :   415e18: movk    w0, #0x8584, lsl #16
+    0.00 :   415e1c: add     w0, w1, w0
+    0.10 :   415e20: str     w0, [sp, #128]
+    0.00 :   415e24: ldr     w0, [sp, #128]
+    0.57 :   415e28: ror     w0, w0, #11
+    0.00 :   415e2c: str     w0, [sp, #128]
+    0.00 :   415e30: ldr     w1, [sp, #128]
+    0.16 :   415e34: ldr     w0, [sp, #124]
+    0.00 :   415e38: add     w0, w1, w0
+    0.00 :   415e3c: str     w0, [sp, #128]
+         :            II(a, b, c, d, x[8], s41, 0x6fa87e4f);
+    0.00 :   415e40: ldr     w1, [sp, #132]
+    0.00 :   415e44: ldr     w0, [sp, #120]
+    0.00 :   415e48: mvn     w2, w0
+    0.00 :   415e4c: ldr     w0, [sp, #128]
+    0.00 :   415e50: orr     w2, w2, w0
+    0.26 :   415e54: ldr     w0, [sp, #124]
+    0.00 :   415e58: eor     w2, w2, w0
+    0.00 :   415e5c: ldr     w0, [sp, #80]
+    0.00 :   415e60: add     w0, w2, w0
+    0.00 :   415e64: add     w1, w1, w0
+    0.00 :   415e68: mov     w0, #0x7e4f                     // #32335
+    0.00 :   415e6c: movk    w0, #0x6fa8, lsl #16
+    0.00 :   415e70: add     w0, w1, w0
+    0.05 :   415e74: str     w0, [sp, #132]
+    0.00 :   415e78: ldr     w0, [sp, #132]
+    0.00 :   415e7c: ror     w0, w0, #26
+    0.62 :   415e80: str     w0, [sp, #132]
+    0.00 :   415e84: ldr     w1, [sp, #132]
+    0.26 :   415e88: ldr     w0, [sp, #128]
+    0.00 :   415e8c: add     w0, w1, w0
+    0.00 :   415e90: str     w0, [sp, #132]
+         :            II(d, a, b, c, x[15], s42, 0xfe2ce6e0);
+    0.00 :   415e94: ldr     w1, [sp, #120]
+    0.00 :   415e98: ldr     w0, [sp, #124]
+    0.00 :   415e9c: mvn     w2, w0
+    0.16 :   415ea0: ldr     w0, [sp, #132]
+    0.00 :   415ea4: orr     w2, w2, w0
+    0.31 :   415ea8: ldr     w0, [sp, #128]
+    0.00 :   415eac: eor     w2, w2, w0
+    0.00 :   415eb0: ldr     w0, [sp, #108]
+    0.00 :   415eb4: add     w0, w2, w0
+    0.00 :   415eb8: add     w1, w1, w0
+    0.00 :   415ebc: mov     w0, #0xe6e0                     // #59104
+    0.00 :   415ec0: movk    w0, #0xfe2c, lsl #16
+    0.00 :   415ec4: add     w0, w1, w0
+    0.00 :   415ec8: str     w0, [sp, #120]
+    0.05 :   415ecc: ldr     w0, [sp, #120]
+    0.00 :   415ed0: ror     w0, w0, #22
+    0.47 :   415ed4: str     w0, [sp, #120]
+    0.00 :   415ed8: ldr     w1, [sp, #120]
+    0.31 :   415edc: ldr     w0, [sp, #132]
+    0.00 :   415ee0: add     w0, w1, w0
+    0.00 :   415ee4: str     w0, [sp, #120]
+         :            II(c, d, a, b, x[6], s43, 0xa3014314);
+    0.00 :   415ee8: ldr     w1, [sp, #124]
+    0.00 :   415eec: ldr     w0, [sp, #128]
+    0.00 :   415ef0: mvn     w2, w0
+    0.00 :   415ef4: ldr     w0, [sp, #120]
+    0.26 :   415ef8: orr     w2, w2, w0
+    0.00 :   415efc: ldr     w0, [sp, #132]
+    0.00 :   415f00: eor     w2, w2, w0
+    0.00 :   415f04: ldr     w0, [sp, #72]
+    0.00 :   415f08: add     w0, w2, w0
+    0.00 :   415f0c: add     w1, w1, w0
+    0.00 :   415f10: mov     w0, #0x4314                     // #17172
+    0.00 :   415f14: movk    w0, #0xa301, lsl #16
+    0.10 :   415f18: add     w0, w1, w0
+    0.00 :   415f1c: str     w0, [sp, #124]
+    0.00 :   415f20: ldr     w0, [sp, #124]
+    0.00 :   415f24: ror     w0, w0, #17
+    0.41 :   415f28: str     w0, [sp, #124]
+    0.00 :   415f2c: ldr     w1, [sp, #124]
+    0.31 :   415f30: ldr     w0, [sp, #120]
+    0.00 :   415f34: add     w0, w1, w0
+    0.00 :   415f38: str     w0, [sp, #124]
+         :            II(b, c, d, a, x[13], s44, 0x4e0811a1);
+    0.00 :   415f3c: ldr     w1, [sp, #128]
+    0.00 :   415f40: ldr     w0, [sp, #132]
+    0.00 :   415f44: mvn     w2, w0
+    0.10 :   415f48: ldr     w0, [sp, #124]
+    0.00 :   415f4c: orr     w2, w2, w0
+    0.10 :   415f50: ldr     w0, [sp, #120]
+    0.00 :   415f54: eor     w2, w2, w0
+    0.00 :   415f58: ldr     w0, [sp, #100]
+    0.00 :   415f5c: add     w0, w2, w0
+    0.00 :   415f60: add     w1, w1, w0
+    0.00 :   415f64: mov     w0, #0x11a1                     // #4513
+    0.00 :   415f68: movk    w0, #0x4e08, lsl #16
+    0.00 :   415f6c: add     w0, w1, w0
+    0.00 :   415f70: str     w0, [sp, #128]
+    0.16 :   415f74: ldr     w0, [sp, #128]
+    0.31 :   415f78: ror     w0, w0, #11
+    0.05 :   415f7c: str     w0, [sp, #128]
+    0.00 :   415f80: ldr     w1, [sp, #128]
+    0.36 :   415f84: ldr     w0, [sp, #124]
+    0.00 :   415f88: add     w0, w1, w0
+    0.00 :   415f8c: str     w0, [sp, #128]
+         :            II(a, b, c, d, x[4], s41, 0xf7537e82);
+    0.00 :   415f90: ldr     w1, [sp, #132]
+    0.00 :   415f94: ldr     w0, [sp, #120]
+    0.00 :   415f98: mvn     w2, w0
+    0.00 :   415f9c: ldr     w0, [sp, #128]
+    0.00 :   415fa0: orr     w2, w2, w0
+    0.42 :   415fa4: ldr     w0, [sp, #124]
+    0.00 :   415fa8: eor     w2, w2, w0
+    0.00 :   415fac: ldr     w0, [sp, #64]
+    0.00 :   415fb0: add     w0, w2, w0
+    0.00 :   415fb4: add     w1, w1, w0
+    0.00 :   415fb8: mov     w0, #0x7e82                     // #32386
+    0.00 :   415fbc: movk    w0, #0xf753, lsl #16
+    0.00 :   415fc0: add     w0, w1, w0
+    0.00 :   415fc4: str     w0, [sp, #132]
+    0.00 :   415fc8: ldr     w0, [sp, #132]
+    0.00 :   415fcc: ror     w0, w0, #26
+    0.47 :   415fd0: str     w0, [sp, #132]
+    0.00 :   415fd4: ldr     w1, [sp, #132]
+    0.31 :   415fd8: ldr     w0, [sp, #128]
+    0.00 :   415fdc: add     w0, w1, w0
+    0.00 :   415fe0: str     w0, [sp, #132]
+         :            II(d, a, b, c, x[11], s42, 0xbd3af235);
+    0.00 :   415fe4: ldr     w1, [sp, #120]
+    0.00 :   415fe8: ldr     w0, [sp, #124]
+    0.00 :   415fec: mvn     w2, w0
+    0.00 :   415ff0: ldr     w0, [sp, #132]
+    0.00 :   415ff4: orr     w2, w2, w0
+    0.42 :   415ff8: ldr     w0, [sp, #128]
+    0.00 :   415ffc: eor     w2, w2, w0
+    0.00 :   416000: ldr     w0, [sp, #92]
+    0.00 :   416004: add     w0, w2, w0
+    0.00 :   416008: add     w1, w1, w0
+    0.00 :   41600c: mov     w0, #0xf235                     // #62005
+    0.00 :   416010: movk    w0, #0xbd3a, lsl #16
+    0.00 :   416014: add     w0, w1, w0
+    0.00 :   416018: str     w0, [sp, #120]
+    0.05 :   41601c: ldr     w0, [sp, #120]
+    0.00 :   416020: ror     w0, w0, #22
+    0.36 :   416024: str     w0, [sp, #120]
+    0.00 :   416028: ldr     w1, [sp, #120]
+    0.21 :   41602c: ldr     w0, [sp, #132]
+    0.00 :   416030: add     w0, w1, w0
+    0.00 :   416034: str     w0, [sp, #120]
+         :            II(c, d, a, b, x[2], s43, 0x2ad7d2bb);
+    0.00 :   416038: ldr     w1, [sp, #124]
+    0.00 :   41603c: ldr     w0, [sp, #128]
+    0.00 :   416040: mvn     w2, w0
+    0.00 :   416044: ldr     w0, [sp, #120]
+    0.26 :   416048: orr     w2, w2, w0
+    0.00 :   41604c: ldr     w0, [sp, #132]
+    0.00 :   416050: eor     w2, w2, w0
+    0.00 :   416054: ldr     w0, [sp, #56]
+    0.00 :   416058: add     w0, w2, w0
+    0.00 :   41605c: add     w1, w1, w0
+    0.00 :   416060: mov     w0, #0xd2bb                     // #53947
+    0.00 :   416064: movk    w0, #0x2ad7, lsl #16
+    0.10 :   416068: add     w0, w1, w0
+    0.00 :   41606c: str     w0, [sp, #124]
+    0.00 :   416070: ldr     w0, [sp, #124]
+    0.00 :   416074: ror     w0, w0, #17
+    0.52 :   416078: str     w0, [sp, #124]
+    0.00 :   41607c: ldr     w1, [sp, #124]
+    0.21 :   416080: ldr     w0, [sp, #120]
+    0.00 :   416084: add     w0, w1, w0
+    0.00 :   416088: str     w0, [sp, #124]
+         :            II(b, c, d, a, x[9], s44, 0xeb86d391);
+    0.00 :   41608c: ldr     w1, [sp, #128]
+    0.00 :   416090: ldr     w0, [sp, #132]
+    0.00 :   416094: mvn     w2, w0
+    0.10 :   416098: ldr     w0, [sp, #124]
+    0.00 :   41609c: orr     w2, w2, w0
+    0.57 :   4160a0: ldr     w0, [sp, #120]
+    0.00 :   4160a4: eor     w2, w2, w0
+    0.00 :   4160a8: ldr     w0, [sp, #84]
+    0.00 :   4160ac: add     w0, w2, w0
+    0.00 :   4160b0: add     w1, w1, w0
+    0.00 :   4160b4: mov     w0, #0xd391                     // #54161
+    0.00 :   4160b8: movk    w0, #0xeb86, lsl #16
+    0.00 :   4160bc: add     w0, w1, w0
+    0.00 :   4160c0: str     w0, [sp, #128]
+    0.10 :   4160c4: ldr     w0, [sp, #128]
+    0.42 :   4160c8: ror     w0, w0, #11
+    0.00 :   4160cc: str     w0, [sp, #128]
+    0.00 :   4160d0: ldr     w1, [sp, #128]
+    0.26 :   4160d4: ldr     w0, [sp, #124]
+    0.00 :   4160d8: add     w0, w1, w0
+    0.00 :   4160dc: str     w0, [sp, #128]
+         :
+         :            state[0] += a;
+    0.00 :   4160e0: ldr     x0, [sp, #32]
+    0.05 :   4160e4: ldr     w1, [x0]
+    0.00 :   4160e8: ldr     w0, [sp, #132]
+    0.00 :   4160ec: add     w1, w1, w0
+    0.00 :   4160f0: ldr     x0, [sp, #32]
+    0.00 :   4160f4: str     w1, [x0]
+         :            state[1] += b;
+    0.05 :   4160f8: ldr     x0, [sp, #32]
+    0.00 :   4160fc: add     x0, x0, #0x4
+    0.00 :   416100: ldr     w2, [x0]
+    0.00 :   416104: ldr     w1, [sp, #128]
+    0.36 :   416108: ldr     x0, [sp, #32]
+    0.00 :   41610c: add     x0, x0, #0x4
+    0.00 :   416110: add     w1, w2, w1
+    0.00 :   416114: str     w1, [x0]
+         :            state[2] += c;
+    0.00 :   416118: ldr     x0, [sp, #32]
+    0.00 :   41611c: add     x0, x0, #0x8
+    0.00 :   416120: ldr     w2, [x0]
+    0.00 :   416124: ldr     w1, [sp, #124]
+    0.00 :   416128: ldr     x0, [sp, #32]
+    0.00 :   41612c: add     x0, x0, #0x8
+    0.00 :   416130: add     w1, w2, w1
+    0.00 :   416134: str     w1, [x0]
+         :            state[3] += d;
+    0.16 :   416138: ldr     x0, [sp, #32]
+    0.00 :   41613c: add     x0, x0, #0xc
+    0.00 :   416140: ldr     w2, [x0]
+    0.00 :   416144: ldr     w1, [sp, #120]
+    0.00 :   416148: ldr     x0, [sp, #32]
+    0.00 :   41614c: add     x0, x0, #0xc
+    0.00 :   416150: add     w1, w2, w1
+    0.10 :   416154: str     w1, [x0]
+         :            for (int i = 0; i < n_blocks; i += 1)
+    0.00 :   416158: ldr     w0, [sp, #192]
+    0.00 :   41615c: add     w0, w0, #0x1
+    0.00 :   416160: str     w0, [sp, #192]
+    0.00 :   416164: b       4149f0 <MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*)+0x120>
+         :            }
+         :
+         :            // 下面的处理，在理解上较为复杂
+         :            for (int i = 0; i < 4; i++)
+    0.00 :   416168: str     wzr, [sp, #184]
+    0.05 :   41616c: ldr     w0, [sp, #184]
+    0.00 :   416170: cmp     w0, #0x3
+    0.00 :   416174: b.gt    4161e8 <MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*)+0x1918>
+         :            {
+         :            uint32_t value = state[i];
+    0.16 :   416178: ldrsw   x0, [sp, #184]
+    0.00 :   41617c: lsl     x0, x0, #2
+    0.26 :   416180: ldr     x1, [sp, #32]
+    0.00 :   416184: add     x0, x1, x0
+    0.00 :   416188: ldr     w0, [x0]
+    0.63 :   41618c: str     w0, [sp, #168]
+         :            state[i] = ((value & 0xff) << 24) |              // 将最低字节移到最高位
+    0.00 :   416190: ldr     w0, [sp, #168]
+    0.05 :   416194: lsl     w1, w0, #24
+         :            ((value & 0xff00) << 8) |        // 将次低字节左移
+    0.78 :   416198: ldr     w0, [sp, #168]
+    0.00 :   41619c: lsl     w0, w0, #8
+    0.00 :   4161a0: and     w0, w0, #0xff0000
+         :            state[i] = ((value & 0xff) << 24) |              // 将最低字节移到最高位
+    0.00 :   4161a4: orr     w1, w1, w0
+         :            ((value & 0xff0000) >> 8) |      // 将次高字节右移
+    0.00 :   4161a8: ldr     w0, [sp, #168]
+    0.00 :   4161ac: lsr     w0, w0, #8
+    0.00 :   4161b0: and     w0, w0, #0xff00
+         :            ((value & 0xff00) << 8) |        // 将次低字节左移
+    0.00 :   4161b4: orr     w2, w1, w0
+         :            ((value & 0xff000000) >> 24); // 将最高字节移到最低位
+    0.16 :   4161b8: ldr     w0, [sp, #168]
+    0.00 :   4161bc: lsr     w1, w0, #24
+         :            state[i] = ((value & 0xff) << 24) |              // 将最低字节移到最高位
+    0.00 :   4161c0: ldrsw   x0, [sp, #184]
+    0.00 :   4161c4: lsl     x0, x0, #2
+    0.05 :   4161c8: ldr     x3, [sp, #32]
+    0.00 :   4161cc: add     x0, x3, x0
+         :            ((value & 0xff0000) >> 8) |      // 将次高字节右移
+    0.00 :   4161d0: orr     w1, w2, w1
+         :            state[i] = ((value & 0xff) << 24) |              // 将最低字节移到最高位
+    0.00 :   4161d4: str     w1, [x0]
+         :            for (int i = 0; i < 4; i++)
+    0.16 :   4161d8: ldr     w0, [sp, #184]
+    0.00 :   4161dc: add     w0, w0, #0x1
+    0.00 :   4161e0: str     w0, [sp, #184]
+    0.00 :   4161e4: b       41616c <MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*)+0x189c>
+         :            // }
+         :            // cout << endl;
+         :
+         :            // 释放动态分配的内存
+         :            // 实现SIMD并行算法的时候，也请记得及时回收内存！
+         :            delete[] paddedMessage;
+    0.05 :   4161e8: ldr     x0, [sp, #200]
+    0.00 :   4161ec: cmp     x0, #0x0
+    0.00 :   4161f0: b.eq    4161fc <MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*)+0x192c>  // b.none
+    0.10 :   4161f4: ldr     x0, [sp, #200]
+    0.00 :   4161f8: bl      401c00 <operator delete[](void*)@plt>
+         :            delete[] messageLength;
+    0.05 :   4161fc: ldr     x0, [sp, #176]
+    0.00 :   416200: cmp     x0, #0x0
+    0.00 :   416204: b.eq    416228 <MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*)+0x1958>  // b.none
+    0.00 :   416208: ldr     x0, [sp, #176]
+    0.00 :   41620c: bl      401c00 <operator delete[](void*)@plt>
+         :            }
+    0.00 :   416210: b       416228 <MD5Hash(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, unsigned int*)+0x1958>
+         :            paddedMessage = StringProcess(input, &messageLength[i]);
+    0.00 :   416214: mov     x19, x0
+    0.00 :   416218: add     x0, sp, #0x88
+    0.00 :   41621c: bl      401ad0 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string()@plt>
+    0.00 :   416220: mov     x0, x19
+    0.00 :   416224: bl      401d00 <_Unwind_Resume@plt>
+         :            }
+    0.00 :   416228: nop
+    0.00 :   41622c: ldr     x19, [sp, #16]
+    0.00 :   416230: ldp     x29, x30, [sp], #208
+    0.00 :   416234: ret
