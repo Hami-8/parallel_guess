@@ -1,0 +1,2006 @@
+ Percent |	Source code & Disassembly of main for cycles:u (385 samples, percent: local period)
+---------------------------------------------------------------------------------------------------
+         :
+         :
+         :
+         :            Disassembly of section .text:
+         :
+         :            000000000040f274 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])>:
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            * @param input 输入
+         :            * @param[out] state 用于给调用者传递额外的返回值，即最终的缓冲区，也就是MD5的结果
+         :            * @return Byte消息数组
+         :            */
+         :            void MD5Hash_SIMD(const std::string inputs[4], bit32 state_out[4][4])
+         :            {
+    0.00 :   40f274: sub     sp, sp, #0x220
+    0.00 :   40f278: stp     x29, x30, [sp]
+    0.00 :   40f27c: mov     x29, sp
+    0.00 :   40f280: stp     x19, x20, [sp, #16]
+    0.00 :   40f284: add     x19, sp, #0x100
+    0.00 :   40f288: stp     x21, x22, [sp, #32]
+    0.00 :   40f28c: mov     x22, x0
+    0.00 :   40f290: mov     x21, x1
+    0.26 :   40f294: stp     x23, x24, [sp, #48]
+    0.00 :   40f298: add     x24, sp, #0xe0
+    0.26 :   40f29c: stp     x25, x26, [sp, #64]
+    0.00 :   40f2a0: mov     x25, x19
+         :            std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_Alloc_hider::_Alloc_hider(char*, std::allocator<char>&&):
+         :            #else
+         :            _Alloc_hider(pointer __dat, const _Alloc& __a)
+         :            : allocator_type(__a), _M_p(__dat) { }
+         :
+         :            _Alloc_hider(pointer __dat, _Alloc&& __a = _Alloc())
+         :            : allocator_type(std::move(__a)), _M_p(__dat) { }
+    0.00 :   40f2a4: add     x26, sp, #0x130
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+    0.00 :   40f2a8: str     x27, [sp, #80]
+    0.00 :   40f2ac: add     x27, x0, #0x80
+         :            std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::length() const:
+         :
+         :            ///  Returns the number of characters in the string, not including any
+         :            ///  null-termination.
+         :            size_type
+         :            length() const _GLIBCXX_NOEXCEPT
+         :            { return _M_string_length; }
+    0.26 :   40f2b0: ldp     x23, x20, [x22]
+         :            std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_Alloc_hider::_Alloc_hider(char*, std::allocator<char>&&):
+         :            : allocator_type(std::move(__a)), _M_p(__dat) { }
+    1.84 :   40f2b4: str     x26, [sp, #288]
+         :            void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char*>(char*, char*, std::forward_iterator_tag):
+         :            basic_string<_CharT, _Traits, _Alloc>::
+         :            _M_construct(_InIterator __beg, _InIterator __end,
+         :            std::forward_iterator_tag)
+         :            {
+         :            // NB: Not required, but considered best practice.
+         :            if (__gnu_cxx::__is_null_pointer(__beg) && __beg != __end)
+    0.00 :   40f2b8: cmn     x23, x20
+    0.00 :   40f2bc: ccmp    x23, #0x0, #0x0, ne  // ne = any
+    0.00 :   40f2c0: b.eq    40ffd0 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd5c>  // b.none
+         :            std::__throw_logic_error(__N("basic_string::"
+         :            "_M_construct null not valid"));
+         :
+         :            size_type __dnew = static_cast<size_type>(std::distance(__beg, __end));
+    0.26 :   40f2c4: str     x20, [sp, #240]
+         :
+         :            if (__dnew > size_type(_S_local_capacity))
+    0.00 :   40f2c8: cmp     x20, #0xf
+    0.00 :   40f2cc: b.hi    40ff78 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd04>  // b.pmore
+         :            std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_S_copy(char*, char const*, unsigned long):
+         :            if (__n == 1)
+    1.04 :   40f2d0: cmp     x20, #0x1
+    0.00 :   40f2d4: b.ne    40ff6c <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xcf8>  // b.any
+         :            std::char_traits<char>::assign(char&, char const&):
+         :            using comparison_category = strong_ordering;
+         :            #endif
+         :
+         :            static _GLIBCXX17_CONSTEXPR void
+         :            assign(char_type& __c1, const char_type& __c2) _GLIBCXX_NOEXCEPT
+         :            { __c1 = __c2; }
+    0.00 :   40f2d8: ldrb    w1, [x23]
+    0.00 :   40f2dc: mov     x0, x26
+    0.00 :   40f2e0: strb    w1, [sp, #304]
+         :            std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_length(unsigned long):
+         :            { _M_string_length = __length; }
+    0.78 :   40f2e4: str     x20, [sp, #296]
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :
+         :            Byte* paddedMessages[4];
+         :            int paddedLengths[4];
+         :            for (int i = 0; i < 4; i += 1)
+         :            {
+         :            paddedMessages[i] = StringProcess(inputs[i], &paddedLengths[i]);
+    0.00 :   40f2e8: mov     x1, x24
+         :            std::char_traits<char>::assign(char&, char const&):
+    0.00 :   40f2ec: strb    wzr, [x0, x20]
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+    0.00 :   40f2f0: add     x0, sp, #0x120
+    0.00 :   40f2f4: bl      40f180 <StringProcess(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int*)>
+    0.00 :   40f2f8: str     x0, [x25]
+         :            std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_data() const:
+         :            { return _M_dataplus._M_p; }
+    0.52 :   40f2fc: ldr     x0, [sp, #288]
+         :            std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_dispose():
+         :            if (!_M_is_local())
+    0.00 :   40f300: cmp     x0, x26
+    0.00 :   40f304: b.eq    40f314 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xa0>  // b.none
+         :            std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_destroy(unsigned long):
+         :            { _Alloc_traits::deallocate(_M_get_allocator(), _M_data(), __size + 1); }
+    0.00 :   40f308: ldr     x1, [sp, #304]
+         :            __gnu_cxx::new_allocator<char>::deallocate(char*, unsigned long):
+         :            # endif
+         :            std::align_val_t(alignof(_Tp)));
+         :            return;
+         :            }
+         :            #endif
+         :            ::operator delete(__p
+    0.00 :   40f30c: add     x1, x1, #0x1
+    0.00 :   40f310: bl      401bb0 <operator delete(void*, unsigned long)@plt>
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            for (int i = 0; i < 4; i += 1)
+    0.00 :   40f314: add     x22, x22, #0x20
+    0.00 :   40f318: add     x25, x25, #0x8
+    0.00 :   40f31c: add     x24, x24, #0x4
+    0.00 :   40f320: cmp     x27, x22
+    0.00 :   40f324: b.ne    40f2b0 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0x3c>  // b.any
+         :            // cout<<messageLength[i]<<endl;
+         :            // assert(messageLength[i] == messageLength[0]);
+         :            }
+         :            int paddedLength = paddedLengths[0];
+    0.79 :   40f328: ldr     w0, [sp, #224]
+         :            int n_blocks = paddedLength / 64;  // 每个块 64 字节
+    0.00 :   40f32c: cmp     w0, #0x0
+    0.00 :   40f330: add     w20, w0, #0x3f
+    0.00 :   40f334: csel    w20, w20, w0, lt  // lt = tstop
+    0.52 :   40f338: asr     w20, w20, #6
+         :            uint32x4_t B = vdupq_n_u32(0xefcdab89);
+         :            uint32x4_t C = vdupq_n_u32(0x98badcfe);
+         :            uint32x4_t D = vdupq_n_u32(0x10325476);
+         :
+         :            // 对于每个 512-bit 块同时处理 4 个口令
+         :            for (int block = 0; block < n_blocks; block++)
+    0.00 :   40f33c: cmp     w0, #0x3f
+    0.00 :   40f340: b.le    40ffac <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd38>
+         :            uint32x4_t D = vdupq_n_u32(0x10325476);
+    0.00 :   40f344: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f348: add     x22, sp, #0x220
+         :            for (int block = 0; block < n_blocks; block++)
+    0.00 :   40f34c: mov     x23, #0x0                       // #0
+    0.26 :   40f350: stp     d8, d9, [sp, #96]
+         :            uint32x4_t D = vdupq_n_u32(0x10325476);
+    0.00 :   40f354: ldr     q6, [x0, #576]
+         :            uint32x4_t C = vdupq_n_u32(0x98badcfe);
+    0.00 :   40f358: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f35c: stp     d10, d11, [sp, #112]
+    0.52 :   40f360: ldr     q5, [x0, #592]
+         :            uint32x4_t B = vdupq_n_u32(0xefcdab89);
+    0.00 :   40f364: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.26 :   40f368: stp     d12, d13, [sp, #128]
+    0.00 :   40f36c: ldr     q4, [x0, #608]
+         :            uint32x4_t A = vdupq_n_u32(0x67452301);
+    0.00 :   40f370: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f374: stp     d14, d15, [sp, #144]
+    0.26 :   40f378: ldr     q7, [x0, #624]
+    0.00 :   40f37c: nop
+    0.00 :   40f380: add     x11, sp, #0x120
+    0.00 :   40f384: lsl     x5, x23, #6
+         :
+         :            // 下面的处理，在理解上较为复杂
+         :            for (int i1 = 0; i1 < 16; ++i1)
+         :            {
+         :            uint32_t word[4];  // 存储 4 个消息对应位置的 32 位字
+         :            for (int j = 0; j < 4; j++) {
+    0.00 :   40f388: add     x10, x5, #0x1
+    0.00 :   40f38c: add     x9, x5, #0x2
+    0.00 :   40f390: add     x8, x5, #0x3
+         :            uint32x4_t A = vdupq_n_u32(0x67452301);
+    0.00 :   40f394: mov     x1, #0x1                        // #1
+         :            int idx = block * 64 + i1 * 4;
+         :            word[j] = paddedMessages[j][idx] |
+    0.52 :   40f398: add     x0, sp, #0x100
+    0.00 :   40f39c: add     x2, sp, #0xf0
+    0.00 :   40f3a0: add     x0, x0, x1, lsl #3
+    0.26 :   40f3a4: add     x6, x2, x1, lsl #2
+         :            for (int j = 0; j < 4; j++) {
+    2.61 :   40f3a8: add     x1, x1, #0x1
+         :            word[j] = paddedMessages[j][idx] |
+    2.35 :   40f3ac: ldur    x2, [x0, #-8]
+         :            (paddedMessages[j][idx+1] << 8) |
+         :            (paddedMessages[j][idx+2] << 16) |
+    1.23 :   40f3b0: ldrb    w4, [x2, x9]
+         :            (paddedMessages[j][idx+1] << 8) |
+    4.19 :   40f3b4: ldrb    w0, [x2, x10]
+         :            (paddedMessages[j][idx+3] << 24);
+    1.55 :   40f3b8: ldrb    w3, [x2, x8]
+         :            word[j] = paddedMessages[j][idx] |
+    2.09 :   40f3bc: ldrb    w7, [x2, x5]
+         :            (paddedMessages[j][idx+2] << 16) |
+    0.00 :   40f3c0: lsl     w2, w4, #16
+    0.00 :   40f3c4: orr     w0, w2, w0, lsl #8
+    0.00 :   40f3c8: orr     w2, w7, w3, lsl #24
+    1.03 :   40f3cc: orr     w0, w0, w2
+         :            word[j] = paddedMessages[j][idx] |
+    0.79 :   40f3d0: stur    w0, [x6, #-4]
+         :            for (int j = 0; j < 4; j++) {
+    0.26 :   40f3d4: cmp     x1, #0x5
+    0.00 :   40f3d8: b.ne    40f398 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0x124>  // b.any
+         :            vld1q_u32(unsigned int const*):
+         :            __extension__ extern __inline uint32x4_t
+         :            __attribute__ ((__always_inline__, __gnu_inline__, __artificial__))
+         :            vld1q_u32 (const uint32_t *__a)
+         :            {
+         :            return (uint32x4_t)
+         :            __builtin_aarch64_ld1v4si ((const __builtin_aarch64_simd_si *) __a);
+    0.26 :   40f3dc: ldr     q0, [sp, #240]
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            for (int i1 = 0; i1 < 16; ++i1)
+    0.00 :   40f3e0: add     x5, x5, #0x4
+         :            }
+         :            x[i1] = vld1q_u32(word);  // 加载为 NEON 向量
+   10.72 :   40f3e4: str     q0, [x11], #16
+         :            for (int i1 = 0; i1 < 16; ++i1)
+    0.00 :   40f3e8: cmp     x22, x11
+    0.00 :   40f3ec: b.ne    40f388 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0x114>  // b.any
+         :            uint32x4_t a = A;
+         :            uint32x4_t b = B;
+         :            uint32x4_t c = C;
+         :            uint32x4_t d = D;
+         :
+         :            auto start = system_clock::now();
+    0.00 :   40f3f0: stp     q7, q5, [sp, #160]
+         :            for (int block = 0; block < n_blocks; block++)
+    0.00 :   40f3f4: add     x23, x23, #0x1
+         :            auto start = system_clock::now();
+    0.00 :   40f3f8: stp     q6, q4, [sp, #192]
+    0.00 :   40f3fc: bl      401a50 <std::chrono::_V2::system_clock::now()@plt>
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f400: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f404: ldp     q6, q4, [sp, #192]
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f408: ldr     q1, [x0, #640]
+    0.00 :   40f40c: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            /* Round 1 */
+         :            FF_NEON(a, b, c, d, x[0], s11, 0xd76aa478);
+         :            FF_NEON(d, a, b, c, x[1], s12, 0xe8c7b756);
+    0.00 :   40f410: ldp     q23, q16, [sp, #288]
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f414: mov     v0.16b, v4.16b
+    0.00 :   40f418: ldp     q7, q5, [sp, #160]
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f41c: add     v1.4s, v23.4s, v1.4s
+    0.00 :   40f420: ldr     q2, [x0, #656]
+    0.00 :   40f424: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f428: bsl     v0.16b, v5.16b, v6.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f42c: ldr     q3, [x0, #672]
+    0.00 :   40f430: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f434: add     v1.4s, v1.4s, v7.4s
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            FF_NEON(c, d, a, b, x[2], s13, 0x242070db);
+    0.00 :   40f438: ldr     q11, [sp, #320]
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+    0.00 :   40f43c: add     v2.4s, v16.4s, v2.4s
+    0.00 :   40f440: add     v0.4s, v0.4s, v1.4s
+    0.00 :   40f444: add     v9.4s, v11.4s, v3.4s
+    0.26 :   40f448: ldr     q1, [x0, #688]
+    0.00 :   40f44c: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            FF_NEON(b, c, d, a, x[3], s14, 0xc1bdceee);
+    0.25 :   40f450: ldr     q3, [sp, #336]
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+    0.00 :   40f454: add     v2.4s, v2.4s, v6.4s
+    0.00 :   40f458: add     v9.4s, v9.4s, v5.4s
+    0.00 :   40f45c: add     v12.4s, v3.4s, v1.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :
+         :            __extension__ extern __inline uint32x4_t
+         :            __attribute__ ((__always_inline__, __gnu_inline__, __artificial__))
+         :            vshlq_n_u32 (uint32x4_t __a, const int __b)
+         :            {
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f460: shl     v1.4s, v0.4s, #7
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :
+         :            __extension__ extern __inline uint32x4_t
+         :            __attribute__ ((__always_inline__, __gnu_inline__, __artificial__))
+         :            vshrq_n_u32 (uint32x4_t __a, const int __b)
+         :            {
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f464: ushr    v0.4s, v0.4s, #25
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f468: ldr     q25, [x0, #704]
+    0.00 :   40f46c: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            FF_NEON(a, b, c, d, x[4], s11, 0xf57c0faf);
+         :            FF_NEON(d, a, b, c, x[5], s12, 0x4787c62a);
+    0.00 :   40f470: ldp     q10, q19, [sp, #352]
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f474: orr     v0.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f478: add     v12.4s, v12.4s, v4.4s
+    0.00 :   40f47c: add     v25.4s, v10.4s, v25.4s
+    0.00 :   40f480: ldr     q20, [x0, #720]
+    0.00 :   40f484: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f488: add     v0.4s, v0.4s, v4.4s
+    0.00 :   40f48c: ldr     q24, [x0, #736]
+    0.00 :   40f490: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f494: add     v20.4s, v19.4s, v20.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f498: mov     v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f49c: add     v25.4s, v25.4s, v0.4s
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            FF_NEON(c, d, a, b, x[6], s13, 0xa8304613);
+         :            FF_NEON(b, c, d, a, x[7], s14, 0xfd469501);
+    0.00 :   40f4a0: ldp     q13, q21, [sp, #384]
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f4a4: bsl     v1.16b, v4.16b, v5.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f4a8: ldr     q14, [x0, #752]
+    0.00 :   40f4ac: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f4b0: add     v24.4s, v13.4s, v24.4s
+    0.00 :   40f4b4: add     v1.4s, v1.4s, v2.4s
+    0.00 :   40f4b8: add     v14.4s, v21.4s, v14.4s
+    0.00 :   40f4bc: ldr     q30, [x0, #768]
+    0.00 :   40f4c0: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f4c4: shl     v2.4s, v1.4s, #12
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f4c8: ushr    v1.4s, v1.4s, #20
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            FF_NEON(a, b, c, d, x[8], s11, 0x698098d8);
+         :            FF_NEON(d, a, b, c, x[9], s12, 0x8b44f7af);
+    0.52 :   40f4cc: ldp     q15, q8, [sp, #416]
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.26 :   40f4d0: ldr     q29, [x0, #784]
+    0.00 :   40f4d4: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f4d8: orr     v2.16b, v2.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f4dc: add     v30.4s, v15.4s, v30.4s
+    0.00 :   40f4e0: add     v29.4s, v8.4s, v29.4s
+    0.00 :   40f4e4: ldr     q26, [x0, #800]
+    0.00 :   40f4e8: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f4ec: add     v2.4s, v2.4s, v0.4s
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            FF_NEON(c, d, a, b, x[10], s13, 0xffff5bb1);
+    0.00 :   40f4f0: ldr     q17, [sp, #448]
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+    0.00 :   40f4f4: ldr     q27, [x0, #816]
+    0.00 :   40f4f8: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f4fc: mov     v1.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f500: add     v20.4s, v20.4s, v2.4s
+    0.00 :   40f504: add     v26.4s, v17.4s, v26.4s
+    0.00 :   40f508: ldr     q22, [x0, #832]
+    0.00 :   40f50c: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f510: bsl     v1.16b, v0.16b, v4.16b
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            FF_NEON(b, c, d, a, x[11], s14, 0x895cd7be);
+         :            FF_NEON(a, b, c, d, x[12], s11, 0x6b901122);
+    0.00 :   40f514: ldr     q18, [sp, #480]
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f518: ldr     q28, [x0, #848]
+    0.00 :   40f51c: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f520: add     v1.4s, v1.4s, v9.4s
+    0.00 :   40f524: add     v22.4s, v18.4s, v22.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f528: shl     v9.4s, v1.4s, #17
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f52c: ushr    v1.4s, v1.4s, #15
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f530: orr     v1.16b, v9.16b, v1.16b
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            FF_NEON(b, c, d, a, x[11], s14, 0x895cd7be);
+    0.00 :   40f534: ldr     q9, [sp, #464]
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f538: add     v1.4s, v1.4s, v2.4s
+    0.00 :   40f53c: add     v27.4s, v9.4s, v27.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f540: bit     v0.16b, v2.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.53 :   40f544: add     v24.4s, v24.4s, v1.4s
+    0.00 :   40f548: add     v0.4s, v0.4s, v12.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f54c: shl     v12.4s, v0.4s, #22
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f550: ushr    v0.4s, v0.4s, #10
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f554: orr     v0.16b, v12.16b, v0.16b
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            FF_NEON(d, a, b, c, x[13], s12, 0xfd987193);
+    0.00 :   40f558: ldr     q12, [sp, #496]
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f55c: add     v0.4s, v0.4s, v1.4s
+    0.00 :   40f560: add     v28.4s, v12.4s, v28.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.26 :   40f564: bit     v2.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f568: add     v14.4s, v14.4s, v0.4s
+    0.00 :   40f56c: add     v2.4s, v2.4s, v25.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f570: shl     v25.4s, v2.4s, #7
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f574: ushr    v2.4s, v2.4s, #25
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f578: orr     v2.16b, v25.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f57c: ldr     q25, [x0, #864]
+    0.00 :   40f580: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f584: add     v2.4s, v2.4s, v0.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f588: bit     v1.16b, v0.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f58c: add     v30.4s, v30.4s, v2.4s
+    0.00 :   40f590: add     v1.4s, v1.4s, v20.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f594: shl     v20.4s, v1.4s, #12
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f598: ushr    v1.4s, v1.4s, #20
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f59c: orr     v1.16b, v20.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f5a0: add     v1.4s, v1.4s, v2.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f5a4: bit     v0.16b, v2.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f5a8: add     v29.4s, v29.4s, v1.4s
+    0.00 :   40f5ac: add     v0.4s, v0.4s, v24.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f5b0: shl     v24.4s, v0.4s, #17
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f5b4: ushr    v0.4s, v0.4s, #15
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f5b8: orr     v0.16b, v24.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f5bc: ldr     q24, [x0, #880]
+    0.00 :   40f5c0: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f5c4: add     v0.4s, v0.4s, v1.4s
+    1.31 :   40f5c8: ldr     q31, [x0, #896]
+    0.00 :   40f5cc: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f5d0: bit     v2.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f5d4: add     v26.4s, v26.4s, v0.4s
+    0.00 :   40f5d8: add     v31.4s, v16.4s, v31.4s
+    0.00 :   40f5dc: add     v2.4s, v2.4s, v14.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f5e0: shl     v14.4s, v2.4s, #22
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f5e4: ushr    v2.4s, v2.4s, #10
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f5e8: orr     v2.16b, v14.16b, v2.16b
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            FF_NEON(c, d, a, b, x[14], s13, 0xa679438e);
+         :            FF_NEON(b, c, d, a, x[15], s14, 0x49b40821);
+    0.00 :   40f5ec: ldp     q20, q14, [sp, #512]
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f5f0: add     v2.4s, v2.4s, v0.4s
+    0.52 :   40f5f4: add     v25.4s, v20.4s, v25.4s
+    0.00 :   40f5f8: add     v24.4s, v14.4s, v24.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f5fc: bit     v1.16b, v0.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f600: add     v27.4s, v27.4s, v2.4s
+    0.00 :   40f604: add     v1.4s, v1.4s, v30.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f608: shl     v30.4s, v1.4s, #7
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f60c: ushr    v1.4s, v1.4s, #25
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f610: orr     v1.16b, v30.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f614: add     v1.4s, v1.4s, v2.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f618: bit     v0.16b, v2.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f61c: add     v22.4s, v22.4s, v1.4s
+    0.00 :   40f620: add     v0.4s, v0.4s, v29.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f624: shl     v29.4s, v0.4s, #12
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f628: ushr    v0.4s, v0.4s, #20
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f62c: orr     v0.16b, v29.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f630: ldr     q29, [x0, #912]
+    0.00 :   40f634: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f638: add     v0.4s, v0.4s, v1.4s
+    1.04 :   40f63c: add     v29.4s, v13.4s, v29.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f640: bit     v2.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f644: add     v28.4s, v28.4s, v0.4s
+    0.00 :   40f648: add     v2.4s, v2.4s, v26.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f64c: shl     v26.4s, v2.4s, #17
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f650: ushr    v2.4s, v2.4s, #15
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f654: orr     v2.16b, v26.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f658: ldr     q26, [x0, #928]
+    0.00 :   40f65c: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f660: add     v2.4s, v2.4s, v0.4s
+    1.05 :   40f664: add     v26.4s, v9.4s, v26.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f668: bit     v1.16b, v0.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f66c: add     v25.4s, v25.4s, v2.4s
+    0.00 :   40f670: add     v1.4s, v1.4s, v27.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f674: shl     v27.4s, v1.4s, #22
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f678: ushr    v1.4s, v1.4s, #10
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f67c: orr     v1.16b, v27.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f680: ldr     q27, [x0, #944]
+    0.00 :   40f684: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f688: add     v1.4s, v1.4s, v2.4s
+    1.28 :   40f68c: add     v27.4s, v23.4s, v27.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f690: bit     v0.16b, v2.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f694: add     v24.4s, v24.4s, v1.4s
+    0.00 :   40f698: add     v0.4s, v0.4s, v22.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f69c: shl     v22.4s, v0.4s, #7
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f6a0: ushr    v0.4s, v0.4s, #25
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f6a4: orr     v0.16b, v22.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f6a8: ldr     q22, [x0, #960]
+    0.00 :   40f6ac: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f6b0: add     v0.4s, v0.4s, v1.4s
+    0.26 :   40f6b4: add     v22.4s, v19.4s, v22.4s
+    0.00 :   40f6b8: ldr     q30, [x0, #976]
+    0.00 :   40f6bc: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f6c0: bit     v2.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.26 :   40f6c4: add     v31.4s, v31.4s, v0.4s
+    0.00 :   40f6c8: add     v30.4s, v17.4s, v30.4s
+    0.00 :   40f6cc: add     v2.4s, v2.4s, v28.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f6d0: shl     v28.4s, v2.4s, #12
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f6d4: ushr    v2.4s, v2.4s, #20
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f6d8: orr     v28.16b, v28.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f6dc: add     v28.4s, v28.4s, v0.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f6e0: bit     v1.16b, v0.16b, v28.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f6e4: add     v29.4s, v29.4s, v28.4s
+    0.00 :   40f6e8: add     v1.4s, v1.4s, v25.4s
+    0.00 :   40f6ec: ldr     q25, [x0, #992]
+    0.00 :   40f6f0: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f6f4: shl     v2.4s, v1.4s, #17
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    1.30 :   40f6f8: ushr    v1.4s, v1.4s, #15
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f6fc: add     v25.4s, v14.4s, v25.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f700: orr     v2.16b, v2.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f704: add     v2.4s, v2.4s, v28.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f708: bit     v0.16b, v28.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f70c: add     v26.4s, v26.4s, v2.4s
+    0.00 :   40f710: add     v0.4s, v0.4s, v24.4s
+    0.00 :   40f714: ldr     q24, [x0, #1008]
+    0.00 :   40f718: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f71c: shl     v1.4s, v0.4s, #22
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    1.05 :   40f720: ushr    v0.4s, v0.4s, #10
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f724: add     v24.4s, v10.4s, v24.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f728: orr     v1.16b, v1.16b, v0.16b
+    0.00 :   40f72c: mov     v0.16b, v28.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f730: add     v1.4s, v1.4s, v2.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f734: bsl     v0.16b, v1.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f738: add     v27.4s, v27.4s, v1.4s
+    0.00 :   40f73c: add     v0.4s, v0.4s, v31.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f740: shl     v28.4s, v0.4s, #5
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f744: ushr    v0.4s, v0.4s, #27
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f748: orr     v0.16b, v28.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.26 :   40f74c: ldr     q28, [x0, #1024]
+    1.28 :   40f750: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f754: add     v0.4s, v0.4s, v1.4s
+    0.00 :   40f758: add     v28.4s, v8.4s, v28.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f75c: bsl     v2.16b, v0.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f760: add     v22.4s, v22.4s, v0.4s
+    0.00 :   40f764: add     v2.4s, v2.4s, v29.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f768: shl     v29.4s, v2.4s, #9
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f76c: ushr    v2.4s, v2.4s, #23
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f770: orr     v2.16b, v29.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f774: ldr     q29, [x0, #1040]
+    1.57 :   40f778: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f77c: add     v2.4s, v2.4s, v0.4s
+    0.00 :   40f780: add     v29.4s, v20.4s, v29.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f784: bsl     v1.16b, v2.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f788: add     v30.4s, v30.4s, v2.4s
+    0.00 :   40f78c: add     v1.4s, v1.4s, v26.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f790: shl     v26.4s, v1.4s, #14
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f794: ushr    v1.4s, v1.4s, #18
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f798: orr     v1.16b, v26.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f79c: ldr     q26, [x0, #1056]
+    1.17 :   40f7a0: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f7a4: add     v1.4s, v1.4s, v2.4s
+    0.00 :   40f7a8: add     v26.4s, v3.4s, v26.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f7ac: bsl     v0.16b, v1.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f7b0: add     v25.4s, v25.4s, v1.4s
+    0.00 :   40f7b4: add     v0.4s, v0.4s, v27.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f7b8: shl     v27.4s, v0.4s, #20
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f7bc: ushr    v0.4s, v0.4s, #12
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f7c0: orr     v0.16b, v27.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f7c4: ldr     q27, [x0, #1072]
+    1.81 :   40f7c8: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f7cc: add     v0.4s, v0.4s, v1.4s
+    0.00 :   40f7d0: add     v27.4s, v15.4s, v27.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f7d4: bsl     v2.16b, v0.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f7d8: add     v24.4s, v24.4s, v0.4s
+    0.00 :   40f7dc: add     v2.4s, v2.4s, v22.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f7e0: shl     v22.4s, v2.4s, #5
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f7e4: ushr    v2.4s, v2.4s, #27
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f7e8: orr     v22.16b, v22.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f7ec: ldr     q2, [x0, #1088]
+    0.79 :   40f7f0: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f7f4: add     v22.4s, v22.4s, v0.4s
+    0.00 :   40f7f8: add     v2.4s, v12.4s, v2.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f7fc: bsl     v1.16b, v22.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f800: add     v28.4s, v28.4s, v22.4s
+    0.00 :   40f804: add     v1.4s, v1.4s, v30.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f808: shl     v30.4s, v1.4s, #9
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f80c: ushr    v1.4s, v1.4s, #23
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f810: orr     v1.16b, v30.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f814: ldr     q30, [x0, #1104]
+    0.00 :   40f818: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f81c: add     v1.4s, v1.4s, v22.4s
+    0.00 :   40f820: add     v30.4s, v11.4s, v30.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f824: bsl     v0.16b, v1.16b, v22.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f828: add     v29.4s, v29.4s, v1.4s
+    0.00 :   40f82c: add     v0.4s, v0.4s, v25.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f830: shl     v25.4s, v0.4s, #14
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f834: ushr    v0.4s, v0.4s, #18
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f838: orr     v0.16b, v25.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f83c: ldr     q25, [x0, #1120]
+    0.52 :   40f840: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f844: add     v0.4s, v0.4s, v1.4s
+    0.00 :   40f848: add     v25.4s, v21.4s, v25.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f84c: bsl     v22.16b, v0.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f850: add     v26.4s, v26.4s, v0.4s
+    0.00 :   40f854: add     v22.4s, v22.4s, v24.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f858: shl     v24.4s, v22.4s, #20
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f85c: ushr    v22.4s, v22.4s, #12
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f860: orr     v22.16b, v24.16b, v22.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f864: ldr     q24, [x0, #1136]
+    0.52 :   40f868: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f86c: add     v22.4s, v22.4s, v0.4s
+    0.00 :   40f870: add     v24.4s, v18.4s, v24.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f874: bsl     v1.16b, v22.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f878: add     v27.4s, v27.4s, v22.4s
+    0.00 :   40f87c: add     v1.4s, v1.4s, v28.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f880: shl     v28.4s, v1.4s, #5
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f884: ushr    v1.4s, v1.4s, #27
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f888: orr     v1.16b, v28.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f88c: ldr     q28, [x0, #1152]
+    0.79 :   40f890: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f894: add     v1.4s, v1.4s, v22.4s
+    0.00 :   40f898: add     v28.4s, v19.4s, v28.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f89c: bsl     v0.16b, v1.16b, v22.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f8a0: add     v2.4s, v2.4s, v1.4s
+    0.00 :   40f8a4: add     v0.4s, v0.4s, v29.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f8a8: shl     v29.4s, v0.4s, #9
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f8ac: ushr    v0.4s, v0.4s, #23
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f8b0: orr     v0.16b, v29.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f8b4: ldr     q29, [x0, #1168]
+    2.09 :   40f8b8: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f8bc: add     v0.4s, v0.4s, v1.4s
+    0.00 :   40f8c0: add     v29.4s, v15.4s, v29.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f8c4: bsl     v22.16b, v0.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f8c8: add     v30.4s, v30.4s, v0.4s
+    0.00 :   40f8cc: add     v22.4s, v22.4s, v26.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f8d0: shl     v26.4s, v22.4s, #14
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f8d4: ushr    v22.4s, v22.4s, #18
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f8d8: orr     v22.16b, v26.16b, v22.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f8dc: ldr     q26, [x0, #1184]
+    1.61 :   40f8e0: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f8e4: add     v22.4s, v22.4s, v0.4s
+    0.00 :   40f8e8: add     v26.4s, v9.4s, v26.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f8ec: bsl     v1.16b, v22.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f8f0: add     v25.4s, v25.4s, v22.4s
+    0.00 :   40f8f4: add     v1.4s, v1.4s, v27.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f8f8: shl     v27.4s, v1.4s, #20
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f8fc: ushr    v1.4s, v1.4s, #12
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f900: orr     v1.16b, v27.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.52 :   40f904: ldr     q27, [x0, #1200]
+    0.26 :   40f908: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f90c: add     v1.4s, v1.4s, v22.4s
+    0.00 :   40f910: add     v27.4s, v20.4s, v27.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.26 :   40f914: bsl     v0.16b, v1.16b, v22.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f918: add     v24.4s, v24.4s, v1.4s
+    0.00 :   40f91c: add     v0.4s, v0.4s, v2.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f920: shl     v2.4s, v0.4s, #5
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f924: ushr    v0.4s, v0.4s, #27
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f928: orr     v0.16b, v2.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f92c: ldr     q2, [x0, #1216]
+    0.79 :   40f930: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f934: add     v0.4s, v0.4s, v1.4s
+    0.00 :   40f938: add     v2.4s, v16.4s, v2.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f93c: bsl     v22.16b, v0.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f940: add     v28.4s, v28.4s, v0.4s
+    0.00 :   40f944: add     v22.4s, v22.4s, v30.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f948: shl     v30.4s, v22.4s, #9
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f94c: ushr    v22.4s, v22.4s, #23
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f950: orr     v30.16b, v30.16b, v22.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f954: ldr     q22, [x0, #1232]
+    0.52 :   40f958: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f95c: add     v30.4s, v30.4s, v0.4s
+    0.00 :   40f960: add     v22.4s, v10.4s, v22.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f964: bsl     v1.16b, v30.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f968: add     v29.4s, v29.4s, v30.4s
+    0.00 :   40f96c: add     v1.4s, v1.4s, v25.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f970: shl     v25.4s, v1.4s, #14
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f974: ushr    v1.4s, v1.4s, #18
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f978: orr     v1.16b, v25.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f97c: ldr     q25, [x0, #1248]
+    1.04 :   40f980: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f984: add     v1.4s, v1.4s, v30.4s
+    0.00 :   40f988: add     v25.4s, v21.4s, v25.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f98c: bsl     v0.16b, v1.16b, v30.16b
+    0.00 :   40f990: eor     v30.16b, v30.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f994: add     v26.4s, v26.4s, v1.4s
+    0.00 :   40f998: add     v0.4s, v0.4s, v24.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f99c: shl     v24.4s, v0.4s, #20
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f9a0: ushr    v0.4s, v0.4s, #12
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f9a4: orr     v0.16b, v24.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f9a8: ldr     q24, [x0, #1264]
+    0.00 :   40f9ac: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f9b0: add     v0.4s, v0.4s, v1.4s
+    0.00 :   40f9b4: add     v24.4s, v17.4s, v24.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.52 :   40f9b8: eor     v30.16b, v30.16b, v0.16b
+    0.00 :   40f9bc: eor     v1.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f9c0: add     v27.4s, v27.4s, v0.4s
+    0.00 :   40f9c4: add     v28.4s, v28.4s, v30.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f9c8: shl     v30.4s, v28.4s, #4
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40f9cc: ushr    v28.4s, v28.4s, #28
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40f9d0: orr     v28.16b, v30.16b, v28.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f9d4: ldr     q30, [x0, #1280]
+    0.00 :   40f9d8: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40f9dc: add     v28.4s, v28.4s, v0.4s
+    1.57 :   40f9e0: add     v30.4s, v12.4s, v30.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.52 :   40f9e4: eor     v1.16b, v1.16b, v28.16b
+    0.00 :   40f9e8: eor     v0.16b, v0.16b, v28.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40f9ec: add     v2.4s, v2.4s, v28.4s
+    0.00 :   40f9f0: add     v1.4s, v1.4s, v29.4s
+    0.00 :   40f9f4: ldr     q29, [x0, #1296]
+    0.26 :   40f9f8: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40f9fc: shl     v31.4s, v1.4s, #11
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fa00: ushr    v1.4s, v1.4s, #21
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.26 :   40fa04: add     v29.4s, v23.4s, v29.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fa08: orr     v31.16b, v31.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fa0c: add     v31.4s, v31.4s, v28.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fa10: eor     v0.16b, v0.16b, v31.16b
+    0.00 :   40fa14: eor     v1.16b, v28.16b, v31.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fa18: add     v22.4s, v22.4s, v31.4s
+    0.00 :   40fa1c: ldr     q28, [x0, #1312]
+    0.79 :   40fa20: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40fa24: add     v0.4s, v0.4s, v26.4s
+    0.00 :   40fa28: add     v28.4s, v3.4s, v28.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fa2c: shl     v26.4s, v0.4s, #16
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fa30: ushr    v0.4s, v0.4s, #16
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fa34: orr     v26.16b, v26.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fa38: add     v26.4s, v26.4s, v31.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fa3c: eor     v1.16b, v1.16b, v26.16b
+    0.00 :   40fa40: eor     v0.16b, v31.16b, v26.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fa44: add     v25.4s, v25.4s, v26.4s
+    0.00 :   40fa48: add     v1.4s, v1.4s, v27.4s
+    0.00 :   40fa4c: ldr     q27, [x0, #1328]
+    0.00 :   40fa50: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fa54: shl     v31.4s, v1.4s, #23
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    1.31 :   40fa58: ushr    v1.4s, v1.4s, #9
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fa5c: add     v27.4s, v13.4s, v27.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fa60: orr     v31.16b, v31.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fa64: add     v31.4s, v31.4s, v26.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fa68: eor     v0.16b, v0.16b, v31.16b
+    0.00 :   40fa6c: eor     v1.16b, v26.16b, v31.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fa70: add     v24.4s, v24.4s, v31.4s
+    0.00 :   40fa74: ldr     q26, [x0, #1344]
+    0.00 :   40fa78: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40fa7c: add     v0.4s, v0.4s, v2.4s
+    0.78 :   40fa80: add     v26.4s, v8.4s, v26.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fa84: shl     v2.4s, v0.4s, #4
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fa88: ushr    v0.4s, v0.4s, #28
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fa8c: orr     v2.16b, v2.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fa90: add     v2.4s, v2.4s, v31.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fa94: eor     v1.16b, v1.16b, v2.16b
+    0.00 :   40fa98: eor     v0.16b, v31.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fa9c: add     v30.4s, v30.4s, v2.4s
+    0.00 :   40faa0: add     v1.4s, v1.4s, v22.4s
+    0.00 :   40faa4: ldr     q22, [x0, #1360]
+    0.00 :   40faa8: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40faac: shl     v31.4s, v1.4s, #11
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fab0: ushr    v1.4s, v1.4s, #21
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.52 :   40fab4: add     v22.4s, v18.4s, v22.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fab8: orr     v31.16b, v31.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fabc: add     v31.4s, v31.4s, v2.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fac0: eor     v0.16b, v0.16b, v31.16b
+    0.00 :   40fac4: eor     v2.16b, v2.16b, v31.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fac8: add     v29.4s, v29.4s, v31.4s
+    0.00 :   40facc: add     v0.4s, v0.4s, v25.4s
+    0.00 :   40fad0: ldr     q25, [x0, #1376]
+    0.00 :   40fad4: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fad8: shl     v1.4s, v0.4s, #16
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.52 :   40fadc: ushr    v0.4s, v0.4s, #16
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fae0: add     v25.4s, v14.4s, v25.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fae4: orr     v1.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fae8: add     v1.4s, v1.4s, v31.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40faec: eor     v2.16b, v2.16b, v1.16b
+    0.00 :   40faf0: eor     v0.16b, v31.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40faf4: add     v28.4s, v28.4s, v1.4s
+    0.00 :   40faf8: add     v2.4s, v2.4s, v24.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fafc: shl     v24.4s, v2.4s, #23
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fb00: ushr    v2.4s, v2.4s, #9
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fb04: orr     v2.16b, v24.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fb08: ldr     q24, [x0, #1392]
+    0.26 :   40fb0c: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40fb10: add     v2.4s, v2.4s, v1.4s
+    0.00 :   40fb14: add     v24.4s, v11.4s, v24.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.26 :   40fb18: eor     v0.16b, v0.16b, v2.16b
+    0.00 :   40fb1c: eor     v1.16b, v1.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fb20: add     v27.4s, v27.4s, v2.4s
+    0.00 :   40fb24: add     v0.4s, v0.4s, v30.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fb28: shl     v30.4s, v0.4s, #4
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fb2c: ushr    v0.4s, v0.4s, #28
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fb30: orr     v0.16b, v30.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fb34: ldr     q30, [x0, #1408]
+    0.00 :   40fb38: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40fb3c: add     v0.4s, v0.4s, v2.4s
+    0.00 :   40fb40: add     v23.4s, v23.4s, v30.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.79 :   40fb44: eor     v30.16b, v1.16b, v0.16b
+    0.00 :   40fb48: eor     v1.16b, v2.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fb4c: add     v26.4s, v26.4s, v0.4s
+    0.00 :   40fb50: add     v2.4s, v30.4s, v29.4s
+    0.00 :   40fb54: ldr     q30, [x0, #1424]
+    0.00 :   40fb58: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fb5c: shl     v29.4s, v2.4s, #11
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.26 :   40fb60: ushr    v2.4s, v2.4s, #21
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fb64: add     v21.4s, v21.4s, v30.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fb68: orr     v2.16b, v29.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fb6c: ldr     q29, [x0, #1440]
+    0.00 :   40fb70: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40fb74: add     v2.4s, v2.4s, v0.4s
+    0.00 :   40fb78: add     v20.4s, v20.4s, v29.4s
+    0.00 :   40fb7c: ldr     q29, [x0, #1456]
+    0.00 :   40fb80: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fb84: eor     v1.16b, v1.16b, v2.16b
+    0.00 :   40fb88: eor     v0.16b, v0.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.26 :   40fb8c: add     v19.4s, v19.4s, v29.4s
+    0.00 :   40fb90: ldr     q29, [x0, #1472]
+    0.00 :   40fb94: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40fb98: add     v1.4s, v1.4s, v28.4s
+    0.00 :   40fb9c: add     v22.4s, v22.4s, v2.4s
+    0.00 :   40fba0: add     v18.4s, v18.4s, v29.4s
+    0.00 :   40fba4: ldr     q29, [x0, #1488]
+    0.00 :   40fba8: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fbac: shl     v28.4s, v1.4s, #16
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fbb0: ushr    v1.4s, v1.4s, #16
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fbb4: add     v3.4s, v3.4s, v29.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fbb8: orr     v1.16b, v28.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fbbc: ldr     q28, [x0, #1504]
+    0.00 :   40fbc0: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40fbc4: add     v1.4s, v1.4s, v2.4s
+    0.00 :   40fbc8: add     v17.4s, v17.4s, v28.4s
+    0.79 :   40fbcc: ldr     q28, [x0, #1520]
+    0.00 :   40fbd0: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fbd4: eor     v0.16b, v0.16b, v1.16b
+    0.26 :   40fbd8: eor     v2.16b, v2.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fbdc: add     v16.4s, v16.4s, v28.4s
+    0.00 :   40fbe0: ldr     q28, [x0, #1536]
+    0.00 :   40fbe4: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40fbe8: add     v0.4s, v0.4s, v27.4s
+    0.00 :   40fbec: add     v25.4s, v25.4s, v1.4s
+    0.00 :   40fbf0: add     v15.4s, v15.4s, v28.4s
+    0.00 :   40fbf4: ldr     q28, [x0, #1552]
+    0.00 :   40fbf8: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fbfc: shl     v27.4s, v0.4s, #23
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fc00: ushr    v0.4s, v0.4s, #9
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.26 :   40fc04: add     v14.4s, v14.4s, v28.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fc08: orr     v0.16b, v27.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fc0c: ldr     q27, [x0, #1568]
+    0.52 :   40fc10: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40fc14: add     v0.4s, v0.4s, v1.4s
+    0.00 :   40fc18: add     v13.4s, v13.4s, v27.4s
+    0.00 :   40fc1c: ldr     q28, [x0, #1584]
+    0.00 :   40fc20: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fc24: eor     v27.16b, v2.16b, v0.16b
+    0.00 :   40fc28: eor     v2.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fc2c: add     v12.4s, v12.4s, v28.4s
+    0.00 :   40fc30: ldr     q28, [x0, #1600]
+    0.00 :   40fc34: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40fc38: add     v1.4s, v27.4s, v26.4s
+    0.26 :   40fc3c: ldr     q27, [x0, #1616]
+    0.00 :   40fc40: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40fc44: add     v24.4s, v24.4s, v0.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fc48: shl     v26.4s, v1.4s, #4
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fc4c: ushr    v1.4s, v1.4s, #28
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fc50: add     v9.4s, v9.4s, v27.4s
+    0.00 :   40fc54: ldr     q27, [x0, #1632]
+    0.00 :   40fc58: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fc5c: orr     v1.16b, v26.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.52 :   40fc60: ldr     q26, [x0, #1648]
+    0.00 :   40fc64: add     v10.4s, v10.4s, v28.4s
+    0.00 :   40fc68: add     v1.4s, v1.4s, v0.4s
+    0.00 :   40fc6c: add     v8.4s, v8.4s, v26.4s
+    0.00 :   40fc70: add     v11.4s, v11.4s, v27.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fc74: eor     v26.16b, v2.16b, v1.16b
+    0.00 :   40fc78: eor     v2.16b, v0.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fc7c: add     v23.4s, v23.4s, v1.4s
+    0.00 :   40fc80: add     v22.4s, v22.4s, v26.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fc84: shl     v0.4s, v22.4s, #11
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fc88: ushr    v22.4s, v22.4s, #21
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fc8c: orr     v0.16b, v0.16b, v22.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fc90: add     v0.4s, v0.4s, v1.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fc94: eor     v2.16b, v2.16b, v0.16b
+    0.00 :   40fc98: eor     v1.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fc9c: add     v21.4s, v21.4s, v0.4s
+    0.00 :   40fca0: add     v2.4s, v2.4s, v25.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fca4: shl     v22.4s, v2.4s, #16
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fca8: ushr    v2.4s, v2.4s, #16
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fcac: orr     v2.16b, v22.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fcb0: add     v2.4s, v2.4s, v0.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fcb4: eor     v1.16b, v1.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fcb8: add     v20.4s, v20.4s, v2.4s
+    0.00 :   40fcbc: add     v1.4s, v1.4s, v24.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fcc0: shl     v22.4s, v1.4s, #23
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fcc4: ushr    v1.4s, v1.4s, #9
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fcc8: orr     v1.16b, v22.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fccc: add     v1.4s, v1.4s, v2.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.26 :   40fcd0: orn     v0.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fcd4: add     v19.4s, v19.4s, v1.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.53 :   40fcd8: eor     v0.16b, v0.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fcdc: add     v0.4s, v0.4s, v23.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fce0: shl     v22.4s, v0.4s, #6
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fce4: ushr    v0.4s, v0.4s, #26
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fce8: orr     v0.16b, v22.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fcec: add     v0.4s, v0.4s, v1.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.26 :   40fcf0: orn     v2.16b, v0.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fcf4: add     v18.4s, v18.4s, v0.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fcf8: eor     v2.16b, v2.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.46 :   40fcfc: add     v2.4s, v2.4s, v21.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fd00: shl     v21.4s, v2.4s, #10
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fd04: ushr    v2.4s, v2.4s, #22
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.26 :   40fd08: orr     v2.16b, v21.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fd0c: add     v2.4s, v2.4s, v0.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fd10: orn     v1.16b, v2.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.52 :   40fd14: add     v3.4s, v3.4s, v2.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fd18: eor     v1.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fd1c: add     v1.4s, v1.4s, v20.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.26 :   40fd20: shl     v20.4s, v1.4s, #15
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fd24: ushr    v1.4s, v1.4s, #17
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fd28: orr     v1.16b, v20.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fd2c: add     v1.4s, v1.4s, v2.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fd30: orn     v0.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fd34: add     v17.4s, v17.4s, v1.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.52 :   40fd38: eor     v0.16b, v0.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fd3c: add     v0.4s, v0.4s, v19.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fd40: shl     v19.4s, v0.4s, #21
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.26 :   40fd44: ushr    v0.4s, v0.4s, #11
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fd48: orr     v0.16b, v19.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fd4c: add     v0.4s, v0.4s, v1.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.52 :   40fd50: orn     v2.16b, v0.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fd54: add     v16.4s, v16.4s, v0.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fd58: eor     v2.16b, v2.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.26 :   40fd5c: add     v2.4s, v2.4s, v18.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fd60: shl     v18.4s, v2.4s, #6
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fd64: ushr    v2.4s, v2.4s, #26
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.26 :   40fd68: orr     v2.16b, v18.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fd6c: add     v2.4s, v2.4s, v0.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fd70: orn     v1.16b, v2.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.26 :   40fd74: add     v15.4s, v15.4s, v2.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fd78: eor     v1.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fd7c: add     v1.4s, v1.4s, v3.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fd80: shl     v3.4s, v1.4s, #10
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fd84: ushr    v1.4s, v1.4s, #22
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fd88: orr     v1.16b, v3.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.26 :   40fd8c: add     v1.4s, v1.4s, v2.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fd90: orn     v3.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fd94: add     v14.4s, v14.4s, v1.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fd98: eor     v3.16b, v3.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fd9c: add     v3.4s, v3.4s, v17.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fda0: shl     v0.4s, v3.4s, #15
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fda4: ushr    v3.4s, v3.4s, #17
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.52 :   40fda8: orr     v0.16b, v0.16b, v3.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fdac: add     v0.4s, v0.4s, v1.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.26 :   40fdb0: orn     v3.16b, v0.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fdb4: add     v13.4s, v13.4s, v0.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fdb8: eor     v3.16b, v3.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.77 :   40fdbc: add     v3.4s, v3.4s, v16.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fdc0: shl     v2.4s, v3.4s, #21
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fdc4: ushr    v3.4s, v3.4s, #11
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.52 :   40fdc8: orr     v2.16b, v2.16b, v3.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.26 :   40fdcc: add     v2.4s, v2.4s, v0.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fdd0: orn     v3.16b, v2.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.26 :   40fdd4: add     v12.4s, v12.4s, v2.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fdd8: eor     v3.16b, v3.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fddc: add     v3.4s, v3.4s, v15.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fde0: shl     v1.4s, v3.4s, #6
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fde4: ushr    v3.4s, v3.4s, #26
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fde8: orr     v1.16b, v1.16b, v3.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.52 :   40fdec: add     v1.4s, v1.4s, v2.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fdf0: orn     v3.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fdf4: add     v10.4s, v10.4s, v1.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.52 :   40fdf8: eor     v3.16b, v3.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fdfc: add     v3.4s, v3.4s, v14.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fe00: shl     v0.4s, v3.4s, #10
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.52 :   40fe04: ushr    v3.4s, v3.4s, #22
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fe08: orr     v0.16b, v0.16b, v3.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fe0c: add     v0.4s, v0.4s, v1.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.52 :   40fe10: orn     v3.16b, v0.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fe14: add     v9.4s, v9.4s, v0.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fe18: eor     v3.16b, v3.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.53 :   40fe1c: add     v3.4s, v3.4s, v13.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fe20: shl     v2.4s, v3.4s, #15
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fe24: ushr    v3.4s, v3.4s, #17
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.79 :   40fe28: orr     v2.16b, v2.16b, v3.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fe2c: add     v2.4s, v2.4s, v0.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fe30: orn     v3.16b, v2.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.78 :   40fe34: add     v11.4s, v11.4s, v2.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fe38: eor     v3.16b, v3.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fe3c: add     v3.4s, v3.4s, v12.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.26 :   40fe40: shl     v1.4s, v3.4s, #21
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fe44: ushr    v3.4s, v3.4s, #11
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fe48: orr     v1.16b, v1.16b, v3.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.26 :   40fe4c: add     v1.4s, v1.4s, v2.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fe50: orn     v3.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fe54: add     v8.4s, v8.4s, v1.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.26 :   40fe58: eor     v3.16b, v3.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fe5c: add     v3.4s, v3.4s, v10.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fe60: shl     v0.4s, v3.4s, #6
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.26 :   40fe64: ushr    v3.4s, v3.4s, #26
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fe68: orr     v0.16b, v0.16b, v3.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fe6c: add     v0.4s, v0.4s, v1.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.26 :   40fe70: orn     v2.16b, v0.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fe74: add     v7.4s, v7.4s, v0.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fe78: eor     v2.16b, v2.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.52 :   40fe7c: add     v2.4s, v2.4s, v9.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fe80: shl     v3.4s, v2.4s, #10
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.00 :   40fe84: ushr    v2.4s, v2.4s, #22
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.26 :   40fe88: orr     v2.16b, v3.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fe8c: add     v2.4s, v2.4s, v0.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fe90: orn     v1.16b, v2.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.26 :   40fe94: add     v6.4s, v6.4s, v2.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.00 :   40fe98: eor     v1.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fe9c: add     v1.4s, v1.4s, v11.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.79 :   40fea0: shl     v3.4s, v1.4s, #15
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.26 :   40fea4: ushr    v1.4s, v1.4s, #17
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40fea8: orr     v1.16b, v3.16b, v1.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40feac: add     v1.4s, v1.4s, v2.4s
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.00 :   40feb0: orn     v0.16b, v1.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40feb4: add     v5.4s, v5.4s, v1.4s
+         :            veorq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a ^ __b;
+    0.52 :   40feb8: eor     v0.16b, v0.16b, v2.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40febc: add     v0.4s, v0.4s, v8.4s
+         :            vshlq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_ashlv4si ((int32x4_t) __a, __b);
+    0.00 :   40fec0: shl     v2.4s, v0.4s, #21
+         :            vshrq_n_u32(__Uint32x4_t, int):
+         :            return (uint32x4_t) __builtin_aarch64_lshrv4si ((int32x4_t) __a, __b);
+    0.26 :   40fec4: ushr    v0.4s, v0.4s, #11
+         :            vorrq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a | __b;
+    0.52 :   40fec8: orr     v0.16b, v2.16b, v0.16b
+         :            vaddq_u32(__Uint32x4_t, __Uint32x4_t):
+         :            return __a + __b;
+    0.00 :   40fecc: add     v0.4s, v0.4s, v1.4s
+    0.52 :   40fed0: add     v4.4s, v4.4s, v0.4s
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            for (int block = 0; block < n_blocks; block++)
+    0.00 :   40fed4: cmp     w20, w23
+    0.00 :   40fed8: b.gt    40f380 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0x10c>
+    0.26 :   40fedc: ldp     d8, d9, [sp, #96]
+    1.31 :   40fee0: ldp     d10, d11, [sp, #112]
+    0.26 :   40fee4: ldp     d12, d13, [sp, #128]
+    0.00 :   40fee8: ldp     d14, d15, [sp, #144]
+         :            vst1q_u32(unsigned int*, __Uint32x4_t):
+         :
+         :            __extension__ extern __inline void
+         :            __attribute__ ((__always_inline__, __gnu_inline__, __artificial__))
+         :            vst1q_u32 (uint32_t *__a, uint32x4_t __b)
+         :            {
+         :            __builtin_aarch64_st1v4si ((__builtin_aarch64_simd_si *) __a,
+    0.00 :   40feec: mov     x2, x21
+    0.00 :   40fef0: add     x4, x21, #0x40
+    0.00 :   40fef4: add     x3, sp, #0x130
+    0.00 :   40fef8: stp     q7, q4, [x21]
+    0.00 :   40fefc: stp     q5, q6, [x21, #32]
+         :            vld1q_u32(unsigned int const*):
+         :            return (uint32x4_t)
+    0.00 :   40ff00: add     x0, sp, #0x120
+         :            __builtin_aarch64_ld1v4si ((const __builtin_aarch64_simd_si *) __a);
+    0.00 :   40ff04: ldr     q0, [x2]
+         :            vst1q_u32(unsigned int*, __Uint32x4_t):
+         :            __builtin_aarch64_st1v4si ((__builtin_aarch64_simd_si *) __a,
+    0.52 :   40ff08: str     q0, [sp, #288]
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            for (int i = 0; i < 4; i++) {
+         :            uint32_t temp[4];
+         :            uint32x4_t vec = vld1q_u32(state_out[i]); // 加载为 NEON 向量
+         :            vst1q_u32(temp, vec);
+         :            for (int j = 0; j < 4; j++) {
+         :            uint32_t value = temp[j];
+    0.26 :   40ff0c: ldr     w1, [x0]
+    0.00 :   40ff10: rev     w1, w1
+         :            temp[j] = ((value & 0xff) << 24) |
+    1.03 :   40ff14: str     w1, [x0], #4
+         :            for (int j = 0; j < 4; j++) {
+    0.00 :   40ff18: cmp     x3, x0
+    0.00 :   40ff1c: b.ne    40ff0c <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xc98>  // b.any
+         :            ((value & 0xff00) << 8) |
+         :            ((value & 0xff0000) >> 8) |
+         :            ((value & 0xff000000) >> 24);
+         :            }
+         :            memcpy(state_out[i], temp, sizeof(temp));
+    0.26 :   40ff20: ldp     x0, x1, [sp, #288]
+    4.19 :   40ff24: stp     x0, x1, [x2], #16
+         :            for (int i = 0; i < 4; i++) {
+    0.00 :   40ff28: cmp     x4, x2
+    0.00 :   40ff2c: b.ne    40ff00 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xc8c>  // b.any
+    0.00 :   40ff30: add     x20, sp, #0x120
+         :
+         :            // 释放动态分配的内存
+         :            // 实现SIMD并行算法的时候，也请记得及时回收内存！
+         :            // 释放动态分配的内存
+         :            for (int i = 0; i < 4; i++) {
+         :            delete[] paddedMessages[i];
+    0.00 :   40ff34: ldr     x0, [x19]
+    0.00 :   40ff38: cbz     x0, 40ff40 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xccc>
+    0.79 :   40ff3c: bl      401c60 <operator delete[](void*)@plt>
+         :            for (int i = 0; i < 4; i++) {
+    0.00 :   40ff40: add     x19, x19, #0x8
+    0.00 :   40ff44: cmp     x20, x19
+    0.00 :   40ff48: b.ne    40ff34 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xcc0>  // b.any
+         :            }
+         :            // 这里 paddedLengths 改为数组存储，不需要delete
+         :            // delete[] paddedLengths;
+         :            }
+    0.00 :   40ff4c: ldp     x29, x30, [sp]
+    0.52 :   40ff50: ldp     x19, x20, [sp, #16]
+    0.00 :   40ff54: ldp     x21, x22, [sp, #32]
+    0.00 :   40ff58: ldp     x23, x24, [sp, #48]
+    0.00 :   40ff5c: ldp     x25, x26, [sp, #64]
+    0.00 :   40ff60: ldr     x27, [sp, #80]
+    0.00 :   40ff64: add     sp, sp, #0x220
+    0.00 :   40ff68: ret
+         :            std::char_traits<char>::copy(char*, char const*, unsigned long):
+         :            }
+         :
+         :            static _GLIBCXX20_CONSTEXPR char_type*
+         :            copy(char_type* __s1, const char_type* __s2, size_t __n)
+         :            {
+         :            if (__n == 0)
+    0.26 :   40ff6c: mov     x0, x26
+    0.26 :   40ff70: cbz     x20, 40f2e4 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0x70>
+    0.00 :   40ff74: b       40ff94 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd20>
+         :            void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char*>(char*, char*, std::forward_iterator_tag):
+         :            {
+         :            _M_data(_M_create(__dnew, size_type(0)));
+    0.00 :   40ff78: add     x1, sp, #0xf0
+    0.00 :   40ff7c: add     x0, sp, #0x120
+    0.00 :   40ff80: mov     x2, #0x0                        // #0
+    0.00 :   40ff84: bl      401d60 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_create(unsigned long&, unsigned long)@plt>
+         :            std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_capacity(unsigned long):
+         :            { _M_allocated_capacity = __capacity; }
+    0.00 :   40ff88: ldr     x1, [sp, #240]
+         :            std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_data(char*):
+         :            { _M_dataplus._M_p = __p; }
+    0.00 :   40ff8c: str     x0, [sp, #288]
+         :            std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_capacity(unsigned long):
+         :            { _M_allocated_capacity = __capacity; }
+    0.00 :   40ff90: str     x1, [sp, #304]
+         :            std::char_traits<char>::copy(char*, char const*, unsigned long):
+         :            return __s1;
+         :            #ifdef __cpp_lib_is_constant_evaluated
+         :            if (std::is_constant_evaluated())
+         :            return __gnu_cxx::char_traits<char_type>::copy(__s1, __s2, __n);
+         :            #endif
+         :            return static_cast<char_type*>(__builtin_memcpy(__s1, __s2, __n));
+    0.00 :   40ff94: mov     x2, x20
+    0.00 :   40ff98: mov     x1, x23
+    0.00 :   40ff9c: bl      401a60 <memcpy@plt>
+         :            void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char*>(char*, char*, std::forward_iterator_tag):
+         :            {
+         :            _M_dispose();
+         :            __throw_exception_again;
+         :            }
+         :
+         :            _M_set_length(__dnew);
+    0.00 :   40ffa0: ldr     x20, [sp, #240]
+         :            std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_data() const:
+         :            { return _M_dataplus._M_p; }
+    0.00 :   40ffa4: ldr     x0, [sp, #288]
+         :            std::char_traits<char>::copy(char*, char const*, unsigned long):
+    0.00 :   40ffa8: b       40f2e4 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0x70>
+         :            MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4]):
+         :            for (int block = 0; block < n_blocks; block++)
+    0.00 :   40ffac: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40ffb0: ldr     q6, [x0, #576]
+    0.00 :   40ffb4: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40ffb8: ldr     q5, [x0, #592]
+    0.00 :   40ffbc: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40ffc0: ldr     q4, [x0, #608]
+    0.00 :   40ffc4: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40ffc8: ldr     q7, [x0, #624]
+    0.00 :   40ffcc: b       40feec <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xc78>
+         :            void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char*>(char*, char*, std::forward_iterator_tag):
+         :            std::__throw_logic_error(__N("basic_string::"
+    0.00 :   40ffd0: adrp    x0, 410000 <MD5Hash_SIMD(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, unsigned int (*) [4])+0xd8c>
+    0.00 :   40ffd4: add     x0, x0, #0xb8
+    0.00 :   40ffd8: stp     d8, d9, [sp, #96]
+    0.00 :   40ffdc: stp     d10, d11, [sp, #112]
+    0.00 :   40ffe0: stp     d12, d13, [sp, #128]
+    0.00 :   40ffe4: stp     d14, d15, [sp, #144]
+    0.00 :   40ffe8: bl      401b50 <std::__throw_logic_error(char const*)@plt>
+         :            std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::~basic_string():
+         :            { _M_dispose(); }
+    0.00 :   40ffec: mov     x19, x0
+    0.00 :   40fff0: add     x0, sp, #0x120
+         :            ~basic_string()
+    0.00 :   40fff4: stp     d8, d9, [sp, #96]
+    0.00 :   40fff8: stp     d10, d11, [sp, #112]
+    0.00 :   40fffc: stp     d12, d13, [sp, #128]
+    0.00 :   410000: stp     d14, d15, [sp, #144]
+         :            { _M_dispose(); }
+    0.00 :   410004: bl      401c10 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_dispose()@plt>
+         :            __gnu_cxx::new_allocator<char>::~new_allocator():
+         :            ~new_allocator() _GLIBCXX_USE_NOEXCEPT { }
+    0.00 :   410008: mov     x0, x19
+    0.00 :   41000c: bl      401d50 <_Unwind_Resume@plt>
