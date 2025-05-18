@@ -10,30 +10,28 @@
 
 // --------------------- 帮助数据结构和函数 -------------------------
 namespace {
-
 struct ThreadArg {
-    int  tid;                  // 线程编号
-    int  begin;                // 处理区间起始下标（包含）
-    int  end;                  // 处理区间结束下标（不含）
-    const std::string *prefix; // 已经拼接好的前缀字符串 (可为空字符串)
-    const segment      *seg;   // 指向最后一个 segment 的统计数据
-    std::vector<std::string> *local_out; // 线程局部输出容器
+    int  tid;
+    int  begin;
+    int  end;
+    const std::string *prefix;
+    const segment      *seg;
+    std::vector<std::string> *slot;   // 直接指向 PriorityQueue::guesses[tid]
 };
 
 void *generate_worker(void *arg_ptr) {
-    ThreadArg *arg = static_cast<ThreadArg *>(arg_ptr);
+    ThreadArg *arg = static_cast<ThreadArg*>(arg_ptr);
+    std::vector<std::string> &out = *arg->slot;
     const std::string &pre = *arg->prefix;
-    const segment    *s   = arg->seg;
-    std::vector<std::string> &out = *arg->local_out;
-    out.reserve(arg->end - arg->begin);
+    const segment *seg = arg->seg;
+    // out.reserve(out.size() + (arg->end - arg->begin));
 
-    for (int i = arg->begin; i < arg->end; ++i) {
-        out.emplace_back(pre + s->ordered_values[i]);
-    }
+    for (int i = arg->begin; i < arg->end; ++i)
+        out.emplace_back(pre + seg->ordered_values[i]);
     return nullptr;
 }
-
-} // anonymous namespace
+} // namespace
+// anonymous namespace
 // using namespace std;
 
 void PriorityQueue::CalProb(PT &pt)
@@ -218,115 +216,47 @@ void PriorityQueue::Generate(PT pt)
 {
     CalProb(pt);   // 初始概率
 
-    // ---------- Case A: 只有一个 segment ----------
-    if (pt.content.size() == 1)
-    {
-        const segment *a = nullptr;
-        if (pt.content[0].type == 1) a = &m.letters[m.FindLetter(pt.content[0])];
-        if (pt.content[0].type == 2) a = &m.digits[m.FindDigit(pt.content[0])];
-        if (pt.content[0].type == 3) a = &m.symbols[m.FindSymbol(pt.content[0])];
+    // 保证 guesses 向量按需扩容
+    if (guesses.empty()) guesses.resize(THREAD_NUM);
 
-        const int total = pt.max_indices[0];
-        // if (total < 4000)
-        // { // 太小直接串行
-        //     for (int i = 0; i < pt.max_indices[0]; i += 1)
-        //     {
-        //         string guess = a->ordered_values[i];
-        //         // cout << guess << endl;
-        //         guesses.emplace_back(guess);
-        //         total_guesses += 1;
-        //     }
-        //     return;
-        // }
+    auto launch_threads = [&](const std::string &prefix,const segment *seg,int total){
         const int chunk = (total + THREAD_NUM - 1) / THREAD_NUM;
-
-        pthread_t threads[THREAD_NUM];
-        ThreadArg targs[THREAD_NUM];
-        std::vector<std::string> local_out[THREAD_NUM];
-
-        std::string empty_prefix;
-        for (int t = 0; t < THREAD_NUM; ++t)
-        {
+        pthread_t th[THREAD_NUM];
+        ThreadArg arg[THREAD_NUM];
+        for (int t = 0; t < THREAD_NUM; ++t) {
             int L = t * chunk;
             int R = std::min(total, L + chunk);
-            // cout<<"线程 "<<t<<" 的 L:"<<L<<", R:"<<R<<endl;
-            if (L >= R) { 
-                // 让它处理一个空区间
-                targs[t] = {t, 0, 0, &empty_prefix, a, &local_out[t]};
-            }
-            else{
-            targs[t] = {t, L, R, &empty_prefix, a, &local_out[t]};
+            arg[t] = {t, L, R, &prefix, seg, &guesses[t]};
+            pthread_create(&th[t], nullptr, generate_worker, &arg[t]);
         }
-            pthread_create(&threads[t], nullptr, generate_worker, &targs[t]);
-        }
-        for (int t = 0; t < THREAD_NUM; ++t) pthread_join(threads[t], nullptr);
-
-        // 合并线程输出
-        for (int t = 0; t < THREAD_NUM; ++t)
-            guesses.insert(guesses.end(), local_out[t].begin(), local_out[t].end());
-
+        for (int t = 0; t < THREAD_NUM; ++t) pthread_join(th[t], nullptr);
         total_guesses += total;
+    };
+
+    // -------- CASE A : 单 segment --------
+    if (pt.content.size() == 1) {
+        const segment *s=nullptr;
+        if (pt.content[0].type==1) s=&m.letters[m.FindLetter(pt.content[0])];
+        if (pt.content[0].type==2) s=&m.digits[m.FindDigit(pt.content[0])];
+        if (pt.content[0].type==3) s=&m.symbols[m.FindSymbol(pt.content[0])];
+        launch_threads(std::string(),s,pt.max_indices[0]);
         return;
     }
 
-    // ---------- Case B: 多个 segment，最后一个待填充 ----------
 
-    // 1) 构造前缀 (除最后一个 segment 外)
+    // -------- CASE B : 多 segment，最后一段待填充 --------
     std::string prefix;
-    int seg_idx = 0;
-    for (int idx : pt.curr_indices)
-    {
-        if (pt.content[seg_idx].type == 1)
-            prefix += m.letters[m.FindLetter(pt.content[seg_idx])].ordered_values[idx];
-        if (pt.content[seg_idx].type == 2)
-            prefix += m.digits[m.FindDigit(pt.content[seg_idx])].ordered_values[idx];
-        if (pt.content[seg_idx].type == 3)
-            prefix += m.symbols[m.FindSymbol(pt.content[seg_idx])].ordered_values[idx];
-        ++seg_idx;
-        if (seg_idx == pt.content.size() - 1) break; // 留出最后一个 segment
+    for (size_t k=0;k<pt.curr_indices.size();++k){
+        if (k==pt.content.size()-1) break;
+        int idx = pt.curr_indices[k];
+        if (pt.content[k].type==1) prefix+=m.letters[m.FindLetter(pt.content[k])].ordered_values[idx];
+        if (pt.content[k].type==2) prefix+=m.digits[m.FindDigit(pt.content[k])].ordered_values[idx];
+        if (pt.content[k].type==3) prefix+=m.symbols[m.FindSymbol(pt.content[k])].ordered_values[idx];
     }
-
-    // 2) 定位最后一个 segment 的统计数据
-    const segment *last_seg = nullptr;
-    const segment &seg_obj = pt.content.back();
-    if (seg_obj.type == 1) last_seg = &m.letters[m.FindLetter(seg_obj)];
-    if (seg_obj.type == 2) last_seg = &m.digits[m.FindDigit(seg_obj)];
-    if (seg_obj.type == 3) last_seg = &m.symbols[m.FindSymbol(seg_obj)];
-
-    const int total = pt.max_indices.back();
-        // if (total < 4000)
-        // { // 太小直接串行
-        //     for (int i = 0; i < pt.max_indices[pt.content.size() - 1]; i += 1)
-        //     {
-        //         guesses.emplace_back(prefix + last_seg->ordered_values[i]);
-        //         total_guesses += 1;
-        //     }
-        //     return;
-        // }
-    const int chunk = (total + THREAD_NUM - 1) / THREAD_NUM;
-
-    pthread_t threads[THREAD_NUM];
-    ThreadArg targs[THREAD_NUM];
-    std::vector<std::string> local_out[THREAD_NUM];
-
-    for (int t = 0; t < THREAD_NUM; ++t)
-    {
-        int L = t * chunk;
-        int R = std::min(total, L + chunk);
-        // cout<<"线程 "<<t<<" 的 L:"<<L<<", R:"<<R<<endl;
-        if (L >= R) { // 让它处理一个空区间
-            targs[t] = {t, 0, 0, &prefix, last_seg, &local_out[t]}; 
-        }
-        else{
-        targs[t] = {t, L, R, &prefix, last_seg, &local_out[t]};
-    }
-        pthread_create(&threads[t], nullptr, generate_worker, &targs[t]);
-    }
-    for (int t = 0; t < THREAD_NUM; ++t) pthread_join(threads[t], nullptr);
-
-    // 3) 合并输出
-    for (int t = 0; t < THREAD_NUM; ++t)
-        guesses.insert(guesses.end(), local_out[t].begin(), local_out[t].end());
-
-    total_guesses += total;
+    const segment *last=nullptr;
+    const segment &sg = pt.content.back();
+    if (sg.type==1) last=&m.letters[m.FindLetter(sg)];
+    if (sg.type==2) last=&m.digits[m.FindDigit(sg)];
+    if (sg.type==3) last=&m.symbols[m.FindSymbol(sg)];
+    launch_threads(prefix,last,pt.max_indices.back());
 }

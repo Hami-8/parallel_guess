@@ -22,6 +22,13 @@ using namespace chrono;
     -DTHREAD_NUM=8 \
     -pthread -o main
 
+auto current_guess_count = [](PriorityQueue &pq) -> size_t {
+    size_t s = 0;
+    for (auto &vec : pq.guesses) s += vec.size();
+    return s;
+};
+
+
 int main()
 {
     double time_hash = 0;  // 用于MD5哈希的时间
@@ -63,7 +70,7 @@ int main()
     while (!q.priority.empty())
     {
         q.PopNext();
-        q.total_guesses = q.guesses.size();
+        q.total_guesses = current_guess_count(q);
         if (q.total_guesses - curr_num >= 100000)
         {
             cout << "Guesses generated: " <<history + q.total_guesses << endl;
@@ -89,13 +96,22 @@ int main()
         {
             auto start_hash = system_clock::now();
             bit32 state[4];
-            for (string pw : q.guesses)
+            for (auto &vec : q.guesses)
             {
-                if (test_set.find(pw) != test_set.end()) {
+                // if (test_set.find(pw) != test_set.end()) {
+                //     cracked+=1;
+                // }
+                // // TODO：对于SIMD实验，将这里替换成你的SIMD MD5函数
+                // MD5Hash(pw, state);
+
+                for (const std::string &pw : vec)
+                {
+                    if (test_set.find(pw) != test_set.end()) {
                     cracked+=1;
                 }
-                // TODO：对于SIMD实验，将这里替换成你的SIMD MD5函数
-                MD5Hash(pw, state);
+                    // bit32 state[4];
+                    MD5Hash(pw, state);
+                }
 
                 // 以下注释部分用于输出猜测和哈希，但是由于自动测试系统不太能写文件，所以这里你可以改成cout
                 // a<<pw<<"\t";

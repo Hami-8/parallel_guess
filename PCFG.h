@@ -158,5 +158,5 @@ public:
     // 将优先队列最前面的一个PT
     void PopNext();
     int total_guesses = 0;
-    vector<string> guesses;
+    std::vector<std::vector<std::string>> guesses;// ← 线程私有槽，每槽对应一个 tid
 };
