@@ -307,95 +307,19 @@ Ordering letters
 Ordering digits
 ordering symbols
 here
-线程 0 的 L:0, R:42672
-线程 1 的 L:42672, R:85344
-线程 2 的 L:85344, R:128016
-线程 3 的 L:128016, R:170685
 Guesses generated: 170685
-线程 0 的 L:0, R:36241
-线程 1 的 L:36241, R:72482
-线程 2 的 L:72482, R:108723
-线程 3 的 L:108723, R:144962
 Guesses generated: 315647
-线程 0 的 L:0, R:36032
-线程 1 的 L:36032, R:72064
-线程 2 的 L:72064, R:108096
-线程 3 的 L:108096, R:144127
 Guesses generated: 459774
-线程 0 的 L:0, R:25038
-线程 1 的 L:25038, R:50076
-线程 2 的 L:50076, R:75114
-线程 3 的 L:75114, R:100150
 Guesses generated: 559924
-线程 0 的 L:0, R:25046
-线程 1 的 L:25046, R:50092
-线程 2 的 L:50092, R:75138
-线程 3 的 L:75138, R:100181
 Guesses generated: 660105
-线程 0 的 L:0, R:17716
-线程 1 的 L:17716, R:35432
-线程 2 的 L:35432, R:53148
-线程 3 的 L:53148, R:70863
-线程 0 的 L:0, R:16631
-线程 1 的 L:16631, R:33262
-线程 2 的 L:33262, R:49893
-线程 3 的 L:49893, R:66521
 Guesses generated: 797589
-线程 0 的 L:0, R:16243
-线程 1 的 L:16243, R:32486
-线程 2 的 L:32486, R:48729
-线程 3 的 L:48729, R:64970
-线程 0 的 L:0, R:16174
-线程 1 的 L:16174, R:32348
-线程 2 的 L:32348, R:48522
-线程 3 的 L:48522, R:64693
 Guesses generated: 927462
-线程 0 的 L:0, R:12411
-线程 1 的 L:12411, R:24822
-线程 2 的 L:24822, R:37233
-线程 3 的 L:37233, R:49644
-线程 0 的 L:0, R:10025
-线程 1 的 L:10025, R:20050
-线程 2 的 L:20050, R:30075
-线程 3 的 L:30075, R:40099
-线程 0 的 L:0, R:8424
-线程 1 的 L:8424, R:16848
-线程 2 的 L:16848, R:25272
-线程 3 的 L:25272, R:33696
 Guesses generated: 1051391
-线程 0 的 L:0, R:6760
-线程 1 的 L:6760, R:13520
-线程 2 的 L:13520, R:20280
-线程 3 的 L:20280, R:27038
 Guesses generated: 1155657
-线程 0 的 L:0, R:5323
-线程 1 的 L:5323, R:10646
-线程 2 的 L:10646, R:15969
-线程 3 的 L:15969, R:21291
-线程 0 的 L:0, R:4127
-线程 1 的 L:4127, R:8254
-线程 2 的 L:8254, R:12381
-线程 3 的 L:12381, R:16508
-线程 0 的 L:0, R:2906
-线程 1 的 L:2906, R:5812
-线程 2 的 L:5812, R:8718
-线程 3 的 L:8718, R:11624
 Guesses generated: 1265010
-线程 0 的 L:0, R:2659
-线程 1 的 L:2659, R:5318
-线程 2 的 L:5318, R:7977
-线程 3 的 L:7977, R:10633
-线程 0 的 L:0, R:9535
-线程 1 的 L:9535, R:19070
-线程 2 的 L:19070, R:28605
-线程 3 的 L:28605, R:38137
 Guesses generated: 1365026
 Guesses generated: 1544868
 Guesses generated: 1645038
-线程 0 的 L:0, R:1712
-线程 1 的 L:1712, R:3424
-线程 2 的 L:3424, R:5136
-线程 3 的 L:5136, R:6846
 Guesses generated: 1754096
 Guesses generated: 1863276
 Guesses generated: 1986926
@@ -416,20 +340,8 @@ Guesses generated: 3625326
 Guesses generated: 3799642
 Guesses generated: 3899792
 Guesses generated: 4080351
-线程 0 的 L:0, R:1045
-线程 1 的 L:1045, R:2090
-线程 2 的 L:2090, R:3135
-线程 3 的 L:3135, R:4180
 Guesses generated: 4243981
 Guesses generated: 4345439
-线程 0 的 L:0, R:991
-线程 1 的 L:991, R:1982
-线程 2 的 L:1982, R:2973
-线程 3 的 L:2973, R:3961
-线程 0 的 L:0, R:4321
-线程 1 的 L:4321, R:8642
-线程 2 的 L:8642, R:12963
-线程 3 的 L:12963, R:17283
 Guesses generated: 4466915
 Guesses generated: 4570085
 Guesses generated: 4685900
@@ -472,9 +384,8 @@ Guesses generated: 9528822
 Guesses generated: 9699507
 Guesses generated: 9853408
 Guesses generated: 10106852
-Guess time:0.745933seconds
-Hash time:6.59815seconds
-Train time:23.0192seconds
-Cracked:358217
+Guess time:0.873154seconds
+Hash time:2.941seconds
+Train time:22.9889seconds
 
 Authorized users only. All activities may be monitored and reported.

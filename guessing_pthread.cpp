@@ -5,7 +5,7 @@
 
 // ---------------------------- 线程配置 -----------------------------
 #ifndef THREAD_NUM
-#define THREAD_NUM 4            // 可在编译命令中 -DTHREAD_NUM=N 动态修改
+#define THREAD_NUM 7            // 可在编译命令中 -DTHREAD_NUM=N 动态修改
 #endif
 
 // --------------------- 帮助数据结构和函数 -------------------------
@@ -227,6 +227,17 @@ void PriorityQueue::Generate(PT pt)
         if (pt.content[0].type == 3) a = &m.symbols[m.FindSymbol(pt.content[0])];
 
         const int total = pt.max_indices[0];
+        // if (total < 4000)
+        // { // 太小直接串行
+        //     for (int i = 0; i < pt.max_indices[0]; i += 1)
+        //     {
+        //         string guess = a->ordered_values[i];
+        //         // cout << guess << endl;
+        //         guesses.emplace_back(guess);
+        //         total_guesses += 1;
+        //     }
+        //     return;
+        // }
         const int chunk = (total + THREAD_NUM - 1) / THREAD_NUM;
 
         pthread_t threads[THREAD_NUM];
@@ -238,7 +249,7 @@ void PriorityQueue::Generate(PT pt)
         {
             int L = t * chunk;
             int R = std::min(total, L + chunk);
-            cout<<"线程 "<<t<<" 的 L:"<<L<<", R:"<<R<<endl;
+            // cout<<"线程 "<<t<<" 的 L:"<<L<<", R:"<<R<<endl;
             if (L >= R) { 
                 // 让它处理一个空区间
                 targs[t] = {t, 0, 0, &empty_prefix, a, &local_out[t]};
@@ -283,6 +294,15 @@ void PriorityQueue::Generate(PT pt)
     if (seg_obj.type == 3) last_seg = &m.symbols[m.FindSymbol(seg_obj)];
 
     const int total = pt.max_indices.back();
+        // if (total < 4000)
+        // { // 太小直接串行
+        //     for (int i = 0; i < pt.max_indices[pt.content.size() - 1]; i += 1)
+        //     {
+        //         guesses.emplace_back(prefix + last_seg->ordered_values[i]);
+        //         total_guesses += 1;
+        //     }
+        //     return;
+        // }
     const int chunk = (total + THREAD_NUM - 1) / THREAD_NUM;
 
     pthread_t threads[THREAD_NUM];
@@ -293,6 +313,7 @@ void PriorityQueue::Generate(PT pt)
     {
         int L = t * chunk;
         int R = std::min(total, L + chunk);
+        // cout<<"线程 "<<t<<" 的 L:"<<L<<", R:"<<R<<endl;
         if (L >= R) { // 让它处理一个空区间
             targs[t] = {t, 0, 0, &prefix, last_seg, &local_out[t]}; 
         }

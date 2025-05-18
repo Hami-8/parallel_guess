@@ -13,10 +13,14 @@ using namespace chrono;
 // g++ correctness_guess.cpp train.cpp guessing.cpp md5.cpp -o main -O2
 
 // pthread 版本编译指令：
-// g++ correctness_guess.cpp train.cpp guessing_pthread.cpp md5.cpp -o main
-// g++ correctness_guess.cpp train.cpp guessing_pthread.cpp md5.cpp -o main -O1
-// g++ correctness_guess.cpp train.cpp guessing_pthread.cpp md5.cpp -o main -O2
+// g++ correctness_guess.cpp train.cpp guessing_pthread.cpp md5.cpp -lpthread -o main
+// g++ correctness_guess.cpp train.cpp guessing_pthread.cpp md5.cpp -lpthread -o main -O1
+// g++ correctness_guess.cpp train.cpp guessing_pthread.cpp md5.cpp -lpthread -o main -O2
 
+// g++ -std=c++17 -O2 \
+    main.cpp train.cpp guessing_parallel.cpp md5_SIMD.cpp \
+    -DTHREAD_NUM=8 \
+    -pthread -o main
 
 int main()
 {
