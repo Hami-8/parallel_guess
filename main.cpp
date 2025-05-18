@@ -23,12 +23,6 @@ using namespace chrono;
 // g++ main.cpp train.cpp guessing_pthread.cpp md5.cpp -o main -O2 -lpthread
 // bash test.sh 2 1 8
 
-auto current_guess_count = [](PriorityQueue &pq) -> size_t {
-    size_t s = 0;
-    for (auto &vec : pq.guesses) s += vec.size();
-    return s;
-};
-
 int main()
 {
     double time_hash = 0;  // 用于MD5哈希的时间
@@ -52,14 +46,14 @@ int main()
     while (!q.priority.empty())
     {
         q.PopNext();
-        q.total_guesses = current_guess_count(q);
+        q.total_guesses = q.guesses.size();
         if (q.total_guesses - curr_num >= 100000)
         {
             cout << "Guesses generated: " <<history + q.total_guesses << endl;
             curr_num = q.total_guesses;
 
             // 在此处更改实验生成的猜测上限
-            int generate_n=10000000;
+            int generate_n=100000000;
             if (history + q.total_guesses > generate_n)
             {
                 auto end = system_clock::now();
@@ -77,16 +71,10 @@ int main()
         {
             auto start_hash = system_clock::now();
             bit32 state[4];
-            for (auto &vec : q.guesses)
+            for (string pw : q.guesses)
             {
-                for (const std::string &pw : vec)
-                {
-                    bit32 state[4];
-                    MD5Hash(pw, state);
-                }
-
                 // TODO：对于SIMD实验，将这里替换成你的SIMD MD5函数
-                // MD5Hash(pw, state);
+                MD5Hash(pw, state);
 
                 // 以下注释部分用于输出猜测和哈希，但是由于自动测试系统不太能写文件，所以这里你可以改成cout
                 // a<<pw<<"\t";
@@ -149,12 +137,7 @@ int main()
             // 记录已经生成的口令总数
             history += curr_num;
             curr_num = 0;
-            // q.guesses.clear();
-            for (auto &vec : q.guesses)
-            {
-                vec.clear();
-                vec.shrink_to_fit(); // 把 capacity 也收回
-            }
+            q.guesses.clear();
         }
     }
 }
