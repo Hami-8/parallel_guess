@@ -1,5 +1,10 @@
 #include "PCFG.h"
 #include <omp.h>
+
+#include <atomic>
+#include <chrono>
+std::atomic<long long> g_generate_us{0};   // 微秒累计
+std::atomic<long long> g_merge_us{0};
 using namespace std;
 
 void PriorityQueue::CalProb(PT &pt)
@@ -182,6 +187,9 @@ vector<PT> PT::NewPTs()
 // 尽量看懂，然后进行并行实现
 void PriorityQueue::Generate(PT pt)
 {
+    using namespace std::chrono;
+    auto t_start = high_resolution_clock::now();      // ⟵ 开始
+    
     omp_set_num_threads(8);        // 全局指定 8 线程
     
     CalProb(pt);                        // 初始化概率
@@ -252,6 +260,9 @@ void PriorityQueue::Generate(PT pt)
         buffers[tid].emplace_back(prefix + last->ordered_values[i]);
     }
 
+    using clk = std::chrono::high_resolution_clock;
+
+    auto m_start = clk::now();
     // 合并
     for (auto &buf : buffers)
     {
@@ -266,4 +277,8 @@ void PriorityQueue::Generate(PT pt)
             }
         }
     }
+
+    auto t_end   = high_resolution_clock::now();      // ⟵ 结束
+    g_merge_us += std::chrono::duration_cast<std::chrono::microseconds>(t_end-m_start).count();
+    g_generate_us += duration_cast<microseconds>(t_end - t_start).count();
 }

@@ -1022,8 +1022,10 @@ Guesses generated: 99554531
 Guesses generated: 99675972
 Guesses generated: 99820099
 Guesses generated: 100006361
-Guess time:68.1545seconds
-Hash time:97.9744seconds
-Train time:95.2985seconds
+Guess time:5.15245seconds
+Hash time:29.4661seconds
+Train time:24.5963seconds
+Generate total time: 2.716982 seconds
+merge‑time total = 1.073547 s
 
 Authorized users only. All activities may be monitored and reported.

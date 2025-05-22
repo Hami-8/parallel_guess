@@ -4,8 +4,12 @@
 #include "md5.h"
 // #include "md5_SIMD.h"
 #include <iomanip>
+#include <atomic>
 using namespace std;
 using namespace chrono;
+
+extern std::atomic<long long> g_generate_us;   // 声明
+extern std::atomic<long long> g_merge_us;
 
 // 编译指令如下
 // g++ main.cpp train.cpp guessing.cpp md5.cpp -o main
@@ -23,7 +27,7 @@ using namespace chrono;
 // bash test.sh 2 1 8
 
 // openmp 版本编译指令
-// g++ -std=c++17 -fopenmp main.cpp train.cpp guessing_openmp.cpp md5.cpp -o main
+// g++ -fopenmp main.cpp train.cpp guessing_openmp.cpp md5.cpp -o main
 
 int main()
 {
@@ -64,6 +68,11 @@ int main()
                 cout << "Guess time:" << time_guess - time_hash << "seconds"<< endl;
                 cout << "Hash time:" << time_hash << "seconds"<<endl;
                 cout << "Train time:" << time_train <<"seconds"<<endl;
+                cout << "Generate total time: "
+                     << std::fixed << std::setprecision(6)
+                     << (g_generate_us.load() / 1e6) << " seconds" << endl;
+                cout << "merge‑time total = "
+                     << g_merge_us.load() / 1e6 << " s" << endl;
                 break;
             }
         }
