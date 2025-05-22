@@ -7,6 +7,8 @@
 using namespace std;
 using namespace chrono;
 
+extern std::atomic<long long> g_generate_us;   // 声明
+
 // 编译指令如下
 // g++ main.cpp train.cpp guessing.cpp md5.cpp -o main
 // g++ main.cpp train.cpp guessing.cpp md5.cpp -o main -O1
@@ -14,7 +16,13 @@ using namespace chrono;
 
 // g++ main.cpp train.cpp guessing.cpp md5_SIMD.cpp -o main
 
-// bash test.sh 1 1
+
+// pthread 编译指令
+// g++ main.cpp train.cpp guessing_pthread.cpp md5_SIMD.cpp -o main -pthread
+// g++ main.cpp train.cpp guessing_pthread.cpp md5_SIMD.cpp -o main -pthread -O1
+// g++ main.cpp train.cpp guessing_pthread.cpp md5_SIMD.cpp -o main -pthread -O2
+
+// bash test.sh 2 1 8
 
 int main()
 {
@@ -55,6 +63,9 @@ int main()
                 cout << "Guess time:" << time_guess - time_hash << "seconds"<< endl;
                 cout << "Hash time:" << time_hash << "seconds"<<endl;
                 cout << "Train time:" << time_train <<"seconds"<<endl;
+                cout << "Generate total time: "
+                     << std::fixed << std::setprecision(6)
+                     << (g_generate_us.load() / 1e6) << " seconds" << endl;
                 break;
             }
         }

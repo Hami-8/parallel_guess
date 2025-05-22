@@ -5,6 +5,9 @@
 #include <omp.h>
 // #include <chrono>   
 // using namespace chrono;
+// 顶部插入 ↓
+#include <pthread.h>
+#include <atomic>
 using namespace std;
 
 class segment
@@ -159,4 +162,7 @@ public:
     void PopNext();
     int total_guesses = 0;
     vector<string> guesses;
+
+    std::atomic<long long> total_guesses_atomic{0};   // 并发安全计数
+
 };
