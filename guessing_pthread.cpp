@@ -10,27 +10,21 @@ std::atomic<long long> g_merge_us{0};
 const int NUM_THREADS = 8; 
 
 // ---------- 线程参数 ----------
-struct GenTask {
-    const vector<string>* values;   // 指向 a->ordered_values
-    string                prefix;   // 已确定前缀
-    size_t                begin;    // [begin, end)
-    size_t                end;
-    vector<string>*       localBuf; // 线程私有输出
+/* ---------- 1. 线程 worker ---------- */
+struct TaskArg {
+    const vector<string>* values;
+    string                prefix;
+    size_t                begin, end;
+    vector<string>*       out;     // ← 指向 guesses_pool[tid]
 };
-
-// ---------- 线程函数 ----------
-static void* gen_worker(void* arg_) {
-    auto* arg = static_cast<GenTask*>(arg_);
-    arg->localBuf->reserve(arg->end - arg->begin);
-
+static void* worker(void* p) {
+    auto* arg = static_cast<TaskArg*>(p);
+    arg->out->reserve(arg->end - arg->begin);
     for (size_t i = arg->begin; i < arg->end; ++i) {
-        string g = arg->prefix;
-        g += (*(arg->values))[i];
-        arg->localBuf->push_back(std::move(g));
+        arg->out->push_back(arg->prefix + (*arg->values)[i]);
     }
     return nullptr;
 }
-
 
 void PriorityQueue::CalProb(PT &pt)
 {
@@ -118,6 +112,7 @@ void PriorityQueue::init()
         priority.emplace_back(pt);
     }
     // cout << "priority size:" << priority.size() << endl;
+    guesses_pool.assign(num_threads, {});
 }
 
 void PriorityQueue::PopNext()
@@ -214,6 +209,17 @@ vector<PT> PT::NewPTs()
 // 尽量看懂，然后进行并行实现
 void PriorityQueue::Generate(PT pt)
 {
+    if (guesses_pool.empty())
+    {
+        std::cerr << "ERROR: guesses_pool not initialized\n";
+        std::abort();
+    }
+    if ((int)guesses_pool.size() < num_threads)
+    {
+        std::cerr << "ERROR: guesses_pool size < num_threads\n";
+        std::abort();
+    }
+
     using namespace std::chrono;
     auto t_start = high_resolution_clock::now();      // ⟵ 开始
     /* ---------- 0. 先算出 pt 的概率（与原逻辑一致） ---------- */
@@ -263,50 +269,28 @@ void PriorityQueue::Generate(PT pt)
             a = &m.symbols[m.FindSymbol(lastSeg)];
     }
 
-    /* ---------- 2. 并行生成猜测 ---------- */
-    const size_t totalVals   = pt.max_indices[lastIdx];   // value 总个数
-    if (totalVals == 0) return;                           // 保险
+    /* ---------- 2. 并行调度 ---------- */
+    size_t totalVals = pt.max_indices[lastIdx];
+    int T = std::min(num_threads, (int)totalVals);
+    size_t chunk = (totalVals + T - 1) / T;
 
-    /* 2‑1. 动态决定线程数 */
-    constexpr int MAX_THREADS = 8;                        // 可按需调整
-    int    T     = std::min<int>(MAX_THREADS, totalVals);
-    size_t chunk = (totalVals + T - 1) / T;               // 每线程处理量
+    pthread_t tids[T];
+    TaskArg args[T];
 
-    /* 2‑2. 线程资源 */
-    pthread_t      tids[MAX_THREADS];
-    GenTask        tasks[MAX_THREADS];
-    vector<string> localBufs[MAX_THREADS];
-
-    /* 2‑3. 创建线程 */
-    for (int t = 0; t < T; ++t) {
+    for (int t = 0; t < T; ++t)
+    {
         size_t L = t * chunk;
         size_t R = std::min(totalVals, L + chunk);
-        if (L >= R) { T = t; break; }                     // 不再需要新线程
-
-        tasks[t] = { &a->ordered_values, prefix, L, R, &localBufs[t] };
-        pthread_create(&tids[t], nullptr, gen_worker, &tasks[t]);
+        if (L >= R)
+        {
+            T = t;
+            break;
+        } // 少于线程数
+        args[t] = {&a->ordered_values, prefix, L, R, &guesses_pool[t]};
+        pthread_create(&tids[t], nullptr, worker, &args[t]);
     }
-
-    /* 2‑4. 等待线程结束 */
-    for (int t = 0; t < T; ++t) pthread_join(tids[t], nullptr);
-
-    using clk = std::chrono::high_resolution_clock;
-
-    auto m_start = clk::now();
-
-    /* ---------- 3. 一次性合并到全局 guesses ---------- */
-    size_t newSize = guesses.size();
-    for (int t = 0; t < T; ++t) newSize += localBufs[t].size();
-    guesses.reserve(newSize);                             // 减少 realloc
-
-    for (int t = 0; t < T; ++t) {
-        guesses.insert(guesses.end(),
-                       std::make_move_iterator(localBufs[t].begin()),
-                       std::make_move_iterator(localBufs[t].end()));
-    }
-
-    auto m_end = clk::now();
-    g_merge_us += std::chrono::duration_cast<std::chrono::microseconds>(m_end-m_start).count();
+    for (int t = 0; t < T; ++t)
+        pthread_join(tids[t], nullptr);
 
     /* ---------- 4. 更新计数 ---------- */
     total_guesses           += totalVals;

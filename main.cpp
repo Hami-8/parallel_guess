@@ -27,8 +27,19 @@ extern std::atomic<long long> g_merge_us;
 
 // bash test.sh 2 1 8
 
+
+
 int main()
 {
+    // --- 辅助函数：统计所有线程已生成的口令数 ---
+    auto pool_size = [&](PriorityQueue &q) -> size_t
+    {
+        size_t s = 0;
+        for (auto &v : q.guesses_pool)
+            s += v.size();
+        return s;
+    };
+
     double time_hash = 0;  // 用于MD5哈希的时间
     double time_guess = 0; // 哈希和猜测的总时长
     double time_train = 0; // 模型训练的总时长
@@ -50,7 +61,8 @@ int main()
     while (!q.priority.empty())
     {
         q.PopNext();
-        q.total_guesses = q.guesses.size();
+        // q.total_guesses = q.guesses.size();
+        q.total_guesses = pool_size(q);         // 新实现
         if (q.total_guesses - curr_num >= 100000)
         {
             cout << "Guesses generated: " <<history + q.total_guesses << endl;
@@ -80,18 +92,28 @@ int main()
         {
             auto start_hash = system_clock::now();
             bit32 state[4];
-            for (string pw : q.guesses)
-            {
-                // TODO：对于SIMD实验，将这里替换成你的SIMD MD5函数
-                MD5Hash(pw, state);
+            // for (string pw : q.guesses)
+            // {
+            //     // TODO：对于SIMD实验，将这里替换成你的SIMD MD5函数
+            //     MD5Hash(pw, state);
 
-                // 以下注释部分用于输出猜测和哈希，但是由于自动测试系统不太能写文件，所以这里你可以改成cout
-                // a<<pw<<"\t";
-                // for (int i1 = 0; i1 < 4; i1 += 1)
-                // {
-                //     a << std::setw(8) << std::setfill('0') << hex << state[i1];
-                // }
-                // a << endl;
+            //     // 以下注释部分用于输出猜测和哈希，但是由于自动测试系统不太能写文件，所以这里你可以改成cout
+            //     // a<<pw<<"\t";
+            //     // for (int i1 = 0; i1 < 4; i1 += 1)
+            //     // {
+            //     //     a << std::setw(8) << std::setfill('0') << hex << state[i1];
+            //     // }
+            //     // a << endl;
+            // }
+
+            /* ---------- 遍历所有线程缓冲 ---------- */
+            for (auto &vec : q.guesses_pool)
+            {
+                for (string &pw : vec)
+                {
+                    MD5Hash(pw, state); // 或 SIMD 批量
+                }
+                vec.clear(); // 这一线程的猜测用完即清空
             }
 
             // int total = q.guesses.size();
@@ -146,7 +168,11 @@ int main()
             // 记录已经生成的口令总数
             history += curr_num;
             curr_num = 0;
-            q.guesses.clear();
+            // q.guesses.clear();
+
+            // 当你把缓冲清空后，需要把 curr_num 也置零
+            for (auto &v : q.guesses_pool)
+                v.clear();
         }
     }
 }
