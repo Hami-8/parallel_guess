@@ -161,7 +161,7 @@ public:
     // 将优先队列最前面的一个PT
     void PopNext();
     int total_guesses = 0;
-    // vector<string> guesses;
+    vector<string> guesses;
 
     std::atomic<long long> total_guesses_atomic{0};   // 并发安全计数
 
