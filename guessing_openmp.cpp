@@ -1,6 +1,12 @@
 #include "PCFG.h"
 #include <omp.h>
+#include <atomic>
+#include <chrono>
 using namespace std;
+
+std::atomic<long long> g_generate_us{0};   // 微秒累计
+std::atomic<long long> g_merge_us{0};
+
 
 void PriorityQueue::CalProb(PT &pt)
 {
@@ -88,6 +94,8 @@ void PriorityQueue::init()
         priority.emplace_back(pt);
     }
     // cout << "priority size:" << priority.size() << endl;
+    if (guesses_pool.empty())
+        guesses_pool.assign(num_threads, {}); // 每线程 1 个 vector
 }
 
 void PriorityQueue::PopNext()
@@ -182,88 +190,67 @@ vector<PT> PT::NewPTs()
 // 尽量看懂，然后进行并行实现
 void PriorityQueue::Generate(PT pt)
 {
-    omp_set_num_threads(8);        // 全局指定 8 线程
-    
-    CalProb(pt);                        // 初始化概率
+    using clk = std::chrono::high_resolution_clock;
+    auto t0   = clk::now();
 
-    // ---------- Case 1: 只有 1 个 segment ----------
-    if (pt.content.size() == 1)
-    {
-        segment *a = nullptr;
-        if (pt.content[0].type == 1) a = &m.letters[m.FindLetter(pt.content[0])];
-        if (pt.content[0].type == 2) a = &m.digits [m.FindDigit (pt.content[0])];
-        if (pt.content[0].type == 3) a = &m.symbols[m.FindSymbol(pt.content[0])];
+    /* ---------- A. 计算概率 & 构造 prefix ---------- */
+    CalProb(pt);
 
-        const int N = pt.max_indices[0];
+    string   prefix;
+    segment* a       = nullptr;
+    size_t   lastIdx = 0;
 
-        // 线程私有缓存，用于减少锁竞争
-        std::vector<std::vector<std::string>> buffers(omp_get_max_threads());
-
-        #pragma omp parallel for schedule(static)
-        for (int i = 0; i < N; ++i)
-        {
-            int tid = omp_get_thread_num();
-            buffers[tid].emplace_back(a->ordered_values[i]);
+    if (pt.content.size() == 1) {
+        lastIdx = 0;
+        a = (pt.content[0].type == 1) ? &m.letters[m.FindLetter(pt.content[0])]
+            : (pt.content[0].type == 2) ? &m.digits[m.FindDigit(pt.content[0])]
+                                        : &m.symbols[m.FindSymbol(pt.content[0])];
+    } else {
+        lastIdx = pt.content.size() - 1;
+        /* ---- 生成 prefix ---- */
+        for (size_t s = 0; s < lastIdx; ++s) {
+            int idx = pt.curr_indices[s];
+            const segment& seg = pt.content[s];
+            if (seg.type == 1) prefix += m.letters[m.FindLetter(seg)].ordered_values[idx];
+            else if (seg.type == 2) prefix += m.digits[m.FindDigit(seg)].ordered_values[idx];
+            else prefix += m.symbols[m.FindSymbol(seg)].ordered_values[idx];
         }
-
-        // 合并到共享 guesses
-        for (auto &buf : buffers)
-        {
-            if (!buf.empty())
-            {
-                #pragma omp critical
-                {
-                    guesses.insert(guesses.end(),
-                                   std::make_move_iterator(buf.begin()),
-                                   std::make_move_iterator(buf.end()));
-                    total_guesses += buf.size();
-                }
-            }
-        }
-        return;
+        const segment& lastSeg = pt.content[lastIdx];
+        a = (lastSeg.type == 1) ? &m.letters[m.FindLetter(lastSeg)]
+            : (lastSeg.type == 2) ? &m.digits[m.FindDigit(lastSeg)]
+                                  : &m.symbols[m.FindSymbol(lastSeg)];
     }
 
-    // ---------- Case 2: 多个 segment，最后 1 个待填充 ----------
-    std::string prefix;
-    int seg_idx = 0;
-    for (int idx : pt.curr_indices)
-    {
-        if (pt.content[seg_idx].type == 1)
-            prefix += m.letters[m.FindLetter(pt.content[seg_idx])].ordered_values[idx];
-        if (pt.content[seg_idx].type == 2)
-            prefix += m.digits [m.FindDigit (pt.content[seg_idx])].ordered_values[idx];
-        if (pt.content[seg_idx].type == 3)
-            prefix += m.symbols[m.FindSymbol(pt.content[seg_idx])].ordered_values[idx];
-        if (++seg_idx == pt.content.size()-1) break;
-    }
+    /* ---------- B. 并行生成猜测 ---------- */
+    const size_t totalVals = pt.max_indices[lastIdx];
+    if (totalVals == 0) return;               // 安全检查
 
-    segment *last = nullptr;
-    if (pt.content.back().type == 1) last = &m.letters[m.FindLetter(pt.content.back())];
-    if (pt.content.back().type == 2) last = &m.digits [m.FindDigit (pt.content.back())];
-    if (pt.content.back().type == 3) last = &m.symbols[m.FindSymbol(pt.content.back())];
+    /* 如果第一次调用，还没分配 pool */
+    if (guesses_pool.empty()) guesses_pool.assign(num_threads, {});
 
-    const int N = pt.max_indices.back();
-    std::vector<std::vector<std::string>> buffers(omp_get_max_threads());
-
-    #pragma omp parallel for schedule(static)
-    for (int i = 0; i < N; ++i)
+    size_t local_sum = 0;                     // 每线程私有计数
+#pragma omp parallel num_threads(num_threads) \
+        firstprivate(prefix) reduction(+:local_sum)
     {
         int tid = omp_get_thread_num();
-        buffers[tid].emplace_back(prefix + last->ordered_values[i]);
-    }
+        vector<string>& out = guesses_pool[tid];
 
-    // 合并
-    for (auto &buf : buffers)
-    {
-        if (!buf.empty())
-        {
-            #pragma omp critical
-            {
-                guesses.insert(guesses.end(),
-                               std::make_move_iterator(buf.begin()),
-                               std::make_move_iterator(buf.end()));
-                total_guesses += buf.size();
-            }
+        /* 预留空间：每线程大约 totalVals/num_threads */
+#pragma omp single
+        {                                     // 只让 1 线程做 reserve 计算
+            size_t per = (totalVals + num_threads - 1) / num_threads;
+            for (auto& v : guesses_pool) v.reserve(v.size() + per);
         }
-    }
+#pragma omp for schedule(static)
+        for (size_t i = 0; i < totalVals; ++i) {
+            out.push_back(prefix + a->ordered_values[i]);
+            local_sum += 1;
+        }
+    } // parallel
+
+    /* ---------- C. 更新全局计数 ---------- */
+    total_guesses        += local_sum;
+
+    auto t1 = clk::now();
+    g_generate_us += std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
 }

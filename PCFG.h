@@ -158,5 +158,9 @@ public:
     // 将优先队列最前面的一个PT
     void PopNext();
     int total_guesses = 0;
-    vector<string> guesses;
+    // vector<string> guesses;
+
+    int                           num_threads = 8;          // 线程数，可在 init() 前改
+    vector<vector<string>>        guesses_pool;             // [tid] -> 线程私有口令
+ 
 };
