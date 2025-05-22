@@ -22,6 +22,9 @@ using namespace chrono;
 // g++ main.cpp train.cpp guessing_pthread.cpp md5.cpp -o main -O2 -lpthread
 // bash test.sh 2 1 8
 
+// openmp 版本编译指令
+// g++ -std=c++17 -fopenmp main.cpp train.cpp guessing_openmp.cpp md5.cpp -o main
+
 int main()
 {
     double time_hash = 0;  // 用于MD5哈希的时间
