@@ -164,5 +164,6 @@ public:
     vector<string> guesses;
 
     std::atomic<long long> total_guesses_atomic{0};   // 并发安全计数
+    vector<string> spare;
 
 };

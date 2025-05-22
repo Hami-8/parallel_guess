@@ -4,6 +4,7 @@
 #include <atomic>
 #include <chrono>
 std::atomic<long long> g_generate_us{0};   // 微秒累计
+std::atomic<long long> g_merge_us{0};
 
 
 const int NUM_THREADS = 8; 
@@ -289,6 +290,10 @@ void PriorityQueue::Generate(PT pt)
     /* 2‑4. 等待线程结束 */
     for (int t = 0; t < T; ++t) pthread_join(tids[t], nullptr);
 
+    using clk = std::chrono::high_resolution_clock;
+
+    auto m_start = clk::now();
+
     /* ---------- 3. 一次性合并到全局 guesses ---------- */
     size_t newSize = guesses.size();
     for (int t = 0; t < T; ++t) newSize += localBufs[t].size();
@@ -299,6 +304,9 @@ void PriorityQueue::Generate(PT pt)
                        std::make_move_iterator(localBufs[t].begin()),
                        std::make_move_iterator(localBufs[t].end()));
     }
+
+    auto m_end = clk::now();
+    g_merge_us += std::chrono::duration_cast<std::chrono::microseconds>(m_end-m_start).count();
 
     /* ---------- 4. 更新计数 ---------- */
     total_guesses           += totalVals;

@@ -1,13 +1,14 @@
 #include "PCFG.h"
 #include <chrono>
 #include <fstream>
-// #include "md5.h"
-#include "md5_SIMD.h"
+#include "md5.h"
+// #include "md5_SIMD.h"
 #include <iomanip>
 using namespace std;
 using namespace chrono;
 
 extern std::atomic<long long> g_generate_us;   // 声明
+extern std::atomic<long long> g_merge_us;
 
 // 编译指令如下
 // g++ main.cpp train.cpp guessing.cpp md5.cpp -o main
@@ -18,6 +19,8 @@ extern std::atomic<long long> g_generate_us;   // 声明
 
 
 // pthread 编译指令
+// g++ main.cpp train.cpp guessing_pthread.cpp md5.cpp -o main -pthread -O2
+
 // g++ main.cpp train.cpp guessing_pthread.cpp md5_SIMD.cpp -o main -pthread
 // g++ main.cpp train.cpp guessing_pthread.cpp md5_SIMD.cpp -o main -pthread -O1
 // g++ main.cpp train.cpp guessing_pthread.cpp md5_SIMD.cpp -o main -pthread -O2
@@ -66,6 +69,8 @@ int main()
                 cout << "Generate total time: "
                      << std::fixed << std::setprecision(6)
                      << (g_generate_us.load() / 1e6) << " seconds" << endl;
+                cout << "merge‑time total = "
+                     << g_merge_us.load() / 1e6 << " s" << endl;
                 break;
             }
         }
@@ -74,64 +79,64 @@ int main()
         if (curr_num > 1000000)
         {
             auto start_hash = system_clock::now();
-            // bit32 state[4];
-            // for (string pw : q.guesses)
-            // {
-            //     // TODO：对于SIMD实验，将这里替换成你的SIMD MD5函数
-            //     MD5Hash(pw, state);
-
-            //     // 以下注释部分用于输出猜测和哈希，但是由于自动测试系统不太能写文件，所以这里你可以改成cout
-            //     // a<<pw<<"\t";
-            //     // for (int i1 = 0; i1 < 4; i1 += 1)
-            //     // {
-            //     //     a << std::setw(8) << std::setfill('0') << hex << state[i1];
-            //     // }
-            //     // a << endl;
-            // }
-
-            int total = q.guesses.size();
-            int groupCount = total / 4;  // 整组数
-
-            // 依次对整组的每 4 个口令进行并行处理
-            for (int i = 0; i < groupCount; i++)
+            bit32 state[4];
+            for (string pw : q.guesses)
             {
-                std::string batch[4];
-                for (int j = 0; j < 4; j++)
-                {
-                    batch[j] = q.guesses[i * 4 + j];
-                }
-                // 定义输出的并行哈希结果：state_out[k][j] 表示第 j 个口令的第 k 个状态字
-                bit32 state_parallel[4][4];
-                MD5Hash_SIMD(batch, state_parallel);
+                // TODO：对于SIMD实验，将这里替换成你的SIMD MD5函数
+                MD5Hash(pw, state);
 
-                // 这里可以根据需要输出或记录每个口令的哈希结果
-                
-                // for (int j = 0; j < 4; j++) {
-                //     a << batch[j] << "\t";
-                //     for (int k = 0; k < 4; k++) {
-                //         a << std::setw(8) << std::setfill('0') << hex << state_parallel[k][j] << " ";
-                //     }
-                //     a << endl;
+                // 以下注释部分用于输出猜测和哈希，但是由于自动测试系统不太能写文件，所以这里你可以改成cout
+                // a<<pw<<"\t";
+                // for (int i1 = 0; i1 < 4; i1 += 1)
+                // {
+                //     a << std::setw(8) << std::setfill('0') << hex << state[i1];
                 // }
-                
+                // a << endl;
             }
-            // 如果剩余不足 4 个口令，单独处理
-            int remaining = total % 4;
-            if (remaining > 0)
-            {
-                std::string batch[4];
-                for (int i = 0; i < remaining; i++)
-                {
-                    batch[i] = q.guesses[groupCount * 4 + i];
-                }
-                for (int i = remaining; i < 4; i++)
-                {
-                    batch[i] = ""; // 补充空字符串，保证 4 个口令
-                }
-                bit32 state_parallel[4][4];
-                MD5Hash_SIMD(batch, state_parallel);
+
+            // int total = q.guesses.size();
+            // int groupCount = total / 4;  // 整组数
+
+            // // 依次对整组的每 4 个口令进行并行处理
+            // for (int i = 0; i < groupCount; i++)
+            // {
+            //     std::string batch[4];
+            //     for (int j = 0; j < 4; j++)
+            //     {
+            //         batch[j] = q.guesses[i * 4 + j];
+            //     }
+            //     // 定义输出的并行哈希结果：state_out[k][j] 表示第 j 个口令的第 k 个状态字
+            //     bit32 state_parallel[4][4];
+            //     MD5Hash_SIMD(batch, state_parallel);
+
+            //     // 这里可以根据需要输出或记录每个口令的哈希结果
                 
-            }
+            //     // for (int j = 0; j < 4; j++) {
+            //     //     a << batch[j] << "\t";
+            //     //     for (int k = 0; k < 4; k++) {
+            //     //         a << std::setw(8) << std::setfill('0') << hex << state_parallel[k][j] << " ";
+            //     //     }
+            //     //     a << endl;
+            //     // }
+                
+            // }
+            // // 如果剩余不足 4 个口令，单独处理
+            // int remaining = total % 4;
+            // if (remaining > 0)
+            // {
+            //     std::string batch[4];
+            //     for (int i = 0; i < remaining; i++)
+            //     {
+            //         batch[i] = q.guesses[groupCount * 4 + i];
+            //     }
+            //     for (int i = remaining; i < 4; i++)
+            //     {
+            //         batch[i] = ""; // 补充空字符串，保证 4 个口令
+            //     }
+            //     bit32 state_parallel[4][4];
+            //     MD5Hash_SIMD(batch, state_parallel);
+                
+            // }
 
             // 在这里对哈希所需的总时长进行计算
             auto end_hash = system_clock::now();
