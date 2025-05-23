@@ -21,7 +21,7 @@ static void* worker(void* p) {
     auto* arg = static_cast<TaskArg*>(p);
     arg->out->reserve(arg->end - arg->begin);
     for (size_t i = arg->begin; i < arg->end; ++i) {
-        arg->out->push_back(arg->prefix + (*arg->values)[i]);
+        arg->out->emplace_back(arg->prefix + (*arg->values)[i]);
     }
     return nullptr;
 }

@@ -2,6 +2,7 @@
 using namespace std;
 #include <chrono>
 std::atomic<long long> g_generate_us{0};   // 微秒累计
+std::atomic<long long> g_merge_us{0};
 
 void PriorityQueue::CalProb(PT &pt)
 {
