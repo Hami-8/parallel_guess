@@ -236,14 +236,14 @@ void PriorityQueue::Generate(PT pt)
         vector<string>& out = guesses_pool[tid];
 
         /* 预留空间：每线程大约 totalVals/num_threads */
-#pragma omp single
-        {                                     // 只让 1 线程做 reserve 计算
-            size_t per = (totalVals + num_threads - 1) / num_threads;
-            for (auto& v : guesses_pool) v.reserve(v.size() + per);
-        }
+// #pragma omp single
+//         {                                     // 只让 1 线程做 reserve 计算
+//             size_t per = (totalVals + num_threads - 1) / num_threads;
+//             for (auto& v : guesses_pool) v.reserve(v.size() + per);
+//         }
 #pragma omp for schedule(static)
         for (size_t i = 0; i < totalVals; ++i) {
-            out.push_back(prefix + a->ordered_values[i]);
+            out.emplace_back(prefix + a->ordered_values[i]);
             local_sum += 1;
         }
     } // parallel

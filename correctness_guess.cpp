@@ -13,21 +13,27 @@ using namespace chrono;
 // g++ correctness_guess.cpp train.cpp guessing.cpp md5.cpp -o main -O2
 
 // pthread 版本编译指令：
-// g++ correctness_guess.cpp train.cpp guessing_pthread.cpp md5.cpp -o main -lpthread
-// g++ correctness_guess.cpp train.cpp guessing_pthread.cpp md5.cpp -o main -O1 -lpthread
-// g++ correctness_guess.cpp train.cpp guessing_pthread.cpp md5.cpp -o main -O2 -lpthread
+// g++ correctness_guess.cpp train.cpp guessing_pthread.cpp md5.cpp -o main -pthread
+// g++ correctness_guess.cpp train.cpp guessing_pthread.cpp md5.cpp -o main -O1 -pthread
+// g++ correctness_guess.cpp train.cpp guessing_pthread.cpp md5.cpp -o main -O2 -pthread
 
-// openmp 版本编译指令：
-// g++ -std=c++17 -fopenmp correctness_guess.cpp train.cpp guessing_openmp.cpp md5.cpp -o main
-
+// openmp 版本编译指令
+// g++ correctness_guess.cpp train.cpp guessing_openmp.cpp md5.cpp -o main -fopenmp -O2
 
 
 // bash test.sh 2 1 8
-// bash test.sh 3 1 8
-
 
 int main()
 {
+    // --- 辅助函数：统计所有线程已生成的口令数 ---
+    auto pool_size = [&](PriorityQueue &q) -> size_t
+    {
+        size_t s = 0;
+        for (auto &v : q.guesses_pool)
+            s += v.size();
+        return s;
+    };
+    
     double time_hash = 0;  // 用于MD5哈希的时间
     double time_guess = 0; // 哈希和猜测的总时长
     double time_train = 0; // 模型训练的总时长
@@ -67,7 +73,8 @@ int main()
     while (!q.priority.empty())
     {
         q.PopNext();
-        q.total_guesses = q.guesses.size();
+        // q.total_guesses = q.guesses.size();
+        q.total_guesses = pool_size(q);  
         if (q.total_guesses - curr_num >= 100000)
         {
             cout << "Guesses generated: " <<history + q.total_guesses << endl;
@@ -93,21 +100,35 @@ int main()
         {
             auto start_hash = system_clock::now();
             bit32 state[4];
-            for (string pw : q.guesses)
-            {
-                if (test_set.find(pw) != test_set.end()) {
-                    cracked+=1;
-                }
-                // TODO：对于SIMD实验，将这里替换成你的SIMD MD5函数
-                MD5Hash(pw, state);
+            // for (string pw : q.guesses)
+            // {
+            //     if (test_set.find(pw) != test_set.end()) {
+            //         cracked+=1;
+            //     }
+            //     // TODO：对于SIMD实验，将这里替换成你的SIMD MD5函数
+            //     MD5Hash(pw, state);
 
-                // 以下注释部分用于输出猜测和哈希，但是由于自动测试系统不太能写文件，所以这里你可以改成cout
-                // a<<pw<<"\t";
-                // for (int i1 = 0; i1 < 4; i1 += 1)
-                // {
-                //     a << std::setw(8) << std::setfill('0') << hex << state[i1];
-                // }
-                // a << endl;
+            //     // 以下注释部分用于输出猜测和哈希，但是由于自动测试系统不太能写文件，所以这里你可以改成cout
+            //     // a<<pw<<"\t";
+            //     // for (int i1 = 0; i1 < 4; i1 += 1)
+            //     // {
+            //     //     a << std::setw(8) << std::setfill('0') << hex << state[i1];
+            //     // }
+            //     // a << endl;
+            // }
+
+            /* ---------- 遍历所有线程缓冲 ---------- */
+            for (auto &vec : q.guesses_pool)
+            {
+                for (string &pw : vec)
+                {
+                    if (test_set.find(pw) != test_set.end())
+                    {
+                        cracked += 1;
+                    }
+                    MD5Hash(pw, state); // 或 SIMD 批量
+                }
+                vec.clear(); // 这一线程的猜测用完即清空
             }
 
             // 在这里对哈希所需的总时长进行计算
@@ -118,7 +139,10 @@ int main()
             // 记录已经生成的口令总数
             history += curr_num;
             curr_num = 0;
-            q.guesses.clear();
+            // q.guesses.clear();
+            // 当你把缓冲清空后，需要把 curr_num 也置零
+            for (auto &v : q.guesses_pool)
+                v.clear();
         }
     }
 }
