@@ -160,7 +160,7 @@ public:
     int total_guesses = 0;
     // vector<string> guesses;
 
-    int                           num_threads = 8;          // 线程数，可在 init() 前改
+    int                           num_threads = 4;          // 线程数，可在 init() 前改
     vector<vector<string>>        guesses_pool;             // [tid] -> 线程私有口令
  
 };
