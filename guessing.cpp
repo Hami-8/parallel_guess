@@ -1,5 +1,8 @@
 #include "PCFG.h"
 using namespace std;
+#include <chrono>
+std::atomic<long long> g_generate_us{0};   // 微秒累计
+std::atomic<long long> g_merge_us{0};
 
 void PriorityQueue::CalProb(PT &pt)
 {
@@ -181,6 +184,8 @@ vector<PT> PT::NewPTs()
 // 尽量看懂，然后进行并行实现
 void PriorityQueue::Generate(PT pt)
 {
+    using namespace std::chrono;
+    auto t_start = high_resolution_clock::now();      // ⟵ 开始
     // 计算PT的概率，这里主要是给PT的概率进行初始化
     CalProb(pt);
 
@@ -270,4 +275,6 @@ void PriorityQueue::Generate(PT pt)
             total_guesses += 1;
         }
     }
+    auto t_end   = high_resolution_clock::now();      // ⟵ 结束
+    g_generate_us += duration_cast<microseconds>(t_end - t_start).count();
 }

@@ -5,6 +5,9 @@
 #include <omp.h>
 // #include <chrono>   
 // using namespace chrono;
+// 顶部插入 ↓
+#include <pthread.h>
+#include <atomic>
 using namespace std;
 
 class segment
@@ -158,6 +161,13 @@ public:
     // 将优先队列最前面的一个PT
     void PopNext();
     int total_guesses = 0;
-    // std::vector<std::vector<std::string>> guesses;// ← 线程私有槽，每槽对应一个 tid
     vector<string> guesses;
+
+    std::atomic<long long> total_guesses_atomic{0};   // 并发安全计数
+
+    /* 并行相关 ↓ */
+    int                           num_threads = 4;      // 可 run‑time 调整
+    vector<vector<string>>        guesses_pool;         // [tid] -> 口令列表
+    vector<size_t>                pool_size_snapshot;   // main 用来快速计数
+
 };

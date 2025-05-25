@@ -2,37 +2,28 @@
 
 #include <pthread.h>
 #include <atomic>
+#include <chrono>
+std::atomic<long long> g_generate_us{0};   // 微秒累计
 
-// ---------------------------- 线程配置 -----------------------------
-#ifndef THREAD_NUM
-#define THREAD_NUM 7            // 可在编译命令中 -DTHREAD_NUM=N 动态修改
-#endif
 
-// --------------------- 帮助数据结构和函数 -------------------------
-namespace {
-struct ThreadArg {
-    int  tid;
-    int  begin;
-    int  end;
-    const std::string *prefix;
-    const segment      *seg;
-    std::vector<std::string> *slot;   // 直接指向 PriorityQueue::guesses[tid]
+const int NUM_THREADS = 8; 
+
+// ---------- 线程参数 ----------
+/* ---------- 1. 线程 worker ---------- */
+struct TaskArg {
+    const vector<string>* values;
+    string                prefix;
+    size_t                begin, end;
+    vector<string>*       out;     // ← 指向 guesses_pool[tid]
 };
-
-void *generate_worker(void *arg_ptr) {
-    ThreadArg *arg = static_cast<ThreadArg*>(arg_ptr);
-    std::vector<std::string> &out = *arg->slot;
-    const std::string &pre = *arg->prefix;
-    const segment *seg = arg->seg;
-    // out.reserve(out.size() + (arg->end - arg->begin));
-
-    for (int i = arg->begin; i < arg->end; ++i)
-        out.emplace_back(pre + seg->ordered_values[i]);
+static void* worker(void* p) {
+    auto* arg = static_cast<TaskArg*>(p);
+    arg->out->reserve(arg->end - arg->begin);
+    for (size_t i = arg->begin; i < arg->end; ++i) {
+        arg->out->emplace_back(arg->prefix + (*arg->values)[i]);
+    }
     return nullptr;
 }
-} // namespace
-// anonymous namespace
-// using namespace std;
 
 void PriorityQueue::CalProb(PT &pt)
 {
@@ -120,6 +111,7 @@ void PriorityQueue::init()
         priority.emplace_back(pt);
     }
     // cout << "priority size:" << priority.size() << endl;
+    guesses_pool.assign(num_threads, {});
 }
 
 void PriorityQueue::PopNext()
@@ -212,51 +204,97 @@ vector<PT> PT::NewPTs()
 
 // 这个函数是PCFG并行化算法的主要载体
 // 尽量看懂，然后进行并行实现
+// 这个函数是PCFG并行化算法的主要载体
+// 尽量看懂，然后进行并行实现
 void PriorityQueue::Generate(PT pt)
 {
-    CalProb(pt);   // 初始概率
+    if (guesses_pool.empty())
+    {
+        std::cerr << "ERROR: guesses_pool not initialized\n";
+        std::abort();
+    }
+    if ((int)guesses_pool.size() < num_threads)
+    {
+        std::cerr << "ERROR: guesses_pool size < num_threads\n";
+        std::abort();
+    }
 
-    // 保证 guesses 向量按需扩容
-    if (guesses.empty()) guesses.resize(THREAD_NUM);
+    using namespace std::chrono;
+    auto t_start = high_resolution_clock::now();      // ⟵ 开始
+    /* ---------- 0. 先算出 pt 的概率（与原逻辑一致） ---------- */
+    CalProb(pt);
 
-    auto launch_threads = [&](const std::string &prefix,const segment *seg,int total){
-        const int chunk = (total + THREAD_NUM - 1) / THREAD_NUM;
-        pthread_t th[THREAD_NUM];
-        ThreadArg arg[THREAD_NUM];
-        for (int t = 0; t < THREAD_NUM; ++t) {
-            int L = t * chunk;
-            int R = std::min(total, L + chunk);
-            arg[t] = {t, L, R, &prefix, seg, &guesses[t]};
-            pthread_create(&th[t], nullptr, generate_worker, &arg[t]);
+    /* ---------- 1. 准备 prefix 和最后一个 segment 指针 ---------- */
+    string   prefix;               // 已确定的前缀
+    segment* a       = nullptr;    // 指向模型中“最后一段”的统计
+    size_t   lastIdx = 0;          // pt.max_indices 下标
+
+    if (pt.content.size() == 1) {          // ===== 单 segment 情况 =====
+        lastIdx = 0;
+        if (pt.content[0].type == 1)
+            a = &m.letters[m.FindLetter(pt.content[0])];
+        else if (pt.content[0].type == 2)
+            a = &m.digits[m.FindDigit(pt.content[0])];
+        else
+            a = &m.symbols[m.FindSymbol(pt.content[0])];
+
+        prefix.clear();                    // 单段无前缀
+    }
+    else {                                 // ===== 多 segment 情况 =====
+        lastIdx = pt.content.size() - 1;
+
+        // ---- 拼接 prefix（除最后一个 segment 以外） ----
+        int seg_idx = 0;
+        for (int idx : pt.curr_indices) {
+            if (seg_idx == lastIdx) break;
+
+            if (pt.content[seg_idx].type == 1)
+                prefix += m.letters[m.FindLetter(pt.content[seg_idx])].ordered_values[idx];
+            else if (pt.content[seg_idx].type == 2)
+                prefix += m.digits[m.FindDigit(pt.content[seg_idx])].ordered_values[idx];
+            else
+                prefix += m.symbols[m.FindSymbol(pt.content[seg_idx])].ordered_values[idx];
+
+            ++seg_idx;
         }
-        for (int t = 0; t < THREAD_NUM; ++t) pthread_join(th[t], nullptr);
-        total_guesses += total;
-    };
 
-    // -------- CASE A : 单 segment --------
-    if (pt.content.size() == 1) {
-        const segment *s=nullptr;
-        if (pt.content[0].type==1) s=&m.letters[m.FindLetter(pt.content[0])];
-        if (pt.content[0].type==2) s=&m.digits[m.FindDigit(pt.content[0])];
-        if (pt.content[0].type==3) s=&m.symbols[m.FindSymbol(pt.content[0])];
-        launch_threads(std::string(),s,pt.max_indices[0]);
-        return;
+        // ---- 找到最后一段指针 ----
+        const segment& lastSeg = pt.content[lastIdx];
+        if (lastSeg.type == 1)
+            a = &m.letters[m.FindLetter(lastSeg)];
+        else if (lastSeg.type == 2)
+            a = &m.digits[m.FindDigit(lastSeg)];
+        else
+            a = &m.symbols[m.FindSymbol(lastSeg)];
     }
 
+    /* ---------- 2. 并行调度 ---------- */
+    size_t totalVals = pt.max_indices[lastIdx];
+    int T = std::min(num_threads, (int)totalVals);
+    size_t chunk = (totalVals + T - 1) / T;
 
-    // -------- CASE B : 多 segment，最后一段待填充 --------
-    std::string prefix;
-    for (size_t k=0;k<pt.curr_indices.size();++k){
-        if (k==pt.content.size()-1) break;
-        int idx = pt.curr_indices[k];
-        if (pt.content[k].type==1) prefix+=m.letters[m.FindLetter(pt.content[k])].ordered_values[idx];
-        if (pt.content[k].type==2) prefix+=m.digits[m.FindDigit(pt.content[k])].ordered_values[idx];
-        if (pt.content[k].type==3) prefix+=m.symbols[m.FindSymbol(pt.content[k])].ordered_values[idx];
+    pthread_t tids[T];
+    TaskArg args[T];
+
+    for (int t = 0; t < T; ++t)
+    {
+        size_t L = t * chunk;
+        size_t R = std::min(totalVals, L + chunk);
+        if (L >= R)
+        {
+            T = t;
+            break;
+        } // 少于线程数
+        args[t] = {&a->ordered_values, prefix, L, R, &guesses_pool[t]};
+        pthread_create(&tids[t], nullptr, worker, &args[t]);
     }
-    const segment *last=nullptr;
-    const segment &sg = pt.content.back();
-    if (sg.type==1) last=&m.letters[m.FindLetter(sg)];
-    if (sg.type==2) last=&m.digits[m.FindDigit(sg)];
-    if (sg.type==3) last=&m.symbols[m.FindSymbol(sg)];
-    launch_threads(prefix,last,pt.max_indices.back());
+    for (int t = 0; t < T; ++t)
+        pthread_join(tids[t], nullptr);
+
+    /* ---------- 4. 更新计数 ---------- */
+    total_guesses           += totalVals;
+    total_guesses_atomic    += totalVals;
+
+    auto t_end   = high_resolution_clock::now();      // ⟵ 结束
+    g_generate_us += duration_cast<microseconds>(t_end - t_start).count();
 }
