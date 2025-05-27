@@ -74,7 +74,7 @@ int main()
 
             // 在此处更改实验生成的猜测上限
             int generate_n=10000000;
-            if (history + q.total_guesses > 10000000)
+            if (history + q.total_guesses > generate_n)
             {
                 auto end = system_clock::now();
                 auto duration = duration_cast<microseconds>(end - start);
