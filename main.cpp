@@ -18,15 +18,16 @@ extern std::atomic<long long> g_generate_us;   // 仅 generate 函数的时间
 
 
 // pthread 编译指令
+// g++ main.cpp train.cpp guessing_pthread.cpp md5.cpp -o main -pthread
+// g++ main.cpp train.cpp guessing_pthread.cpp md5.cpp -o main -pthread -O1
 // g++ main.cpp train.cpp guessing_pthread.cpp md5.cpp -o main -pthread -O2
 
-// g++ main.cpp train.cpp guessing_pthread.cpp md5_SIMD.cpp -o main -pthread
-// g++ main.cpp train.cpp guessing_pthread.cpp md5_SIMD.cpp -o main -pthread -O1
-// g++ main.cpp train.cpp guessing_pthread.cpp md5_SIMD.cpp -o main -pthread -O2
 
 // bash test.sh 2 1 4
 
 // openmp 编译指令
+// g++ main.cpp train.cpp guessing_openmp.cpp md5.cpp -o main -fopenmp
+// g++ main.cpp train.cpp guessing_openmp.cpp md5.cpp -o main -fopenmp -O1
 // g++ main.cpp train.cpp guessing_openmp.cpp md5.cpp -o main -fopenmp -O2
 
 // bash test.sh 3 1 4
