@@ -1,5 +1,5 @@
 /*
-MPI 的main
+MPI 的 main
 */
 #include "PCFG.h"
 #include <chrono>
@@ -8,6 +8,7 @@ MPI 的main
 // #include "md5_SIMD.h"
 #include <iomanip>
 #include <mpi.h> 
+#include <unordered_set>
 using namespace std;
 using namespace chrono;
 
@@ -16,7 +17,7 @@ extern std::atomic<long long> g_generate_us;   // 声明
 
 
 // 编译指令如下
-// mpic++ -std=c++17 main_mpi.cpp train.cpp guessing_mpi.cpp md5.cpp -o main -O2
+// mpic++ -std=c++17 main_mpi_correctness.cpp train.cpp guessing_mpi.cpp md5.cpp -o main -O2
 
 // qsub qsub_mpi.sh
 // qstat
@@ -90,6 +91,22 @@ int RootMain()
     auto duration_train = duration_cast<microseconds>(end_train - start_train);
     time_train = double(duration_train.count()) * microseconds::period::num / microseconds::period::den;
 
+    // 加载一些测试数据
+    unordered_set<std::string> test_set;
+    ifstream test_data("/guessdata/Rockyou-singleLined-full.txt");
+    int test_count=0;
+    string pw;
+    while(test_data>>pw)
+    {   
+        test_count+=1;
+        test_set.insert(pw);
+        if (test_count>=1000000)
+        {
+            break;
+        }
+    }
+    int cracked=0;
+
     q.init();
     cout << "here" << endl;
     int curr_num = 0;
@@ -119,6 +136,7 @@ int RootMain()
                 cout << "Generate total time: "
                      << std::fixed << std::setprecision(6)
                      << (g_generate_us.load() / 1e6) << " seconds" << endl;
+                cout<<"Cracked:"<< cracked<<endl;
                 break;
             }
         }
@@ -130,6 +148,10 @@ int RootMain()
             bit32 state[4];
             for (string pw : q.guesses)
             {
+                if (test_set.erase(pw)) {
+                    cracked+=1;
+                }
+                
                 // TODO：对于SIMD实验，将这里替换成你的SIMD MD5函数
                 MD5Hash(pw, state);
 

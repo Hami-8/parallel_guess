@@ -6,179 +6,11 @@ using namespace std;
 #include <cstring>   // std::memcpy
 std::atomic<long long> g_generate_us{0};   // 微秒累计
 std::atomic<long long> g_merge_us{0};
-static MPI_Comm pw_comm = MPI_COMM_WORLD;
-
-
-void Generate_MPI_Worker(int maxN)
-{
-    /* 此函数执行下列步骤：
-       1) 已经拿到 maxN —— 就按和 root 同样的 Bcast 顺序
-          再连续 MPI_Bcast prefix / lens[] / flat_values
-       2) 划分 rank 自己的 [start,end) 区间
-       3) 拼接本地口令（可直接丢弃或统计条数即可）
-    */
-
-    int rank, size; 
-    MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-    MPI_Comm_size(MPI_COMM_WORLD,&size);
-
-    /* --- 接收 prefix --- */
-    int plen;  MPI_Bcast(&plen,1,MPI_INT,0,MPI_COMM_WORLD);
-    std::string prefix(plen,'\0');
-    if (plen) MPI_Bcast(prefix.data(), plen, MPI_CHAR, 0, MPI_COMM_WORLD);
-
-    /* --- 接收 lens[] 与扁平值块 --- */
-    std::vector<int> lens(maxN);
-    MPI_Bcast(lens.data(), maxN, MPI_INT, 0, MPI_COMM_WORLD);
-
-    int flatLen; MPI_Bcast(&flatLen,1,MPI_INT,0,MPI_COMM_WORLD);
-    std::string flat(flatLen,'\0');
-    if (flatLen) MPI_Bcast(flat.data(), flatLen, MPI_CHAR, 0, MPI_COMM_WORLD);
-
-    /* --- 切割 value 字符串 --- */
-    std::vector<std::string> segVals(maxN);
-    int off=0;
-    for(int i=0;i<maxN;++i){
-        segVals[i].assign(flat.data()+off, (size_t)lens[i]);
-        off += lens[i];
-    }
-
-    /* --- 计算工作区间并生成 (可省内存只统计) --- */
-    int base = maxN / size, extra = maxN % size;
-    int start = rank*base + std::min(rank,extra);
-    int end   = start + base + (rank<extra);
-
-    for(int i=start;i<end;++i){
-        /* 若只需算 MD5、或只需返回条数，这里可省内存 */
-        volatile std::string tmp = prefix + segVals[i];
-        (void)tmp;      // 占位，防优化
-    }
-}
-
-
-/* 被动服务：不停接收 Generate_MPI 的广播，直至 stop_flag=-1 */
-void WorkerLoop()
-{
-    int flag;
-    while (true)
-    {
-        /* 先探测是否有“停止”广播 */
-        MPI_Bcast(&flag, 1, MPI_INT, 0, MPI_COMM_WORLD);
-
-        if (flag == -1) break;                 // 主进程宣告任务完成
-
-        /* —— 其余情况：flag 就是 maxN —— */
-        /* 我们需要把它推回缓冲，让 Generate_MPI_Worker() 能正常取到 —— */
-        /* 方案：用 MPI_Bcast 'MPI_IN_PLACE' 回填，或直接调用一个只做“接收” */
-        Generate_MPI_Worker(flag);             
-    }
-}
 
 
 
-// ────────────────────────────────────────────────────────────────
-// 把每个进程的 vector<string> 聚合到 root
-// root_buf 只在 root 内部填充，其余进程可传一个 dummy 变量
-// ────────────────────────────────────────────────────────────────
-void gather_strings_to_root(const std::vector<std::string>& local,
-                            int root, MPI_Comm comm,
-                            std::vector<std::string>& root_buf)
-{
-    int rank, size;
-    MPI_Comm_rank(comm, &rank);
-    MPI_Comm_size(comm, &size);
 
-    /* ----------------------------------------------------------
-     * ① 先收集“每个进程有多少条字符串”
-     * -------------------------------------------------------- */
-    int local_count = static_cast<int>(local.size());
-    std::vector<int> all_counts(size);        // 仅 root 用到
-    MPI_Gather(&local_count, 1, MPI_INT,
-               all_counts.data(), 1, MPI_INT,
-               root, comm);
 
-    /* ----------------------------------------------------------
-     * ② 收集每条字符串长度（变长数据，需要 Gatherv）
-     * -------------------------------------------------------- */
-    std::vector<int> local_lens(local_count);
-    for (int i = 0; i < local_count; ++i)
-        local_lens[i] = static_cast<int>(local[i].size());
-
-    // 统计全局元素总数 (root 端)
-    int total_strings = 0;
-    if (rank == root)
-        total_strings = std::accumulate(all_counts.begin(),
-                                        all_counts.end(), 0);
-
-    // root 预分配长度数组
-    std::vector<int> all_lens;
-    std::vector<int> lens_disp;
-    if (rank == root) {
-        all_lens.resize(total_strings);
-        lens_disp.resize(size, 0);
-        for (int i = 1; i < size; ++i)
-            lens_disp[i] = lens_disp[i - 1] + all_counts[i - 1];
-    }
-
-    MPI_Gatherv(local_lens.data(),            // sendbuf
-                local_count, MPI_INT,
-                /*root recv*/ (rank==root ? all_lens.data() : nullptr),
-                /*recvcounts*/ (rank==root ? all_counts.data() : nullptr),
-                /*displs*/     (rank==root ? lens_disp.data() : nullptr),
-                MPI_INT, root, comm);
-
-    /* ----------------------------------------------------------
-     * ③ 收集真正的字节内容（再次 Gatherv）
-     * -------------------------------------------------------- */
-    // 把本地字符串扁平化
-    int local_bytes = 0;
-    for (const auto& s : local) local_bytes += static_cast<int>(s.size());
-
-    std::vector<char> byte_buf(local_bytes);
-    int offset = 0;
-    for (const auto& s : local) {
-        std::memcpy(byte_buf.data() + offset, s.data(), s.size());
-        offset += static_cast<int>(s.size());
-    }
-
-    // root 准备全局缓冲
-    std::vector<int> bytes_counts(size), bytes_disp(size, 0);
-    MPI_Gather(&local_bytes, 1, MPI_INT,
-               bytes_counts.data(), 1, MPI_INT,
-               root, comm);
-
-    int total_bytes = 0;
-    if (rank == root) {
-        total_bytes = std::accumulate(bytes_counts.begin(),
-                                      bytes_counts.end(), 0);
-        for (int i = 1; i < size; ++i)
-            bytes_disp[i] = bytes_disp[i - 1] + bytes_counts[i - 1];
-    }
-
-    std::vector<char> all_bytes;
-    if (rank == root) all_bytes.resize(total_bytes);
-
-    MPI_Gatherv(byte_buf.data(), local_bytes, MPI_CHAR,
-                (rank==root ? all_bytes.data() : nullptr),
-                (rank==root ? bytes_counts.data() : nullptr),
-                (rank==root ? bytes_disp.data() : nullptr),
-                MPI_CHAR, root, comm);
-
-    /* ----------------------------------------------------------
-     * ④ root 端重建 vector<string>
-     * -------------------------------------------------------- */
-    if (rank == root) {
-        root_buf.clear();
-        root_buf.reserve(total_strings);
-
-        int cur_byte = 0;
-        for (int len : all_lens) {
-            root_buf.emplace_back(all_bytes.data() + cur_byte,
-                                   static_cast<size_t>(len));
-            cur_byte += len;
-        }
-    }
-}
 
 void PriorityQueue::CalProb(PT &pt)
 {
@@ -355,133 +187,236 @@ vector<PT> PT::NewPTs()
     return res;
 }
 
+void PriorityQueue::GenerateSerial(PT pt)
+{
+    using namespace std::chrono;
+    auto t_start = high_resolution_clock::now();      // ⟵ 开始
+    // 计算PT的概率，这里主要是给PT的概率进行初始化
+    CalProb(pt);
+
+    // 对于只有一个segment的PT，直接遍历生成其中的所有value即可
+    if (pt.content.size() == 1)
+    {
+        // 指向最后一个segment的指针，这个指针实际指向模型中的统计数据
+        segment *a;
+        // 在模型中定位到这个segment
+        if (pt.content[0].type == 1)
+        {
+            a = &m.letters[m.FindLetter(pt.content[0])];
+        }
+        if (pt.content[0].type == 2)
+        {
+            a = &m.digits[m.FindDigit(pt.content[0])];
+        }
+        if (pt.content[0].type == 3)
+        {
+            a = &m.symbols[m.FindSymbol(pt.content[0])];
+        }
+        
+        // Multi-thread TODO：
+        // 这个for循环就是你需要进行并行化的主要部分了，特别是在多线程&GPU编程任务中
+        // 可以看到，这个循环本质上就是把模型中一个segment的所有value，赋值到PT中，形成一系列新的猜测
+        // 这个过程是可以高度并行化的
+        for (int i = 0; i < pt.max_indices[0]; i += 1)
+        {
+            string guess = a->ordered_values[i];
+            // cout << guess << endl;
+            guesses.emplace_back(guess);
+            total_guesses += 1;
+        }
+    }
+    else
+    {
+        string guess;
+        int seg_idx = 0;
+        // 这个for循环的作用：给当前PT的所有segment赋予实际的值（最后一个segment除外）
+        // segment值根据curr_indices中对应的值加以确定
+        // 这个for循环你看不懂也没太大问题，并行算法不涉及这里的加速
+        for (int idx : pt.curr_indices)
+        {
+            if (pt.content[seg_idx].type == 1)
+            {
+                guess += m.letters[m.FindLetter(pt.content[seg_idx])].ordered_values[idx];
+            }
+            if (pt.content[seg_idx].type == 2)
+            {
+                guess += m.digits[m.FindDigit(pt.content[seg_idx])].ordered_values[idx];
+            }
+            if (pt.content[seg_idx].type == 3)
+            {
+                guess += m.symbols[m.FindSymbol(pt.content[seg_idx])].ordered_values[idx];
+            }
+            seg_idx += 1;
+            if (seg_idx == pt.content.size() - 1)
+            {
+                break;
+            }
+        }
+
+        // 指向最后一个segment的指针，这个指针实际指向模型中的统计数据
+        segment *a;
+        if (pt.content[pt.content.size() - 1].type == 1)
+        {
+            a = &m.letters[m.FindLetter(pt.content[pt.content.size() - 1])];
+        }
+        if (pt.content[pt.content.size() - 1].type == 2)
+        {
+            a = &m.digits[m.FindDigit(pt.content[pt.content.size() - 1])];
+        }
+        if (pt.content[pt.content.size() - 1].type == 3)
+        {
+            a = &m.symbols[m.FindSymbol(pt.content[pt.content.size() - 1])];
+        }
+        
+        // Multi-thread TODO：
+        // 这个for循环就是你需要进行并行化的主要部分了，特别是在多线程&GPU编程任务中
+        // 可以看到，这个循环本质上就是把模型中一个segment的所有value，赋值到PT中，形成一系列新的猜测
+        // 这个过程是可以高度并行化的
+        for (int i = 0; i < pt.max_indices[pt.content.size() - 1]; i += 1)
+        {
+            string temp = guess + a->ordered_values[i];
+            // cout << temp << endl;
+            guesses.emplace_back(temp);
+            total_guesses += 1;
+        }
+    }
+    auto t_end   = high_resolution_clock::now();      // ⟵ 结束
+    g_generate_us += duration_cast<microseconds>(t_end - t_start).count();
+}
+
 
 // 这个函数是PCFG并行化算法的主要载体
 // 尽量看懂，然后进行并行实现
+/* root 专用：把最后一个 segment 的所有 value 划片给 worker 并收集结果
+ * 假设外层保证 size >= 1；若 size==1 直接调用 GenerateSerial()
+ */
 void PriorityQueue::Generate(PT pt)
 {
     using namespace std::chrono;
+
     int rank, size;
-    MPI_Comm_rank(pw_comm, &rank);
-    MPI_Comm_size(pw_comm, &size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);     // 这里 rank 必然是 0
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    /* 单进程时直接退化为串行 Generate --------------------------- */
-    // if (size == 1) { Generate(pt); return; }
-
-    auto t0 = high_resolution_clock::now();
-
-    if (rank == 0) CalProb(pt);          // 概率初始化仅 root 需要
-
-    /******** 1. root 构造 prefix、最后一个 segment 的 value 列表 ********/
-    segment *last_seg = nullptr;
-    std::string prefix;                  // 若 PT 只有 1 段，则为空串
-    int maxN = 0;                        // value 个数
-
-    if (rank == 0)
-    {
-        /* ① 找到最后一个 segment 在模型中的指针 ------------------- */
-        auto locate_seg_ptr = [&](segment &sg) -> segment* {
-            if (sg.type == 1) return &m.letters[m.FindLetter(sg)];
-            if (sg.type == 2) return &m.digits [m.FindDigit (sg)];
-            return            &m.symbols[m.FindSymbol(sg)];
-        };
-
-        // 只有 1 个 segment
-        if (pt.content.size() == 1)
-        {
-            last_seg = locate_seg_ptr(pt.content[0]);
-        }
-        else
-        {
-            /* ② 先拼 prefix（除最后一段外的各 segment value） ------ */
-            int idx_seg = 0;
-            for (int idx_val : pt.curr_indices)
-            {
-                if (idx_seg == pt.content.size() - 1) break;
-                segment &sg = pt.content[idx_seg];
-                if (sg.type == 1)
-                    prefix += m.letters[m.FindLetter(sg)].ordered_values[idx_val];
-                if (sg.type == 2)
-                    prefix += m.digits[m.FindDigit(sg)].ordered_values[idx_val];
-                if (sg.type == 3)
-                    prefix += m.symbols[m.FindSymbol(sg)].ordered_values[idx_val];
-                ++idx_seg;
-            }
-            last_seg = locate_seg_ptr(pt.content.back());
-        }
-        maxN = pt.max_indices.back();    // 最后一段 value 总数
+    if(size == 1) {           // 单进程退化为串行
+        GenerateSerial(pt);
+        return;
     }
 
-    /******** 2. 广播公共参数：maxN、prefix、value 列表 ********/
-    MPI_Bcast(&maxN, 1, MPI_INT, 0, pw_comm);
+    /*------------------------------------------------------------
+     * 0. root 构造公共数据：prefix、最后一段的 ordered_values[]
+     *-----------------------------------------------------------*/
+    string prefix;                 // 若 PT 只有 1 段，它为空
+    segment *last_seg = nullptr;   // 指向模型中最后 segment
+    if(pt.content.size() == 1) {
+        auto &sg = pt.content[0];
+        if(sg.type==1) last_seg=&m.letters[m.FindLetter(sg)];
+        if(sg.type==2) last_seg=&m.digits [m.FindDigit (sg)];
+        if(sg.type==3) last_seg=&m.symbols[m.FindSymbol(sg)];
+    } else {
+        /* 拼除最后一段外的前缀 */
+        for(size_t i=0;i<pt.content.size()-1;i++){
+            int idx = pt.curr_indices[i];
+            auto &sg = pt.content[i];
+            if(sg.type==1) prefix += m.letters[m.FindLetter(sg)].ordered_values[idx];
+            if(sg.type==2) prefix += m.digits [m.FindDigit (sg)].ordered_values[idx];
+            if(sg.type==3) prefix += m.symbols[m.FindSymbol(sg)].ordered_values[idx];
+        }
+        /* 取最后一段 pointer */
+        auto &sg = pt.content.back();
+        if(sg.type==1) last_seg=&m.letters[m.FindLetter(sg)];
+        if(sg.type==2) last_seg=&m.digits [m.FindDigit (sg)];
+        if(sg.type==3) last_seg=&m.symbols[m.FindSymbol(sg)];
+    }
 
-    /* ---- prefix ---- */
-    int plen = (rank == 0) ? static_cast<int>(prefix.size()) : 0;
-    MPI_Bcast(&plen, 1, MPI_INT, 0, pw_comm);
-    if (rank != 0) prefix.resize(plen);
-    void *prefix_buf = (plen == 0) ? nullptr
-                                   : const_cast<char *>(prefix.data());
-    MPI_Bcast(prefix_buf, plen, MPI_CHAR, 0, pw_comm);
+    int N = last_seg->ordered_values.size();      // 循环总数
 
-    /* ---- value 列表：先广播长度数组，再广播扁平字符块 ---- */
-    std::vector<int> lens(maxN);          // 每个 value 的字符长度
-    std::string      flat_values;         // 所有 value 拼接
+    /*------------------------------------------------------------
+     * 1. 把 ordered_values 扁平成 “\0” 分隔的 char 缓冲 flatBuf
+     *    并构造 offset[i] → 每个 value 起始偏移
+     *-----------------------------------------------------------*/
+    vector<char>  flatBuf;
+    vector<int>   offset;               // N+1: 最后一个元素是总长
+    offset.reserve(N+1);
 
-    if (rank == 0)
+    size_t pos = 0;
+    for(const string &v : last_seg->ordered_values){
+        offset.push_back(static_cast<int>(pos));
+        pos += v.size() + 1;            // +1 记录 '\0'
+    }
+    offset.push_back(static_cast<int>(pos));      // 末尾
+    flatBuf.resize(pos);
+
+    /* 填充 flatBuf */
     {
-        lens.reserve(maxN);
-        for (int i = 0; i < maxN; ++i)
-        {
-            const std::string &v = last_seg->ordered_values[i];
-            lens[i] = static_cast<int>(v.size());
-            flat_values += v;
+        char *p = flatBuf.data();
+        for(const string &v : last_seg->ordered_values){
+            memcpy(p, v.c_str(), v.size()+1);
+            p += v.size()+1;
         }
     }
 
-    MPI_Bcast(lens.data(), maxN, MPI_INT, 0, pw_comm);
+    /*------------------------------------------------------------
+     * 2. 广播任务给所有进程
+     *    顺序：N → prefix → flatBuf → offset
+     *-----------------------------------------------------------*/
+    auto bcast_str = [](string &s){
+        int len = s.size();
+        MPI_Bcast(&len,1,MPI_INT,0,MPI_COMM_WORLD);
+        if(len){
+            if(MPI::COMM_WORLD.Get_rank()!=0) s.resize(len);
+            MPI_Bcast(s.data(),len,MPI_CHAR,0,MPI_COMM_WORLD);
+        }
+    };
 
-    int flatLen = (rank == 0) ? static_cast<int>(flat_values.size()) : 0;
-    MPI_Bcast(&flatLen, 1, MPI_INT, 0, pw_comm);
-    if (rank != 0) flat_values.resize(flatLen);
-    void *flat_buf = (flatLen == 0) ? nullptr
-                                    : const_cast<char *>(flat_values.data());
-    MPI_Bcast(flat_buf, flatLen, MPI_CHAR, 0, pw_comm);
+    MPI_Bcast(&N,1,MPI_INT,0,MPI_COMM_WORLD);         // (a) N
+    bcast_str(prefix);                                 // (b) prefix
 
-    /* 非 root 分割 flat_values → segVals --------------------- */
-    std::vector<std::string> segVals(maxN);
-    int offset = 0;
-    for (int i = 0; i < maxN; ++i)
-    {
-        segVals[i].assign(flat_values.data() + offset,
-                          static_cast<size_t>(lens[i]));
-        offset += lens[i];
+    int bufLen = flatBuf.size();
+    MPI_Bcast(&bufLen,1,MPI_INT,0,MPI_COMM_WORLD);     // (c.1) flatBuf 长度
+    MPI_Bcast(flatBuf.data(),bufLen,MPI_CHAR,0,MPI_COMM_WORLD); // (c.2) 实际内容
+
+    int offLen = offset.size();
+    MPI_Bcast(&offLen,1,MPI_INT,0,MPI_COMM_WORLD);     // (d.1) offset 长度
+    MPI_Bcast(offset.data(),offLen,MPI_INT,0,MPI_COMM_WORLD);   // (d.2) offset 内容
+
+    /*------------------------------------------------------------
+     * 3. root 自己也生成一片：按“等块划分”策略
+     *-----------------------------------------------------------*/
+    int base  = N / size;
+    int extra = N % size;
+    int start = 0 * base + std::min(0,extra);
+    int end   = start + base + (0 < extra);
+
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+
+    for(int i = start; i < end; ++i){
+        const char* val = flatBuf.data() + offset[i];
+        string guess = prefix + string(val);
+        guesses.emplace_back(std::move(guess));
+        total_guesses++;
     }
 
-    /******** 3. 均匀划分 value 下标区间 & 本地拼接 ********/
-    int base  = maxN / size;
-    int extra = maxN % size;
-    int start = rank * base + std::min(rank, extra);
-    int end   = start + base + (rank < extra);
+    /*------------------------------------------------------------
+     * 4. 接收每个 worker 的结果 (bytes + payload)
+     *-----------------------------------------------------------*/
+    for(int src=1; src<size; ++src){
+        int bytes = 0;
+        MPI_Recv(&bytes,1,MPI_INT,src,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+        if(bytes==0) continue;
+        vector<char> buf(bytes);
+        MPI_Recv(buf.data(),bytes,MPI_CHAR,src,1,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 
-    std::vector<std::string> local;
-    local.reserve(end - start);
-
-    for (int i = start; i < end; ++i)
-        local.emplace_back(prefix + segVals[i]);
-
-    /******** 4. 回收到 root，并统计 g_generate_us ********/
-    std::vector<std::string> root_buf;      // 仅 root 写入
-    gather_strings_to_root(local, 0, pw_comm, root_buf);
-
-    if (rank == 0)
-    {
-        guesses.insert(guesses.end(),
-                       root_buf.begin(), root_buf.end());
-        total_guesses += static_cast<int>(root_buf.size());
-
-        auto t1 = high_resolution_clock::now();
-        g_generate_us += duration_cast<microseconds>(t1 - t0).count();
+        /* 把 buf 拆成字符串 */
+        char *p = buf.data();
+        while(p < buf.data()+bytes){
+            string g(p);
+            guesses.emplace_back(std::move(g));
+            p += g.size()+1;
+            total_guesses++;
+        }
     }
 
-    /* 其余 rank 直接返回 */
+    auto t_end = high_resolution_clock::now();
+    g_generate_us += duration_cast<microseconds>(t_end - t_start).count();
 }

@@ -158,6 +158,8 @@ public:
     // 对优先队列的一个PT，生成所有guesses
     void Generate(PT pt);
 
+    void GenerateSerial(PT pt);
+
     // 将优先队列最前面的一个PT
     void PopNext();
     int total_guesses = 0;
