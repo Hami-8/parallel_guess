@@ -307,33 +307,16 @@ Ordering letters
 Ordering digits
 ordering symbols
 here
-Guesses generated: 1066779
-Guesses generated: 2099628
-Guesses generated: 3252643
-Guesses generated: 3878579
-Guesses generated: 4767682
-Guesses generated: 5148570
-Guesses generated: 5797937
-Guesses generated: 6318400
-Guesses generated: 6780023
-Guesses generated: 7264179
-Guesses generated: 7693680
-Guesses generated: 7992732
-Guesses generated: 8393168
-Guesses generated: 8573903
-Guesses generated: 8673916
-Guesses generated: 8832746
-Guesses generated: 8981457
-Guesses generated: 9139690
-Guesses generated: 9349420
-Guesses generated: 9560032
-Guesses generated: 9681883
-Guesses generated: 9815138
-Guesses generated: 9950950
-Guesses generated: 10093049
-Guess time:0.427436seconds
-Hash time:2.8888seconds
-Train time:23.3716seconds
-Generate total time: 0.303561 seconds
+
+===================================================================================
+=   BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES
+=   PID 1652056 RUNNING AT master_ubss4
+=   EXIT CODE: 139
+=   CLEANING UP REMAINING PROCESSES
+=   YOU CAN IGNORE THE BELOW CLEANUP MESSAGES
+===================================================================================
+YOUR APPLICATION TERMINATED WITH THE EXIT STRING: Segmentation fault (signal 11)
+This typically refers to a problem with your application.
+Please see the FAQ page for debugging suggestions
 
 Authorized users only. All activities may be monitored and reported.

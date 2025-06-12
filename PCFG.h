@@ -160,6 +160,8 @@ public:
 
     void GenerateSerial(PT pt);
 
+    void BatchGenerateMPI(int K);
+
     // 将优先队列最前面的一个PT
     void PopNext();
     int total_guesses = 0;
