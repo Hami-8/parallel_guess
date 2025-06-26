@@ -173,3 +173,13 @@ public:
     vector<size_t>                pool_size_snapshot;   // main 用来快速计数
 
 };
+
+
+#ifdef USE_CUDA
+void GPUGenerateSingleSeg(segment* seg,
+                          std::vector<std::string>& out_vec);
+
+void GPUGenerateLastSeg(const std::string& prefix,
+                        segment* last_seg,
+                        std::vector<std::string>& out_vec);
+#endif
