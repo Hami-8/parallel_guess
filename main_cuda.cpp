@@ -14,6 +14,8 @@ using namespace chrono;
 #define USE_CUDA
 #endif
 
+
+
 extern std::atomic<long long> g_generate_us;   // 声明
 // extern std::atomic<long long> g_merge_us;
 

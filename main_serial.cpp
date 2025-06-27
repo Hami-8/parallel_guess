@@ -20,8 +20,12 @@ extern std::atomic<long long> g_generate_us;   // 声明
 
 // g++ main_serial.cpp train.cpp guessing.cpp md5_SIMD.cpp -o main
 
+// nvcc -std=c++17 -O2 main_serial.cpp train.cpp guessing.cpp md5.cpp -o main
 
-// bash test.sh 1 1 1
+
+
+// 执行
+// ./main      > test.o   2> test.e
 
 int main()
 {

@@ -1,6 +1,9 @@
 #include "PCFG.h"
 using namespace std;
 #include <chrono>
+#ifdef USE_CUDA
+#include "gpu_scheduler.h"
+#endif
 std::atomic<long long> g_generate_us{0};   // 微秒累计
 std::atomic<long long> g_merge_us{0};
 
@@ -95,8 +98,48 @@ void PriorityQueue::init()
 void PriorityQueue::PopNext()
 {
 
-    // 对优先队列最前面的PT，首先利用这个PT生成一系列猜测
-    Generate(priority.front());
+    // // 对优先队列最前面的PT，首先利用这个PT生成一系列猜测
+    // Generate(priority.front());
+
+#ifdef USE_CUDA
+    static Batch batch;
+#endif
+    /* ----- 原先第一段：Generate(PT) 改为： ----- */
+    PT cur = priority.front();          // 先取队首
+    priority.erase(priority.begin());   // 出队
+
+#ifdef USE_CUDA
+    int workload = cur.max_indices.back();   // suffix 数
+    if(workload < GPU_THRESHOLD){
+        GenerateCPU(cur);               // 小活直接 CPU
+    }else{
+        // 封装 Task
+        Task t;
+        if(cur.content.size()==1){
+            t.prefix="";
+            if(cur.content[0].type==1)
+                t.last_seg=&m.letters[m.FindLetter(cur.content[0])];
+            else if(cur.content[0].type==2)
+                t.last_seg=&m.digits[m.FindDigit(cur.content[0])];
+            else
+                t.last_seg=&m.symbols[m.FindSymbol(cur.content[0])];
+        }else{
+            t.prefix   = build_prefix(this, cur);
+            int ttype  = cur.content.back().type;
+            t.last_seg = (ttype==1)? &m.letters[m.FindLetter(cur.content.back())]:
+                          (ttype==2)? &m.digits [m.FindDigit(cur.content.back())]:
+                                     &m.symbols[m.FindSymbol(cur.content.back())];
+        }
+        t.workload = workload;
+        batch.tasks.emplace_back(std::move(t));
+        batch.total_pwd += workload;
+
+        if((int)batch.tasks.size() >= BATCH_MAX_PT)
+            SubmitBatchAndWait(batch, this);
+    }
+#else
+    GenerateCPU(cur);
+#endif
 
     // 然后需要根据即将出队的PT，生成一系列新的PT
     vector<PT> new_pts = priority.front().NewPTs();
@@ -177,6 +220,104 @@ vector<PT> PT::NewPTs()
     }
 
     return res;
+}
+
+
+void PriorityQueue::GenerateCPU(PT pt)
+{
+    using namespace std::chrono;
+    auto t_start = high_resolution_clock::now();      // ⟵ 开始
+    // 计算PT的概率，这里主要是给PT的概率进行初始化
+    CalProb(pt);
+
+    // 对于只有一个segment的PT，直接遍历生成其中的所有value即可
+    if (pt.content.size() == 1)
+    {
+        // 指向最后一个segment的指针，这个指针实际指向模型中的统计数据
+        segment *a;
+        // 在模型中定位到这个segment
+        if (pt.content[0].type == 1)
+        {
+            a = &m.letters[m.FindLetter(pt.content[0])];
+        }
+        if (pt.content[0].type == 2)
+        {
+            a = &m.digits[m.FindDigit(pt.content[0])];
+        }
+        if (pt.content[0].type == 3)
+        {
+            a = &m.symbols[m.FindSymbol(pt.content[0])];
+        }
+        
+        // Multi-thread TODO：
+        // 这个for循环就是你需要进行并行化的主要部分了，特别是在多线程&GPU编程任务中
+        // 可以看到，这个循环本质上就是把模型中一个segment的所有value，赋值到PT中，形成一系列新的猜测
+        // 这个过程是可以高度并行化的
+        for (int i = 0; i < pt.max_indices[0]; i += 1)
+        {
+            string guess = a->ordered_values[i];
+            // cout << guess << endl;
+            guesses.emplace_back(guess);
+            total_guesses += 1;
+        }
+    }
+    else
+    {
+        string guess;
+        int seg_idx = 0;
+        // 这个for循环的作用：给当前PT的所有segment赋予实际的值（最后一个segment除外）
+        // segment值根据curr_indices中对应的值加以确定
+        // 这个for循环你看不懂也没太大问题，并行算法不涉及这里的加速
+        for (int idx : pt.curr_indices)
+        {
+            if (pt.content[seg_idx].type == 1)
+            {
+                guess += m.letters[m.FindLetter(pt.content[seg_idx])].ordered_values[idx];
+            }
+            if (pt.content[seg_idx].type == 2)
+            {
+                guess += m.digits[m.FindDigit(pt.content[seg_idx])].ordered_values[idx];
+            }
+            if (pt.content[seg_idx].type == 3)
+            {
+                guess += m.symbols[m.FindSymbol(pt.content[seg_idx])].ordered_values[idx];
+            }
+            seg_idx += 1;
+            if (seg_idx == pt.content.size() - 1)
+            {
+                break;
+            }
+        }
+
+        // 指向最后一个segment的指针，这个指针实际指向模型中的统计数据
+        segment *a;
+        if (pt.content[pt.content.size() - 1].type == 1)
+        {
+            a = &m.letters[m.FindLetter(pt.content[pt.content.size() - 1])];
+        }
+        if (pt.content[pt.content.size() - 1].type == 2)
+        {
+            a = &m.digits[m.FindDigit(pt.content[pt.content.size() - 1])];
+        }
+        if (pt.content[pt.content.size() - 1].type == 3)
+        {
+            a = &m.symbols[m.FindSymbol(pt.content[pt.content.size() - 1])];
+        }
+        
+        // Multi-thread TODO：
+        // 这个for循环就是你需要进行并行化的主要部分了，特别是在多线程&GPU编程任务中
+        // 可以看到，这个循环本质上就是把模型中一个segment的所有value，赋值到PT中，形成一系列新的猜测
+        // 这个过程是可以高度并行化的
+        for (int i = 0; i < pt.max_indices[pt.content.size() - 1]; i += 1)
+        {
+            string temp = guess + a->ordered_values[i];
+            // cout << temp << endl;
+            guesses.emplace_back(temp);
+            total_guesses += 1;
+        }
+    }
+    auto t_end   = high_resolution_clock::now();      // ⟵ 结束
+    g_generate_us += duration_cast<microseconds>(t_end - t_start).count();
 }
 
 

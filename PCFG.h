@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <iostream>
 #include <unordered_map>
@@ -9,6 +10,13 @@
 #include <pthread.h>
 #include <atomic>
 using namespace std;
+
+// ---------------- CUDA Hybrid 统一配置 ----------------
+#ifdef USE_CUDA
+constexpr int GPU_THRESHOLD = 4096;   // 小于此 suffix 数目 → CPU 跑
+constexpr int BATCH_MAX_PT  =  64;    // 一批最多聚多少个 PT
+constexpr int MAX_PWD       =  64;    // 每个口令预留空间，>= 训练集最长
+#endif
 
 class segment
 {
@@ -172,14 +180,34 @@ public:
     vector<vector<string>>        guesses_pool;         // [tid] -> 口令列表
     vector<size_t>                pool_size_snapshot;   // main 用来快速计数
 
+#ifdef USE_CUDA
+    void GenerateCPU(PT pt);
+#endif
+
 };
 
 
+// #ifdef USE_CUDA
+// void GPUGenerateSingleSeg(segment* seg,
+//                           std::vector<std::string>& out_vec);
+
+// void GPUGenerateLastSeg(const std::string& prefix,
+//                         segment* last_seg,
+//                         std::vector<std::string>& out_vec);
+// #endif
+
 #ifdef USE_CUDA
-void GPUGenerateSingleSeg(segment* seg,
+#include <vector>
+#include <string>
+
+void GPUGenerateSingleSeg(struct segment* seg,
                           std::vector<std::string>& out_vec);
 
 void GPUGenerateLastSeg(const std::string& prefix,
-                        segment* last_seg,
+                        struct segment* last_seg,
                         std::vector<std::string>& out_vec);
+
+/* =====  混合调度 ===== */
+struct Task;            // 前向声明
+struct Batch;
 #endif

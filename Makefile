@@ -1,6 +1,6 @@
 NVCC := nvcc  -std=c++17 -O2
 CPP  := g++   -std=c++17 -O2
-SRC  := main_cuda_correctness.cpp train.cpp guessing_cuda.cpp md5.cpp
+SRC  := main_cuda_correctness.cpp train.cpp guessing_cuda.cpp md5.cpp gpu_scheduler.cpp
 CUDA := guessing_cuda.cu
 INC  := -I.
 
@@ -9,7 +9,7 @@ TARGET := main
 
 # ---------- 默认目标 ----------
 $(TARGET): $(SRC) $(CUDA)
-	$(NVCC) -DUSE_CUDA $(INC) -o $@ $^
+	$(NVCC) -DUSE_CUDA $(INC) -lpthread -o $@ $^
 
 # ---------- 清理 ----------
 .PHONY: clean
