@@ -180,6 +180,8 @@ vector<PT> PT::NewPTs()
 }
 
 
+const int CPU_THRESHOLD = 2048; 
+
 // 这个函数是PCFG并行化算法的主要载体
 // 尽量看懂，然后进行并行实现
 void PriorityQueue::Generate(PT pt)
@@ -193,8 +195,16 @@ void PriorityQueue::Generate(PT pt)
                      : (pt.content[0].type==2)? &m.digits [m.FindDigit (pt.content[0])]
                      :                           &m.symbols[m.FindSymbol(pt.content[0])];
 
-        GPUGenerateSingleSeg(a, guesses);         // ← GPU 生成 + 回传
-        total_guesses += a->ordered_values.size();
+        int N = a->ordered_values.size();
+
+        if (N < CPU_THRESHOLD) {              // --- 小任务：CPU 串行 ---
+            for (int i=0; i<N; ++i) {
+                guesses.emplace_back(a->ordered_values[i]);
+            }
+        } else {                              // --- 大任务：GPU ---
+            GPUGenerateSingleSeg(a, guesses);
+        }
+        total_guesses += N;
     }else{                                       // ---------- 多 segment ----------
         /* 拼 prefix（除最后段） */
         std::string prefix; int seg_idx=0;
@@ -211,8 +221,16 @@ void PriorityQueue::Generate(PT pt)
                          :(pt.content.back().type==2)? &m.digits [m.FindDigit (pt.content.back())]
                          :                               &m.symbols[m.FindSymbol(pt.content.back())];
 
-        GPUGenerateLastSeg(prefix,last,guesses);  // ← GPU
-        total_guesses += last->ordered_values.size();
+        int N = last->ordered_values.size();
+
+        if (N < CPU_THRESHOLD) {              // 小任务：CPU
+            for (int i=0; i<N; ++i) {
+                guesses.emplace_back(prefix + last->ordered_values[i]);
+            }
+        } else {                              // 大任务：GPU
+            GPUGenerateLastSeg(prefix, last, guesses);
+        }
+        total_guesses += N;
     }
 #else
     
