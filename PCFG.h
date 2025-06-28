@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <iostream>
 #include <unordered_map>
@@ -5,7 +6,6 @@
 #include <omp.h>
 // #include <chrono>   
 // using namespace chrono;
-// 顶部插入 ↓
 #include <pthread.h>
 #include <atomic>
 using namespace std;
@@ -176,10 +176,12 @@ public:
 
 
 #ifdef USE_CUDA
+#include <cuda_runtime.h>
 void GPUGenerateSingleSeg(segment* seg,
-                          std::vector<std::string>& out_vec);
-
+                          std::vector<std::string>& out_vec,
+                          cudaStream_t s = 0);
 void GPUGenerateLastSeg(const std::string& prefix,
                         segment* last_seg,
-                        std::vector<std::string>& out_vec);
+                        std::vector<std::string>& out_vec,
+                        cudaStream_t s = 0);
 #endif

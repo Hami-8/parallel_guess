@@ -4,6 +4,7 @@
 #include "md5.h"
 #include <iomanip>
 #include <unordered_set>
+#include "gpu_pipeline.h"
 using namespace std;
 using namespace chrono;
 
@@ -25,6 +26,9 @@ extern std::atomic<long long> g_generate_us;   // 声明
 
 int main()
 {
+#ifdef USE_CUDA
+    g_gpu_thread = new std::thread(gpu_worker);
+#endif
     double time_hash = 0;  // 用于MD5哈希的时间
     double time_guess = 0; // 哈希和猜测的总时长
     double time_train = 0; // 模型训练的总时长
@@ -61,9 +65,27 @@ int main()
     // 由于需要定期清空内存，我们在这里记录已生成的猜测总数
     int history = 0;
     // std::ofstream a("./files/results.txt");
+#ifdef USE_CUDA
+    // 收集函数
+    auto collect_gpu_results = [&]()
+    {
+        std::lock_guard<std::mutex> lk(g_m_done);
+        while (!g_doneQ.empty())
+        {
+            auto res = g_doneQ.front();
+            g_doneQ.pop();
+            // 把 GPU 生成的结果合并到 guesses，随后可立即 Hash
+            q.guesses.insert(q.guesses.end(),
+                             res.dst->begin(), res.dst->end());
+        }
+    };
+#endif
     while (!q.priority.empty())
     {
-        q.PopNext();
+#ifdef USE_CUDA
+        collect_gpu_results(); // 先取回上一批 GPU 完成的口令
+#endif
+        q.PopNext(); // 继续生成 (CPU 或 投递 GPU)
         q.total_guesses = q.guesses.size();
         if (q.total_guesses - curr_num >= 100000)
         {
@@ -76,6 +98,17 @@ int main()
             {
                 auto end = system_clock::now();
                 auto duration = duration_cast<microseconds>(end - start);
+#ifdef USE_CUDA
+                collect_gpu_results();              // 把可能残留的 GPU 结果全部并入
+                // 退出前停止线程
+                {
+                    std::lock_guard<std::mutex> g(g_m_in);
+                    g_stop_gpu = true;
+                }
+                g_cv_in.notify_one();
+                g_gpu_thread->join();
+                delete g_gpu_thread;
+#endif
                 time_guess = double(duration.count()) * microseconds::period::num / microseconds::period::den;
                 cout << "Guess time:" << time_guess - time_hash << "seconds"<< endl;
                 cout << "Hash time:" << time_hash << "seconds"<<endl;
@@ -88,6 +121,9 @@ int main()
         // 然后，q.guesses将会被清空。为了有效记录已经生成的口令总数，维护一个history变量来进行记录
         if (curr_num > 1000000)
         {
+#ifdef USE_CUDA
+            collect_gpu_results(); // 确保待哈希口令完整
+#endif
             auto start_hash = system_clock::now();
             bit32 state[4];
             for (string pw : q.guesses)

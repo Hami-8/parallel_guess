@@ -4,6 +4,44 @@ using namespace std;
 std::atomic<long long> g_generate_us{0};   // 微秒累计
 std::atomic<long long> g_merge_us{0};
 
+#ifndef USE_CUDA
+#define USE_CUDA
+#endif
+
+#ifdef USE_CUDA
+#include "gpu_pipeline.h"
+#include <chrono>
+using namespace std::chrono;
+
+// ------------------ worker ------------------
+void gpu_worker()
+{
+    cudaStream_t stream;  cudaStreamCreate(&stream);
+    while (true) {
+        GPUTask task;
+        {   // 取任务
+            std::unique_lock<std::mutex> lk(g_m_in);
+            g_cv_in.wait(lk, []{ return !g_inQ.empty() || g_stop_gpu; });
+            if (g_stop_gpu && g_inQ.empty()) break;
+            task = std::move(g_inQ.front());
+            g_inQ.pop();
+        }
+        // 执行
+        if (task.prefix.empty())
+            GPUGenerateSingleSeg(task.seg, *task.dst, stream);
+        else
+            GPUGenerateLastSeg(task.prefix, task.seg, *task.dst, stream);
+
+        // 回填
+        {
+            std::lock_guard<std::mutex> g(g_m_done);
+            g_doneQ.push({task.dst});
+        }
+    }
+    cudaStreamDestroy(stream);
+}
+#endif
+
 void PriorityQueue::CalProb(PT &pt)
 {
     // 计算PriorityQueue里面一个PT的流程如下：
@@ -221,7 +259,14 @@ void PriorityQueue::Generate(PT pt)
             double dt = duration_cast<microseconds>(t1 - t0).count(); // µs
             cpu_cost = alpha * (dt / N) + (1 - alpha) * cpu_cost;     // 在线更新
         } else {                              // --- 大任务：GPU ---
-            GPUGenerateSingleSeg(a, guesses);
+            // GPUGenerateSingleSeg(a, guesses);
+            auto vec = std::make_shared<std::vector<std::string>>();
+
+            {
+                std::lock_guard<std::mutex> lk(g_m_in);
+                g_inQ.push({a, std::string(), vec}); // prefix="" 表示单段
+            }
+            g_cv_in.notify_one(); // 唤醒 GPU 线程
             auto t1 = high_resolution_clock::now();
             double dt = duration_cast<microseconds>(t1 - t0).count();
             gpu_cost = alpha * (dt / N) + (1 - alpha) * gpu_cost;
@@ -260,7 +305,13 @@ void PriorityQueue::Generate(PT pt)
             double dt = duration_cast<microseconds>(t1 - t0).count(); // µs
             cpu_cost = alpha * (dt / N) + (1 - alpha) * cpu_cost;     // 在线更新
         } else {                              // 大任务：GPU
-            GPUGenerateLastSeg(prefix, last, guesses);
+            // GPUGenerateLastSeg(prefix, last, guesses);
+            auto vec = std::make_shared<std::vector<std::string>>();
+            {
+                std::lock_guard<std::mutex> lk(g_m_in);
+                g_inQ.push({last, prefix, vec});
+            }
+            g_cv_in.notify_one();
             auto t1 = high_resolution_clock::now();
             double dt = duration_cast<microseconds>(t1 - t0).count();
             gpu_cost = alpha * (dt / N) + (1 - alpha) * gpu_cost;

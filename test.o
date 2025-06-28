@@ -384,7 +384,7 @@ Guesses generated: 9528822
 Guesses generated: 9699507
 Guesses generated: 9853408
 Guesses generated: 10106852
-Guess time:9.31679seconds
-Hash time:7.92957seconds
-Train time:58.025seconds
-Generate total time: 0.748250 seconds
+Guess time:0.34869seconds
+Hash time:5.11743seconds
+Train time:10.974seconds
+Cracked:358217

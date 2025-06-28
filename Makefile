@@ -1,6 +1,6 @@
-NVCC := nvcc  -std=c++17 -O0
-CPP  := g++   -std=c++17 -O0
-SRC  := main_cuda.cpp train.cpp guessing_cuda.cpp md5.cpp
+NVCC := nvcc  -std=c++17 -O2
+CPP  := g++   -std=c++17 -O2
+SRC  := main_cuda_correctness.cpp train.cpp guessing_cuda.cpp md5.cpp
 CUDA := guessing_cuda.cu
 INC  := -I.
 
