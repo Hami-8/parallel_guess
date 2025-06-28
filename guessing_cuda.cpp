@@ -182,6 +182,15 @@ vector<PT> PT::NewPTs()
 
 const int CPU_THRESHOLD = 2048; 
 
+#ifdef USE_CUDA
+namespace {
+    // 初始猜测：CPU 每条 0.35 µs，GPU 每条 2.5 µs (含 launch)
+    double cpu_cost = 0.35;
+    double gpu_cost = 2.5;
+    const double alpha = 0.2;          // EMA 更新权重
+}
+#endif
+
 // 这个函数是PCFG并行化算法的主要载体
 // 尽量看懂，然后进行并行实现
 void PriorityQueue::Generate(PT pt)
@@ -197,12 +206,25 @@ void PriorityQueue::Generate(PT pt)
 
         int N = a->ordered_values.size();
 
-        if (N < CPU_THRESHOLD) {              // --- 小任务：CPU 串行 ---
+        // ---- 预测 ----
+        double T_cpu_est = N * cpu_cost;
+        double T_gpu_est = N * gpu_cost;
+
+        // ---- 计时器 ----
+        auto t0 = high_resolution_clock::now();
+
+        if (T_cpu_est < T_gpu_est) {              // --- 小任务：CPU 串行 ---
             for (int i=0; i<N; ++i) {
                 guesses.emplace_back(a->ordered_values[i]);
             }
+            auto t1 = high_resolution_clock::now();
+            double dt = duration_cast<microseconds>(t1 - t0).count(); // µs
+            cpu_cost = alpha * (dt / N) + (1 - alpha) * cpu_cost;     // 在线更新
         } else {                              // --- 大任务：GPU ---
             GPUGenerateSingleSeg(a, guesses);
+            auto t1 = high_resolution_clock::now();
+            double dt = duration_cast<microseconds>(t1 - t0).count();
+            gpu_cost = alpha * (dt / N) + (1 - alpha) * gpu_cost;
         }
         total_guesses += N;
     }else{                                       // ---------- 多 segment ----------
@@ -223,12 +245,25 @@ void PriorityQueue::Generate(PT pt)
 
         int N = last->ordered_values.size();
 
-        if (N < CPU_THRESHOLD) {              // 小任务：CPU
+        // ---- 预测 ----
+        double T_cpu_est = N * cpu_cost;
+        double T_gpu_est = N * gpu_cost;
+
+        // ---- 计时器 ----
+        auto t0 = high_resolution_clock::now();
+
+        if (T_cpu_est < T_gpu_est) {              // 小任务：CPU
             for (int i=0; i<N; ++i) {
                 guesses.emplace_back(prefix + last->ordered_values[i]);
             }
+            auto t1 = high_resolution_clock::now();
+            double dt = duration_cast<microseconds>(t1 - t0).count(); // µs
+            cpu_cost = alpha * (dt / N) + (1 - alpha) * cpu_cost;     // 在线更新
         } else {                              // 大任务：GPU
             GPUGenerateLastSeg(prefix, last, guesses);
+            auto t1 = high_resolution_clock::now();
+            double dt = duration_cast<microseconds>(t1 - t0).count();
+            gpu_cost = alpha * (dt / N) + (1 - alpha) * gpu_cost;
         }
         total_guesses += N;
     }
