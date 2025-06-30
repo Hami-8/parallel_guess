@@ -36,8 +36,7 @@ sleep 1
 # ---------- 汇总 ----------
 echo "----- GPU summary -----"
 awk 'NR>2 { sm+=$4; pcie+=$9+$10; n++ }
-     END { printf("GPU sm avg     : %.1f %%\n", sm/n);
-           printf("PCIe throughput: %.1f MB/s\n", pcie/n); }' ${GPU_LOG}
+     END { printf("GPU sm avg     : %.1f %%\n", sm/n); }' ${GPU_LOG}
 
 echo "----- CPU summary -----"
 awk '/^[0-9]/ && $1!="Linux" { cpu+=$8; n++ }
