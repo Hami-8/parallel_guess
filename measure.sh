@@ -4,8 +4,8 @@ set -euo pipefail
 rm -f gpu.log cpu.log
 
 APP=./main                 # 可执行文件
-STDOUT=test.o              # 新增：标准输出文件
-STDERR=test.e              # 新增：标准错误文件
+STDOUT=test.o              # 标准输出文件
+STDERR=test.e              # 标准错误文件
 INTERVAL=1
 GPU_LOG=gpu.log
 CPU_LOG=cpu.log
@@ -36,8 +36,7 @@ sleep 1
 # ---------- 汇总 ----------
 echo "----- GPU summary -----"
 awk 'NR>2 { sm+=$4; pcie+=$9+$10; n++ }
-     END { printf("GPU sm avg     : %.1f %%\n", sm/n);
-           printf("PCIe throughput: %.1f MB/s\n", pcie/n); }' ${GPU_LOG}
+     END { printf("GPU sm avg     : %.1f %%\n", sm/n); }' ${GPU_LOG}
 
 echo "----- CPU summary -----"
 awk '/^[0-9]/ && $1!="Linux" { cpu+=$8; n++ }
